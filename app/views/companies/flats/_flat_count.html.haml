@@ -1,0 +1,20 @@
+.row
+  .col-12
+    - if flats.length > 0
+      %ul.nav.nav-tabs.small-tabs{ role: 'tablist' }
+        %li.nav-item
+          %a.nav-link
+            %span.badge.badge-primary= flats.length
+            All
+        %li.nav-item
+          %a.nav-link
+            %span.badge.badge-success= count_flats_by_status(flats, 'Available')
+            Available
+        %li.nav-item
+          %a.nav-link
+            %span.badge.badge-danger= count_flats_by_status(flats, 'Booked')
+            Booked
+        %li.nav-item
+          %a.nav-link
+            %span.badge.badge-secondary= count_flats_by_status(flats, 'Blocked')
+            Blocked

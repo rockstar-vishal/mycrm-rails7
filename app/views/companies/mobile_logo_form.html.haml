@@ -1,0 +1,59 @@
+.content-wrapper
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              %h4.mb-0#newFormTitle Logo Form For #{@company.name}
+            .card-body
+              = bootstrap_form_for(@company) do |f|
+                - if @company.errors.any?
+                  #error_explanation
+                    %h2
+                      = pluralize(@company.errors.count, "error")
+                      prohibited this property configuration from being saved:
+                    %ul
+                      - @company.errors.full_messages.each do |message|
+                        %li= message
+                = f.fields_for :mobile_crm_logo do |ml|
+                  .row
+                    .col-md-6
+                      .form-group
+                        -# = pc.select :required_fields, options_for_select((::Company.broker_required_options).map{|k| [k.humanize, k]}, pc.object&.required_fields),{}, {class: "form-control multiselect", multiple: true}
+                        = ml.file_field :small_icon, label: 'Icon (192x192)', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :large_icon, label: 'Icon (512x512)', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :small_maskable_icon, label: 'Icon Maskable(192x192)', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :large_maskable_icon, label: 'Icon Maskable (512x512)', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :masked_icon, label: 'Masked Icon', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :apple_icon, label: 'Apple Icon', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :tile_image, label: 'Tile Image', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :large_favicon, label: 'Favicon(32)', class: "form-control"
+                    .col-md-6
+                      .form-group
+                        = ml.file_field :er_sm_logo, label: 'Er-Sm-Logo', class: "form-control"
+
+                  .row
+                    %div{align: "center"}
+                      .col-md-12
+                        .form-group
+                          = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+                            = fa_icon "floppy-o"
+                            Save
+                          = link_to companies_path, class: "btn btn-danger" do
+                            = fa_icon "close"
+                            Cancel

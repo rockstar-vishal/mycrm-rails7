@@ -1,0 +1,70 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active
+              #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Closing Manager'} Report
+          %h1.m-0
+            #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Closing Manager'} Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+              .col-md-9
+                .group-link
+                  = render 'reports_button', locals: {report_name: :closing_executives}
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary" do
+                    = fa_icon "download"
+                    Export
+              = render 'report_search'
+          .table-body
+            - plottable = {}
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all User
+                    %th.all Total
+                    - @statuses.each do |status|
+                      %th.desktop= status.name
+                - overall_counts =0
+                %tbody
+                  - @users.each do |user|
+                    - this_user_data = @data.select{|k| k["closing_executive"] == user.id}
+                    - if this_user_data.present?
+                      - status_ids = @statuses.pluck(:id)
+                      - user_total = (this_user_data.map{|k| status_ids.include?(k["status_id"]) ? k["lead_ids"].count : 0}.sum rescue 0)
+                      - plottable[user.name] = user_total
+                      - overall_counts +=user_total
+                      %tr
+                        %td= user.name
+                        %td
+                          = link_to ld_path(:closing_executive=>[user.id], :lead_statuses=>status_ids), target: "_blank" do
+                            = user_total
+                        - @statuses.each do |status|
+                          - this_status_data = this_user_data.detect{|k| k["status_id"] == status.id}
+                          %td
+                            = link_to ld_path(:closing_executive=>[user.id], :lead_statuses=>[status.id]), target: "_blank" do
+                              = this_status_data["lead_ids"].count rescue 0
+                - if @data.present?
+                  %tbody
+                    %tr
+                      %td Total
+                      %td
+                        = link_to ld_path(:closing_executive=>@users.ids), target: "_blank" do
+                          = overall_counts
+                      - @statuses.each do |status|
+                        %td
+                          - this_status_datas= @data.select{|k| @users.ids.include? k["closing_executive"]}
+                          = link_to ld_path(:closing_executive=>@users.ids, :lead_statuses=>[status.id]), target: "_blank" do
+                            = this_status_datas.collect{|k| k["lead_ids"].count if k["status_id"] == status.id}.compact.sum rescue 0
+            - if plottable.present?
+              .chart-canvas.d-none.d-sm-block.pieChart
+                = render partial: "report_chart", locals: {plottable: plottable}

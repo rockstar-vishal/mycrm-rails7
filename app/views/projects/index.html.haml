@@ -1,0 +1,70 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Projects
+          %h1.m-0 Projects
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-7
+                .search-outer
+                  = form_tag projects_path, method: :get do
+                    .search-group
+                      = text_field_tag :search_string, params[:search_string], class: "form-control", placeholder: "Search by Project name, City"
+                      .search-group-btn
+                        = button_tag type: "submit", class: "btn btn-default search-btn" do
+                          = fa_icon "search"
+                        = link_to projects_path, class: "btn btn-default search-btn refresh" do
+                          = fa_icon "refresh"
+              .col-md-5
+                .group-link
+                  = link_to 'Add New Project', new_project_path, remote: true, class: 'btn btn-new ml-auto'
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all Project
+                    %th.all City
+                    %th.all UUID
+                    %th.all Active
+                    %th.all Action
+                %tbody
+                  - @projects.includes{city}.each do |project|
+                    %tr
+                      / %td= project.name
+                      %td= link_to project.name, project_path(project.uuid), remote: true
+                      %td= project.city.name rescue nil
+                      %th
+                        %span{id: "actualLink-#{project.uuid}"}
+                          = project.uuid
+                        %button.clipboard-btn.btn.btn-action{"data-clipboard-text"=>project.uuid}
+                          = fa_icon "copy"
+                      %td= project.active ? "Yes" : "No"
+                      %td
+                        = link_to edit_project_path(project.uuid), remote: true, class: "btn btn-action btn-edit" do
+                          = render partial: 'icons/edit'
+                        - if current_user.is_super?
+                          = link_to (fa_icon "trash"), project_path(project.uuid), class: "btn btn-action btn-remove", method: :delete, data: {:confirm => "Would you like to permanently delete this Project?"}
+                        - if project.company.setting&.enable_project_share
+                          - project_form = current_user.company.project_configuration
+                          - locations="%0D%0A%F0%9F%91%89+Location+%3A+#{project.location}" if project_form.present? && project_form.allowed_fields.include?("location") && project.location.present?
+                          - broucher_link="%0D%0A%F0%9F%91%89+Brochure+%3A+#{project.brochure_link}" if project_form.present? && project_form.allowed_fields.include?("brochure_link") && project.brochure_link.present?
+                          - project_brochure = "%0D%0A%F0%9F%91%89+Project Brochure+%3A+#{project.project_brochure.url}" if project_form.present? && project_form.allowed_fields.include?("project_brochure_file_name") && project.project_brochure.present?
+                          - banner_image = "%0D%0A%F0%9F%91%89+Banner Image+%3A+#{project.banner_image.url}" if project_form.present? && project_form.allowed_fields.include?("banner_image_file_name") && project.banner_image.present?
+                          - property_code="%0D%0A%F0%9F%91%89+Project+Code+%3A+#{project.property_codes.join(',')}" if project.property_codes.present?
+                          -contact="%0D%0A%F0%9F%91%89+Contact+%3A+#{project.contact}" if project_form.present? && project_form.allowed_fields.include?("contact") && project.contact.present?
+                          - description = "%0D%0A%F0%9F%91%89+Description+%3A+#{project.description}" if project.description.present?
+                          %a.share{"data-action" => "share/whatsapp/share", :href => "https://web.whatsapp.com/send?text=%F0%9F%91%89+Project+Name+%3A+#{project.name}%0D%0A%F0%9F%91%89+Project+City+%3A+#{project.city.name rescue '-'}%0D%0A%F0%9F%91%89+Address+%3A+#{project.address}+#{description}+#{locations}+#{contact}+#{broucher_link}+#{project_brochure}+#{banner_image}", :target=>'_blank', class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;"}
+                            %i.fa.fa-whatsapp{"aria-hidden" => "true"}
+        .pagination-custom-holder
+          %strong{style: "margin-left: 0;"} Projects Count - #{@projects.count}
+          = will_paginate @projects, :class  =>  "ct-pag"

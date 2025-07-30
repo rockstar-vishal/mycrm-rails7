@@ -1,0 +1,42 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Sub Sources
+          %h1.m-0 Sub Sources
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3.d-flex.align-items-center
+                %h5.mb-0 Sub Sources
+              .col-md-9
+                .group-link
+                  = link_to 'Add Sub source', new_sub_source_path, remote: true, class: 'btn btn-new ml-auto'
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all Name
+                    - if current_user.company.setting.present? && current_user.company.enable_source_wise_sub_source
+                      %th Source
+                    %th Action
+                %tbody
+                  - @sub_sources.each do |sub_source|
+                    %tr
+                      %td= sub_source.name
+                      - if current_user.company.setting.present? && current_user.company.enable_source_wise_sub_source
+                        %td= (sub_source.source&.name)
+                      %td
+                        = link_to edit_sub_source_path(sub_source.uuid), remote: true, class: "btn btn-action btn-edit" do
+                          = render partial: 'icons/edit'
+        .pagination-custom-holder
+          %strong{style: "margin-left: 0;"} Sub sources Count - #{@sub_sources.count}
+          = will_paginate @sub_sources, :class  =>  "ct-pag"

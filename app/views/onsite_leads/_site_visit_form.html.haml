@@ -1,0 +1,29 @@
+.modal-header
+  %h5.modal-title Add Visit
+  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+    %span{"aria-hidden" => "true"} ×
+.modal-body
+  = bootstrap_form_for @lead, url: :create_visit_lead, method: :post, remote: true do |f|
+    - if @lead.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@lead.errors.count, "error")
+          prohibited this Lead from being saved:
+        %ul
+          - @lead.errors.full_messages.each do |message|
+            %li= message
+    = f.fields_for :visits, @visits, remote: true do |f|
+      = hidden_field_tag :authenticity_token, form_authenticity_token
+      = hidden_field_tag :enable_advance_visits, @lead.company.setting.present? && @lead.company.enable_advance_visits
+      .row
+        - if @company.is_allowed_for_visits?('source_id')
+          .col-md-6
+            = f.select :source_id, options_from_collection_for_select(@company.sources, :id, :name, f.object.source_id), {:prompt=>true}
+      .col-md-12
+        .form-group
+          = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+            = fa_icon "floppy-o"
+            Save
+          = link_to onsite_leads_path, class: "btn btn-danger" do
+            = fa_icon "close"
+            Cancel

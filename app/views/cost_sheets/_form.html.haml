@@ -1,0 +1,84 @@
+= bootstrap_form_for(@cost_sheet) do |f|
+  - if @cost_sheet.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@cost_sheet.errors.count, "error")
+        prohibited this payment plan from being saved:
+      %ul
+        - @cost_sheet.errors.full_messages.each do |message|
+          %li= message
+  .row
+    - if f.object.new_record?
+      = f.hidden_field :user_id, value: current_user.id
+    .col-md-3.required
+      .form-group
+        = f.text_field :project_name, class: "form-control", placeholder: "Project Name", label: "Project Name"
+    .col-md-3.required
+      .form-group
+        = f.text_field :building_name, class: "form-control", placeholder: "Building Name", label: "Building Name"
+    .col-md-3
+      .form-group
+        = f.text_field :client_name, class: "form-control", placeholder: "Client Name", label: "Client Name"
+    .col-md-3.required
+      .form-group
+        = f.text_field :topology, class: "form-control", placeholder: "Topology", label: "Topology"
+    .col-md-3.required
+      .form-group
+        = f.text_field :flat_no, class: "form-control", placeholder: "Flat No.", label: "Flat No."
+    .col-md-3.required
+      .form-group
+        = f.text_field :carpet_area, class: "form-control", placeholder: "Carpet Area", label: "Carpet Area(Sq.Ft)"
+    .col-md-3.required
+      .form-group
+        = f.text_field :total_cost, class: "form-control currency_input", data: {view_target: "agre_value_text"}, placeholder: "Agreement Value", label: "Total Value"
+        %span{:class=>"currency_text", :id=>"agre_value_text"}
+  .w-100
+    .col-md-12
+      .form-group
+        #cost_plans{style: "width: 60%"}
+          #plan_details
+  .w-100
+    .col-md-12
+      .form-group
+        %label.col-sm-2.control-label{:for => "exampleInputFile"} Payment Plans:
+        #items.row{style: "width: 100%"}
+          = f.fields_for :other_items do |item|
+            = render "other_item_fields", :f => item
+          .links.m-4
+            = link_to_add_association "Add", f, :other_items, class: "btn btn-primary"
+  .w-100
+    .col-md-12
+      .form-group.col-md-12
+      %span.lead-title TERMS & CONDTIONS
+      %span.lead-info
+        = f.text_area :notes, class: "form-control", placeholder: "", rows: "5", hide_label: true
+
+  %div{align: "center"}
+    .col-md-12
+      .form-group
+        = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+          = fa_icon "floppy-o"
+          Save
+        = link_to cost_sheets_path, class: "btn btn-danger" do
+          = fa_icon "close"
+          Cancel
+
+:javascript
+
+  $(".currency_input").on("keyup", function(e){
+    var x=$(this).val();
+    var to_fill_span = $("#"+$(this).data("viewTarget"));
+    to_fill_span.html(inWords(x));
+  });
+
+  $('.currency_input').bind('focusout', function() {
+    var x=$(this).val();
+    var to_fill_span = $("#"+$(this).data("viewTarget"));
+    to_fill_span.hide();
+  });
+
+  $('.currency_input').bind('focusin', function() {
+    var x=$(this).val();
+    var to_fill_span = $("#"+$(this).data("viewTarget"));
+    to_fill_span.show();
+  });

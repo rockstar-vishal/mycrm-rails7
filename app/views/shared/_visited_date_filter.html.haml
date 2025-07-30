@@ -1,0 +1,15 @@
+.row
+  .col-md-6
+    .form-group
+      = label_tag :visited_date_from, 'Visit Date From ', class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :visited_date_from, (params[:visited_date_from].to_date rescue nil), class: 'form-control dateFormat pull-right'
+  .col-md-6
+    .form-group
+      = label_tag :visited_date_upto, 'Visit Date Upto', class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :visited_date_upto, (params[:visited_date_upto].to_date rescue nil), class: 'form-control dateFormat pull-right'

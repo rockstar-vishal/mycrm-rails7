@@ -1,0 +1,15 @@
+= javascript_include_tag 'notification_templates'
+.nested-fields.col-md-12#attribute-nested-fields{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
+  .row
+    .col-md-6.text-attribute
+      .form-group
+        = f.text_field :text, :value=>f.object.text, class: "form-control text-field", placeholder: "Text"
+    .col-md-6.attribute-select
+      %label.form-label{ for: 'variable_mapping_id' } Attribute
+      %span
+        = fa_icon "trash-o", class: "btn btn-danger btn-sm custom-attribute", style: "margin-left: 60px;"
+      .form-group
+        = f.collection_select :variable_mapping_id, VariableMapping.all, :id, :name, { include_blank: 'Please Select', hide_label: true }, { class: "form-control multiselect variable-mapping" }
+  %center
+    = link_to_remove_association "Remove", f, class: "btn btn-danger btn-sm"
+

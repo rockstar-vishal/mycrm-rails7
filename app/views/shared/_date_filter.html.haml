@@ -1,0 +1,15 @@
+.row
+  .col-md-6
+    .form-group
+      = label_tag "#{label1}", "#{label1}", class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag "#{field1_name}",(params["#{field1_name}"].to_date rescue nil), class: 'form-control dateFormat pull-right', required: true
+  .col-md-6
+    .form-group
+      = label_tag "#{label2}", "#{label2}", class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag "#{field2_name}",(params["#{field2_name}"].to_date rescue nil), class: 'form-control dateFormat pull-right', required: true

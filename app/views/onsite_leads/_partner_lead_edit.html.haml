@@ -1,0 +1,64 @@
+.modal-header
+  %h5#flatBlockTitle.modal-title Edit Lead: #{@name}
+  %button.hide.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+    %span{"aria-hidden" => "true"} ×
+.modal-body
+  .row.error_text{:style => ("display:none;")}
+    .col-md-6
+      %p{style: "color: red;"}
+        %span * Please fill out the fields.
+  .row
+    .col-md-6.required
+      .form-group
+        = label_tag "Assigned To"
+        = select_tag :users_ids, options_for_select([]), class: "form-control select2", style: "width:100%"
+    .col-md-6.required
+      .form-group
+        = label_tag "Closing Executive"
+        = select_tag :closing_executive, options_for_select([]), class: "form-control select2", style: "width:100%"
+        = hidden_field_tag 'lead_id', @lead_id
+  .modal-footer
+  %button.btn.bg-gradient-primary.lead-edit{} Save
+  -# "data-dismiss" => "modal"
+:javascript
+  $(document).ready(function(){
+    loadPartnersUsers();
+  })
+  function loadPartnersUsers(){
+    var fetch_users = "/onsite_leads/fetch_users";
+    $.getJSON(fetch_users, function(json){
+      $("#users_ids, #closing_executive").append($('<option>').text("Select").attr('value', ''));
+      $.each(json, function(i, obj){
+        $("#users_ids, #closing_executive").append($('<option>').text(obj.text).attr('value', obj.id));
+      });
+    });
+  }
+
+  $('.lead-edit').click(function(){
+    var lead_id = $('#lead_id').val();
+    var user_id = $('#users_ids').val();
+    var closing_executive=$('#closing_executive').val();
+    if(user_id=="" || closing_executive=="")
+    { 
+      $(".error_text").show();
+    }else{
+      $.ajax({
+        type: 'POST',
+        url: '/onsite_leads/'+lead_id+'/edit_lead',
+        data:{
+          lead_id: lead_id,
+          user_id: user_id,
+          closing_executive: closing_executive
+        },
+        dataType: 'json',
+        success: function(response) {
+          if (response["status"]){
+            window.location.reload();
+          }else{
+            toastr.error(response["message"])
+          }
+        }
+      });
+    }
+    
+  });

@@ -1,0 +1,186 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Call Report
+          %h1.m-0.text-dark Call Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present? && current_user.company.enable_call_center_dashboard)
+                = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
+                  = fa_icon "download"
+                  Export
+              .pull-right
+                %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:-2px;", :class=>"btn btn-primary btn-sm"}
+                  Advanced Search
+                  %i.fa.fa-angle-down
+              = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
+                = fa_icon "download"
+                Export
+              = render 'reports_button', locals: {report_name: :call_report}
+            #adv-searchbox.box-body
+              = form_tag nil, method: :get, class: "filter-search-menu" do
+                = hidden_field_tag :is_advanced_search, true
+                .card-header
+                  .custom-search
+                    .row
+                      .col-md-6
+                        = render partial: 'shared/date_range_display'
+                      .col-md-6
+                        = render partial: 'shared/updated_at_filter'
+                      .col-md-3
+                        .form-group
+                          %label Select Direction
+                          = select_tag :call_direction, options_for_select(["Incoming", "Outgoing"], params[:call_direction]), prompt: 'Select Direction', class: "form-control"
+                      .col-md-3
+                        .form-group
+                          %label Lead name
+                          = text_field_tag :lead_name, params[:lead_name], class: "form-control", placeholder: "Lead Name"
+                      .col-md-3
+                        .form-group
+                          %label User
+                          = select_tag "user_ids[]", options_from_collection_for_select(current_user.company.users, :id, :name, params[:user_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Executive'}
+                      .col-md-3
+                        .form-group
+                          %label Call From Number
+                          = text_field_tag :call_from_number, params[:call_from_number], class: "form-control", placeholder: "Call From Number"
+                      .col-md-3
+                        .form-group
+                          %label Call To Number
+                          = text_field_tag :call_to_number, params[:call_to_number], class: "form-control", placeholder: "Call To Number"
+                      .col-md-3
+                        .form-group
+                          %label Call Status
+                          -# call status select convert string to array
+                          = select_tag :call_status, options_for_select(["Answered", "Missed", "Completed", "Abandoned"], params[:call_status]), class: "form-control multi-select-list", prompt: 'Call Status', multiple: true, data: {prompt_name: 'Call Status'}
+
+                      .col-md-3#abandoned-call-status-container.d-none
+                        .form-group
+                          %label Abandoned Call Status
+                          = select_tag "abandoned_calls_status", options_for_select([['Call Canceled by User', 'CANCEL'],
+                            ['Call Failed', 'failed'],
+                            ['Agent Busy', 'Executive Busy'],
+                            ['Call Initiating', 'Originate'],
+                            ['Customer Busy Line', 'Customer Busy'],
+                            ['Connecting', 'CONNECTING'],
+                            ['Line Busy', 'BUSY']], params[:abandoned_calls_status]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Abandoned Call Reasons'}
+                      .col-md-3
+                        .form-group
+                          %label Project
+                          = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects, :id, :name, params[:project_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Project'}
+                      .col-md-3
+                        .form-group
+                          %label Status
+                          = select_tag "lead_statuses", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Lead Status'}
+                      .col-md-3
+                        .form-group
+                          %label Source
+                          = select_tag :source_ids, options_from_collection_for_select(current_user.company.sources, :id, :name, params[:source_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Source'}
+                      .col-md-3
+                        .form-group
+                          %label Channel Partner
+                          = select_tag :broker_ids, options_from_collection_for_select(current_user.company.brokers, :id, :name, params[:broker_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Channel Partner'}
+                      .col-md-3
+                        .form-group
+                          %label.label-block &nbsp;
+                          = button_tag type: "submit", class: "btn btn-primary btn-sm pd-fixes align-fixes", is_advanced_search: "true" do
+                            = fa_icon "search"
+                          = link_to nil, class: "btn btn-primary btn-sm pd-fixes align-fixes" do
+                            = fa_icon "refresh"
+            .card-body
+              - plottable = {}
+              - total_avg_talk_time = 0
+              - total_avg_duration = 0
+              .table-responsive
+                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                  %thead
+                    %tr
+                      %th.all User
+                      %th Total Calls
+                      %th Completed
+                      %th Missed
+                      %th Abandoned
+                      %th Avg. Talk Time
+                      %th Total Talk Time
+                  %tbody
+                    - @users.each do |user|
+                      %tr
+                        %td= user.name
+                        - total_count = @data.where(user_id: user.id).count
+                        - plottable[user.name] = total_count
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                            = total_count
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, completed: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                            = @data.completed_calls.where(user_id: user.id).count
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, missed_calls: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                            = @data.missed.where(user_id: user.id).count
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, abandoned_calls: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                            = @data.abandoned_calls.where(user_id: user.id).count
+                        - duration = @data.where(user_id: user.id).collect{|c| c.duration}
+                        - avg_duration = duration.map(&:to_i)
+                        - avg_talk_time= (avg_duration.sum.to_f / avg_duration.count).round(2)
+                        - total_avg_talk_time = total_avg_talk_time + (avg_talk_time.nan? ? 0 : avg_talk_time)
+                        - total_avg_duration = total_avg_duration + avg_duration.sum
+                        %td= avg_talk_time.nan? ? 0 : avg_talk_time
+                        %td= avg_duration.sum
+                  - if @data.present?
+                    %tbody
+                      %tr
+                        %td Total
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                            = @data.where(user_id: @users.ids).count rescue 0
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, completed: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                            = @data.completed_calls.where(user_id: @users.ids).count
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, missed_calls: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                            = @data.missed.where(user_id: @users.ids).count
+                        %td
+                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, abandoned_calls: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                            = @data.abandoned_calls.where(user_id: @users.ids).count
+                        %td= total_avg_talk_time
+                        %td= total_avg_duration
+                .chart-canvas.d-none.d-sm-block.pieChart
+                  = pie_chart(plottable, library: {animation: {easing: 'easeOutQuart'}})
+:javascript
+
+  function toggleAbandonedStatusBox() {
+    const selected = $('select[name="call_status[]"]').val() || [];
+
+    if (selected.includes("Abandoned")) {
+      $('#abandoned-call-status-container').removeClass('d-none');
+    } else {
+      $('#abandoned-call-status-container').addClass('d-none');
+      $('select[name="abandoned_calls_status[]"]').val([]);
+      $('select[name="abandoned_calls_status[]"]').multiselect('refresh');
+    }
+  }
+
+  $(document).ready(function () {
+    toggleAbandonedStatusBox();
+    $('select[name="call_status[]"]').on('change', toggleAbandonedStatusBox);
+  });
+
+  const targetNode = document.querySelector('select[name="call_status[]"]');
+  const config = { attributes: true, childList: true, subtree: true };
+
+  const observer = new MutationObserver(function () {
+    toggleAbandonedStatusBox();
+  });
+
+  if (targetNode) {
+    observer.observe(targetNode, config);
+  }

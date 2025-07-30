@@ -1,0 +1,34 @@
+.nested-fields.col-md-12
+  .row
+    .col-md-3.required
+      .form-group
+        = f.text_field :section_name, class: "form_control", placeholder: "Eg: Statutory Charges"
+    .col-md-3.required
+      .form-group
+        = f.text_field :name, class: "form_control"
+    .col-md-2
+      .form-group
+        = f.text_field :percentage, class: "form-control"
+    .col-md-2
+      .form-group
+        = f.text_field :amount, class: "form-control currency_input", data: {view_target: "amount_text"}, placeholder: "Amount", label: "Amount"
+        -# %span{:class=>"currency_text", :id=>"amount_text"}
+    .col-md-2
+      .form-group
+        = f.text_field :due_date, class: "form-control dateFormat", placeholder: "Due Date", label: "Due Date"
+    .col-md-3
+      .form-group
+        = f.select :cost_type_id, options_for_select(CostSheets::OtherItem.cost_type_ids.keys.map { |w| w}, f.object.cost_type_id), { include_blank: 'Please Select'},{class: 'form-control custom-select'}
+    .col-md-3
+      .form-group
+        = f.select :slab_operator, options_for_select(CostSheets::OtherItem.slab_operators.keys, f.object.slab_operator), {include_blank: true}, {class: 'form-control'}
+    .col-md-1{style: "margin-top:28px;"}
+      %center
+        = link_to_remove_association "X", f, :class=>"btn btn-danger"
+
+:javascript
+  $('.dateFormat').datetimepicker({
+    timepicker: false,
+    format:'d/m/Y'
+  });
+

@@ -1,0 +1,225 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active
+              %a{:href => "call_logs"} Outbound Calls
+          %h1.m-0 Outbound Calls
+        - unless params[:is_advanced_search].present? || params[:search_query].present?
+          .col-md-12
+            .lead-card.lead-missed
+              %h5
+                Missed Calls
+                = link_to outbound_logs_leads_path(missed_calls: true, is_advanced_search: true) do
+                  = @call_logs.missed.count
+                  = image_tag 'missed-call.svg'
+            .lead-card.lead-incoming
+              %h5
+                Today's Outbound Calls
+                = link_to outbound_logs_leads_path(todays_calls: true, is_advanced_search: true) do
+                  = @call_logs.todays_calls.count
+                  = image_tag 'incoming-call.svg'
+            .lead-card.lead-old-incoming
+              %h5
+                Past Outbound Calls
+                = link_to outbound_logs_leads_path(past_calls_only: true, is_advanced_search: true) do
+                  = @call_logs.past_calls.count
+                  = image_tag 'outgoing-call.svg'
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-7
+                %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
+                  Advanced Search
+                  %i.fa.fa-angle-down
+              .col-md-5
+                .group-link
+                  - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present?)
+                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
+                      = fa_icon "download"
+                      Export
+            #adv-searchbox.box-body
+              = form_tag nil, method: :get, class: "filter-search-menu" do
+                = hidden_field_tag :is_advanced_search, true
+                .p-2
+                  .custom-search
+                    .row
+                      .col-12
+                        %h5.mt-0 Search By Date
+                      .col-xs-6.col-md-3
+                        .form-group
+                          %label Created At From
+                          .input-group
+                            .input-group-addon
+                              = fa_icon "calendar"
+                            = text_field_tag :created_at_from, params[:created_at_from], class: "form-control dateFormat", placeholder: "Created At From"
+                      .col-xs-6.col-md-3
+                        .form-group
+                          %label Created At Upto
+                          .input-group
+                            .input-group-addon
+                              = fa_icon "calendar"
+                            = text_field_tag :created_at_upto, params[:created_at_upto], class: "form-control dateFormat", placeholder: "Created At To"
+                      .col-xs-6.col-md-3
+                        .form-group
+                          %label Updated From
+                          .input-group
+                            .input-group-addon
+                              = fa_icon "calendar"
+                            = text_field_tag :updated_from, params[:updated_from], class: "form-control dateFormat", placeholder: "Updated At From"
+                      .col-xs-6.col-md-3
+                        .form-group
+                          %label Updated Upto
+                          .input-group
+                            .input-group-addon
+                              = fa_icon "calendar"
+                            = text_field_tag :updated_upto, params[:updated_upto], class: "form-control dateFormat", placeholder: "Updated At To"
+                      .col-12
+                        %h5.mt-0 Search By Basic Details
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Lead name
+                          = text_field_tag :lead_name, params[:lead_name], class: "form-control", placeholder: "Lead Name"
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label User
+                          = select_tag "user_ids[]", options_from_collection_for_select(current_user.company.users, :id, :name, params[:user_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Executive'}
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Call From
+                          = text_field_tag :call_from, params[:call_from], class: "form-control", placeholder: "Call From"
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Call To
+                          = text_field_tag :call_to, params[:call_to], class: "form-control", placeholder: "Call To"
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Call Status
+                          -# call status select convert string to array
+                          = select_tag :call_status, options_for_select(["Answered", "Missed", "Completed", "Abandoned"], params[:call_status]), class: "form-control multi-select-list", prompt: 'Call Status', multiple: true, data: {prompt_name: 'Call Status'}
+                      .col-12
+                        %h5.mt-0 Search By Project Details
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Project
+                          = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects, :id, :name, params[:project_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Project'}
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Status
+                          = select_tag "lead_statuses", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Lead Status'}
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Source
+                          = select_tag :source_ids, options_from_collection_for_select(current_user.company.sources, :id, :name, params[:source_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Source'}
+                      .col-xs-6.col-md-4
+                        .form-group
+                          %label Channel Partner
+                          = select_tag :broker_ids, options_from_collection_for_select(current_user.company.brokers, :id, :name, params[:broker_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Channel Partner'}
+                    .row
+                      .col-xs-6.col-md-2
+                        .form-group 
+                          = button_tag type: "submit", class: "btn btn-new" do
+                            Search
+            = render partial: 'leads/dailing_modal'
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-condensed.table-striped.tablesorter
+                %thead
+                  %tr
+                    %th Lead Name
+                    - if current_user.company.setting.present? && current_user.company.enable_lead_number
+                      %th Lead Number
+                    %th Executive
+                    %th From
+                    %th To
+                    %th Call
+                    %th Start Time
+                    %th End Time
+                    %th Lead Status
+                    %th Lead Source
+                    %th CP
+                    %th Project
+                    %th Direction
+                    %th OverAll Call Duration
+                    %th Call Status
+                    %th Call Type
+                    %th Recording Url
+                    %th Action
+                  %tbody
+                    - if @call_logs.present?
+                      - @call_logs.each do |call_log|
+                        %tr
+                          %td= link_to call_log.lead.name, histories_lead_path(call_log.lead), target: '_blank'
+                          - if current_user.company.setting.present? && current_user.company.enable_lead_number
+                            %td= call_log.lead.lead_no
+                          %td= call_log.user&.name
+                          %td= call_log.display_from_number(current_user) rescue nil
+                          %td= call_log.display_to_number(current_user) rescue nil
+                          %td
+                            - if call_log.lead.is_phone_number_valid? && current_user.click_to_call_enabled? && current_user.sid_active? && current_user.mobile.present?
+                              = link_to "javascript:void(0)", class: "call btn btn-action", data: {lead_id: call_log.lead.id} do
+                                = fa_icon "phone"
+                            - else
+                              N/A
+                          %td= call_log.start_time&.strftime("%e %b %Y,%l:%M:%S %p")
+                          %td= call_log.end_time&.strftime("%e %b %Y,%l:%M:%S %p")
+                          %td= call_log.lead.status.name
+                          %td= call_log.lead.source.name
+                          %td= ((call_log.lead.broker.name) rescue '-')
+                          %td= call_log.lead.project.name
+                          %td= call_log.direction
+                          %td= call_log.duration
+                          %td= call_log.status
+                          %td= call_log.call_type
+                          %td
+                            - if call_log.recorded_audio.present?
+                              %audio.player{:controls => ""}
+                                %source{:src => call_log.recorded_audio.url, :type => "audio/mp3"}
+                            - elsif call_log.recording_url.present?
+                              %audio.player{:controls => ""}
+                                %source{:src => call_log.recording_url, :type => "audio/mp3"}
+                            - else
+                              N/A
+                          %td
+                            = link_to edit_lead_path(call_log.lead), remote: true, class: "btn btn-action" do
+                              = render partial: 'icons/edit'
+              - if @call_logs.present?
+                %br
+                  %strong{style: "margin-left: 11px;"} Call Logs Count - #{@call_logs.count}
+                  = will_paginate @call_logs, :class  =>  "ct-pag"
+:javascript
+  $('.call').click(function(){
+    var lead_id = $(this).data('leadId');
+    $("#connected-modal").show();
+    $.ajax({
+      type: 'POST',
+      url: '/leads/'+lead_id+'/make_call',
+      dataType: 'json',
+      success: function(response) {
+        $("#connected-modal").hide();
+        if(response["success"]){
+          $('#success-connected-modal').show();
+        }else
+        {
+          console.log(response);
+          $('#failed-connected-modal').show();
+        }
+      },
+      error: function(response){
+        console.log(response);
+        $("#connected-modal").hide();
+        $('#failed-connected-modal').show();
+        $('#failed-connected-modal').show();
+        if(response?.responseJSON?.message){
+          $('#failed-modal-text').text(response?.responseJSON?.message);
+        }
+      }
+    });
+  });

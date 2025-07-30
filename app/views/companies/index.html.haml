@@ -1,0 +1,87 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Companies
+          %h1.m-0.text-dark Companies
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              .box-header.row
+                .pull-left.col-md-4.d-none.d-sm-block
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm" do
+                    = fa_icon "download"
+                    Export
+                .pull-left.col-md-5
+                  = form_tag companies_path, method: :get do
+                    .input-group.input-group-sm
+                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by name"
+                      .input-group-btn
+                        = button_tag type: "submit", class: "btn btn-default btn-sm pd-fixes" do
+                          = fa_icon "search"
+                        = link_to companies_path, class: "btn btn-default btn-sm pd-fixes" do
+                          = fa_icon "refresh"
+                        %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:5px;", :class=>"btn btn-primary btn-sm"}
+                          Advanced Search
+                          %i.fa.fa-angle-down
+                .box-tools.col-md-3{:style=>"top:inherit;"}
+                  .float-right
+                    .input-group
+                      .input-group-btn
+                        = link_to new_company_path, class: 'btn btn-primary float-right btn-sm' do
+                          = fa_icon "plus"
+                          Add New Company
+            = render partial: "advance_search"
+            .card-body
+              .table-responsive
+                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                  %thead
+                    %tr
+                      %th.all Name
+                      %th.all Domain
+                      %th.all Uuid
+                      %th.all Shuffle Statues
+                      %th SV Form
+                      %th.all Broker Form
+                      %th.all Project Form
+                      %th Logo Form
+                      %th.all Action
+                      %th.all Renewal
+                  %tbody
+                    - @companies.each do |company|
+                      %tr
+                        %td
+                          = link_to company.name, company_path(company), remote: true
+                        %td= company.domain
+                        %td
+                          %span{id: "actualLink-#{company.id}"}
+                            = company.uuid
+                          %button.clipboard-btn.btn.btn-primary{"data-clipboard-text"=>company.uuid}
+                            = fa_icon "copy"
+                        %td.text-center
+                          = link_to (fa_icon "random"), shuffle_statues_form_company_path(company), class: "btn btn-action"
+                        %td
+                          = link_to sv_form_company_path(company), class: "btn btn-action" do
+                            %i.fa.fa-building
+                        %td
+                          = link_to (fa_icon "pencil"), broker_form_company_path(company), class: "btn btn-action"
+                          
+                        %td
+                          = link_to (fa_icon "pencil"), project_form_company_path(company), class: "btn btn-action"
+                        %td
+                          = link_to (fa_icon "pencil"), mobile_logo_form_company_path(company), class: "btn btn-action"
+                        %td
+                          = link_to (fa_icon "pencil"), edit_company_path(company), class: "btn btn-action"
+                        %td
+                          = link_to (fa_icon "pencil"), renewals_company_path(company), class: "btn btn-action"
+          - if @companies.present?
+            .pagination-custom-holder
+              %strong{style: "margin-left: 0;"} Companies Count - #{@companies.total_entries}
+              = will_paginate @companies, :class  =>  "ct-pag"

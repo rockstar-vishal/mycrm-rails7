@@ -1,0 +1,10 @@
+.nested-fields.col-md-4{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
+  .form-group.required
+    = f.text_field :title, :value=>f.object.title, :class=>"form-control", label: 'Title', required: true
+  .form-group.required
+    = f.text_field :form_no, :value=>f.object.form_no, :class=>"form-control", label: 'Form No', required: true
+  - if current_user.company.is_allowed_field?("enquiry_sub_source_id")
+    .form-group.required
+      = f.select :enquiry_sub_source_id, options_from_collection_for_select(current_user.company.sub_sources, :id, :name, f.object.enquiry_sub_source_id), {include_blank: "Select Sub Source", label: 'Sub Source'}, class: "form-control"
+  %center
+    = link_to_remove_association "Remove", f, :class=>"btn btn-danger"

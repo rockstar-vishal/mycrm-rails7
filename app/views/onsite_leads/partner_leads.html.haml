@@ -1,0 +1,39 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Partner Leads
+          %h1.m-0.text-dark Partner Leads
+  .content
+  .container-fluid
+    .row
+      .col-lg-12
+        .card
+          .card-header
+            -# .box-header.row
+              .col-md-5
+                = form_tag onsite_leads_path, method: :get do
+                  .input-group.input-group-sm
+                    = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by name, email or phone"
+                    .input-group-btn
+                      = button_tag type: "submit", class: "btn btn-default btn-sm pd-fixes" do
+                        = fa_icon "search"
+                      = link_to onsite_leads_path, class: "btn btn-default btn-sm pd-fixes" do
+                        = fa_icon "refresh"
+          .card-body
+            #lead_details
+                  
+
+:javascript
+  getLeads(); 
+  function getLeads(){
+    $.ajax({
+      type: 'GET',
+      url: '/onsite_leads/get_leads',
+      dataType: 'script'
+    });
+  };

@@ -1,0 +1,36 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Downloads
+          %h1.m-0 Downloads
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .table-card
+            .table-body
+              .table-responsive
+                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap
+                  %thead
+                    %tr
+                      %th.all File Name
+                      %th.all Exported At
+                      %th.all Status
+                      %th Action
+
+                  %tbody
+                    - @file_exports.each do |export|
+                      - status = export.is_ready? ? "Ready" : "Generating..."
+                      %tr
+                        %td= export.file_name
+                        %td= export.created_at.strftime('%d-%b-%y %H:%M %p')
+                        %td= status
+                        %td
+                          = link_to file_export_download_path(export), class: "btn btn-action#{export.is_ready? ? '' : ' disabled'}" do
+                            = fa_icon "download"
+                            Download

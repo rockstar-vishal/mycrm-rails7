@@ -1,0 +1,58 @@
+= bootstrap_form_for @inventory, url: (@inventory.new_record? ? companies_inventories_path : companies_inventory_path(@inventory.uuid)) do |f|
+  - if @inventory.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@inventory.errors.count, "error")
+        prohibited this Inventory from being saved:
+      %ul
+        - @inventory.errors.full_messages.each do |message|
+          %li= message
+  .row
+    .col-md-3
+      .form-group
+        = f.select :configuration_id, options_for_select((Inventory.configuration_ids.keys).map{|k| [k, k]}, f.object.configuration_id), {include_blank: "Please Select"}, class: 'form-control'
+    .col-md-3
+      .form-group
+        = f.text_field :developer, class: "form-control", placeholder: "Developer"
+    .col-md-3
+      .form-group
+        = f.text_field :development, class: "form-control", placeholder: "Development"
+    .col-md-3
+      .form-group
+        = f.text_field :location, class: "form-control", placeholder: "Location"
+    .col-md-3
+      .form-group
+        = f.text_field :floor, class: "form-control", placeholder: "Floor"
+    .col-md-3
+      .form-group
+        = f.text_field :unit, class: "form-control", placeholder: "Unit"
+    .col-md-3
+      .form-group
+        = f.text_field :carpet, class: "form-control", placeholder: "Carpet"
+    .col-md-3
+      .form-group
+        = f.text_field :wing, class: "form-control", placeholder: "Wing"
+    .col-md-3
+      .form-group
+        = f.text_field :parking, class: "form-control", placeholder: "Carpet"
+    .col-md-3
+      .form-group
+        = f.text_field :quote, class: "form-control", placeholder: "Carpet"
+    .col-md-3
+      .form-group
+        = f.text_field :property, class: "form-control", placeholder: "Property"
+    .col-md-3
+      .form-group
+        = f.text_field :poc, class: "form-control", placeholder: "Point of Contact"
+    .col-md-12
+      .form-group
+        = f.text_area :comments, class: 'form-control', placeholder: 'Additional'
+  %div{align: "center"}
+    .col-md-12
+      .form-group
+        = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+          = fa_icon "floppy-o"
+          Save
+        = link_to companies_path, class: "btn btn-danger" do
+          = fa_icon "close"
+          Cancel

@@ -1,0 +1,33 @@
+.modal-header
+  %h5.modal-title= @project.name
+  %button.close{"data-dismiss" => "modal"} ×
+
+.modal-body
+  %p
+    %strong Project UUID:
+    = @project.uuid
+
+  %p
+    %strong Address:
+    = @project.address
+
+  - if @project.company.setting&.enable_project_share
+    %p
+      %strong WhatsApp Text:
+      = message = " Project Name : #{@project.name} Project UUID : #{@project.uuid} Address : #{@project.address}"
+
+  %h5.mt-3 Users
+  %table.table.table-bordered
+    %thead
+      %tr
+        %th User ID
+        %th Name
+        %th Email
+        %th Role
+    %tbody
+      - @project.accessible_users.each do |user|
+        %tr
+          %td= user.id
+          %td= user.name
+          %td= user.email
+          %td= user.role.name rescue '-'

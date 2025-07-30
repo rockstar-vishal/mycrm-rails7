@@ -1,0 +1,42 @@
+!!!
+%html
+  %head
+    %title Client Mail Panom
+    :css
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+  %body
+    .deviceWidth{:style => "width: 740px;background: #fff;font-family: 'Roboto', Arial, sans-serif; margin:0 auto; padding: 30px 30px 40px;"}
+      .deviceWidth{:style => "width: 100%;background: #FFF;font-family: 'Roboto', Arial, sans-serif; margin:0 auto;  border-radius: 45px;"}
+        %table{:align => "center", :border => "0", :cellpadding => "0", :cellspacing => "0", :style => "font-family: 'Roboto', Arial, sans-serif;line-height: 28px; background: #fff; border-radius: 45px; border:1px solid #dfdfdf", :width => "100%"}
+          %tbody
+            %tr
+              %td{:colspan => "2", :style => " padding: 0 0;  border-radius: 45px;"}
+                %div{:style => "margin:0 auto 50px; padding:0  30px;"}
+                  %h1{:style => "font-weight: 500;font-size: 14px;color: #000; margin:0"} Dear #{@lead.name},
+                  %span{:style => "font-size: 14px; font-weight: 400; color: #000; text-align: left; margin:0 0 10px; line-height: 20px;"}
+                    %p
+                      Accept Greetings of the day from Panom Developers.
+                    %p
+                      We are pleased to inform you that your site visit to #{@lead.project.name.upcase} has been successfully scheduled for #{@lead.tentative_visit_planned&.strftime('%d-%b-%y %H:%M %p')}. Please find the google map location below.
+                    %p
+                      %a{:href => "https://bit.ly/452DB9Q"}
+                        https://bit.ly/452DB9Q
+                    %p
+                      Spread across 2.5 acres of pristine land with 45+ amenities, PARLESHWAR AANGAN is a one-of-a-kind residential development.
+                    %p
+                      We are excited to showcase the development to you further in our Sales Experience Centre. Our experienced team is ready to address any queries or concerns you may have and guide you through the process of owning your dream home at PARLESHWAR AANGAN.
+                    %p
+                      Thank you for scheduling your site visit for PARLESHWAR AANGAN. We are thrilled to have the opportunity to assist you in finding your dream home at PARLESHWAR AANGAN.
+                    %p
+                      Warm Regards,
+                      %br
+                      Seemeen Lakdawala
+                      %br
+                      Manager - PreSales
+                      %br
+                      7665 831 831
+                      %br
+                      Panom Developers
+                      %br
+                      www.panomdevelopers.com
+

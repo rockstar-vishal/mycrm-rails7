@@ -1,0 +1,35 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-sm-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Configurations
+        .col-sm-12
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+                %h5.m-0.text-dark Configurations
+          .table-body
+            %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.table-striped
+              %thead
+                %tr
+                  %th Feature
+                  %th Attributes
+                  %th Actions
+              %tbody
+                %tr
+                  %td Round Robin Assignment
+                  - if current_user.company.closing_executive_round_robin
+                    %td= (current_user.manageables.round_robin_users.pluck(:name) + current_user.manageables.round_robin_closing_executives.pluck(:name)).uniq.join(',')
+                  - else
+                    %td= (current_user.manageables.round_robin_users.pluck(:name).join(','))
+                  %td
+                    = link_to edit_user_config_users_path, remote: true, class: "btn btn-action btn-edit" do
+                      = render partial: 'icons/edit'

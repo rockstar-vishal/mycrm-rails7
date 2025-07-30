@@ -1,0 +1,71 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Inventory
+          %h1.m-0.text-dark Inventory
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              .row
+                .col-md-4
+                  %h4.mb-0 Inventory
+                .col-md-4
+                  = form_tag companies_inventories_path, method: :get do
+                    .input-group.input-group-sm
+                      = text_field_tag :search_string, params[:search_string], class: "form-control", placeholder: "Search by Developer/Development"
+                      .input-group-btn
+                        = button_tag type: "submit", class: "btn btn-default btn-sm pd-fixes" do
+                          = fa_icon "search"
+                        = link_to projects_path, class: "btn btn-default btn-sm pd-fixes" do
+                          = fa_icon "refresh"
+                .col-md-2.offset-md-2.pull-right
+                  = link_to 'Add New Inventory', new_companies_inventory_path, class: 'btn btn-primary float-right btn-sm'
+            .card-body
+              .table-responsive
+                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                  %thead
+                    %tr
+                      %th.all Developer
+                      %th.all Development
+                      %th.all Location
+                      %th.all Floor
+                      %th.all Unit
+                      %th.all Carpet
+                      %th.all Configuration
+                      %th.all Wing
+                      %th.all PARKING
+                      %th.all Quote
+                      %th.all Additional
+                      %th.all Point of Contact
+                      %th.all PROPERTY
+                      %th.all Action
+                  %tbody
+                    - @inventories.each do |inventory|
+                      %tr
+                        %td= inventory.developer
+                        %td= inventory.development rescue nil
+                        %td= inventory.location
+                        %td= inventory.floor
+                        %td= inventory.unit
+                        %td= inventory.carpet
+                        %td= inventory.configuration_id
+                        %td= inventory.wing
+                        %td= inventory.parking
+                        %td= inventory.quote
+                        %td= inventory.comments
+                        %td= inventory.poc
+                        %td= inventory.property
+                        %td
+                          = link_to (fa_icon "pencil"), edit_companies_inventory_path(inventory.uuid), class: "btn btn-primary btn-sm"
+
+          .pagination-custom-holder
+            %strong{style: "margin-left: 0;"} Inventories Count - #{@inventories.count}
+            = will_paginate @inventories, :class  =>  "ct-pag"

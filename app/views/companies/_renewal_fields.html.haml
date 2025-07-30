@@ -1,0 +1,11 @@
+.nested-fields.col-md-4{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
+  .form-group
+    = f.text_field :start_date, :value=>(Date.parse(f.object.start_date.to_s) rescue nil), class: 'form-control datetimepicker'
+    = f.text_field :end_date, :value=>(Date.parse(f.object.end_date.to_s) rescue nil), class: 'form-control datetimepicker'
+    = f.select :sales_executive_id, options_from_collection_for_select(User.where(role_id: ::Role::SYSTEM_ADMIN_ROLE), :id, :name, (f.object.sales_executive_id rescue nil)), :prompt=>'Select Sales Manager', class: 'form-control', id: 'project_id'
+    = f.select :customer_success_executive_id, options_from_collection_for_select(User.where(role_id: ::Role::SYSTEM_ADMIN_ROLE), :id, :name, (f.object.customer_success_executive_id rescue nil)), :prompt=>'Select Cusomter Success', class: 'form-control', id: 'project_id'
+  %center
+    = link_to_remove_association "Remove", f, :class=>"btn btn-danger"
+
+:javascript
+  $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});

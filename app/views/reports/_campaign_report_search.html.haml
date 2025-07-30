@@ -1,0 +1,47 @@
+%a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
+  Advanced Search
+  %i.fa.fa-angle-down
+#adv-searchbox.box-body
+  = form_tag nil, method: :get, class: "filter-search-menu" do
+    .p-2
+      .row
+        .col-12
+          %h5.mt-0 Search By Date
+        .col-md-3
+          .form-group
+            = label_tag 'advance_search[start_date_from]', 'Start Date From', class: 'control-label'
+            .input-group
+              %span.input-group-addon
+                = fa_icon 'calendar'
+              = text_field_tag 'advance_search[start_date_from]', (params.dig(:advance_search, :start_date_from).to_date.strftime('%d/%m/%Y') rescue nil), class: 'form-control dateFormat pull-right'
+        .col-md-3
+          .form-group
+            = label_tag 'advance_search[start_date_upto]', 'Start Date Upto', class: 'control-label'
+            .input-group
+              %span.input-group-addon
+                = fa_icon 'calendar'
+              = text_field_tag 'advance_search[start_date_upto]', (params.dig(:advance_search, :start_date_upto).to_date.strftime('%d/%m/%Y') rescue nil), class: 'form-control dateFormat pull-right'
+        .col-md-3
+          .form-group
+            = label_tag 'advance_search[end_date_from]', 'End Date From', class: 'control-label'
+            .input-group
+              %span.input-group-addon
+                = fa_icon 'calendar'
+              = text_field_tag 'advance_search[end_date_from]', (params.dig(:advance_search, :end_date_from).to_date.strftime('%d/%m/%Y') rescue nil), class: 'form-control dateFormat pull-right'
+        .col-md-3
+          .form-group
+            = label_tag 'advance_search[end_date_upto]', 'End Date Upto', class: 'control-label'
+            .input-group
+              %span.input-group-addon
+                = fa_icon 'calendar'
+              = text_field_tag 'advance_search[end_date_upto]', (params.dig(:advance_search, :end_date_upto).to_date.strftime('%d/%m/%Y') rescue nil), class: 'form-control dateFormat pull-right'
+        .col-12
+          %h5.mt-0 Search By Project Details
+        .col-md-4
+          .form-group
+            %label Project
+            = select_tag 'advance_search[project_id]', options_for_select(@projects.map { |p| [p.name, p.id] }, params.dig(:advance_search, :project_id)), multiple: true, class: "form-control multi-select-list"
+        .col-md-12
+          .form-group
+            = button_tag type: "submit", class: "btn btn-primary" do
+              Search

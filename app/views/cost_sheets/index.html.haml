@@ -1,0 +1,70 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Cost Sheets
+          %h1.m-0.text-dark Cost Sheets
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              .pull-left.col-md-5
+                = form_tag cost_sheets_path, method: :get do
+                  .input-group.input-group-sm
+                    = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by project, building, topology, flat"
+                    .input-group-btn
+                      = button_tag type: "submit", class: "btn btn-default btn-sm pd-fixes" do
+                        = fa_icon "search"
+                      = link_to cost_sheets_path, class: "btn btn-default btn-sm pd-fixes" do
+                        = fa_icon "refresh"
+              .float-right
+                .input-group
+                  .input-group-btn
+                    = link_to 'Add New CostSheet', new_cost_sheet_path, class: 'btn btn-primary float-right btn-sm'
+            .card-body
+              .table-responsive
+                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                  %thead
+                    %tr
+                      %th.all Project
+                      %th.all Building
+                      %th.all Flat No.
+                      %th.all Topology
+                      %th Total value
+                      %th Created By
+                      %th Created at
+                      %th Action
+
+                  %tbody
+                    - @cost_sheets.each do |cost_sheet|
+                      %tr
+                        %td= cost_sheet.project_name
+                        %td= cost_sheet.building_name
+                        %td= cost_sheet.flat_no
+                        %td= cost_sheet.topology
+                        %td= cost_sheet.total_cost
+                        %td= cost_sheet.user&.name
+                        %td= cost_sheet.created_at.strftime("%d-%b-%y %H:%M %p")
+                        %td
+                          - if cost_sheet.company.cost_sheet_letter_types.include?('letter1')
+                            %span{class: "badge bg-gradient", title: "letter1", "data-toggle": "tooltip"}
+                              = link_to cost_sheets_path(cost_sheet_id: cost_sheet, letter_type: 'index', format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                                %i.fa.fa-print{"aria-hidden" => "true"}
+                          - if cost_sheet.company.cost_sheet_letter_types.include?('letter2')
+                            %span{class: "badge bg-gradient", title: "letter2", "data-toggle": "tooltip"}
+                              = link_to cost_sheets_path(cost_sheet_id: cost_sheet, letter_type: 'index1', format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                                %i.fa.fa-print{"aria-hidden" => "true"}
+                          = link_to edit_cost_sheet_path(cost_sheet), class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                            = fa_icon "pencil"
+                          = link_to cost_sheet_path(cost_sheet.id), class: "btn btn-danger", method: :delete,
+                            data: {:confirm => "Would you like to permanently delete this Plan?", "commit-class" => "btn btn-success", "cancel-class" => "btn btn-danger"}, style: "padding: 0px; width: 20px;" do
+                            = fa_icon "trash-o"
+          .pagination-custom-holder
+            %strong{style: "margin-left: 0;"} Cost Sheet Count - #{@cost_sheets.count}
+            = will_paginate @cost_sheets, :class  =>  "ct-pag"

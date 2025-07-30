@@ -1,0 +1,695 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Customer Details
+          %h1.m-0.text-dark Customer Details
+
+
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              %h3.card-title New Booking
+            .card-body
+              = form_tag create_client_companies_flat_path(params[:id]), method: :post do
+                %h4 CUSTOMER DETAILS
+                .row
+                  .col-md-3
+                    .form-group
+                      = label_tag :applicant_name_customer, 'Applicant Name'
+                      = text_field_tag :applicant_name_customer, nil, class: 'form-control autocomplete-input', id:'customerNameDropdown', required: true,  data: { url: search_lead_companies_flats_path }
+                      #customer-autocomplete.autocomplete-dropdown
+                  .col-md-3
+                    .form-group
+                      = label_tag :dob_customer, 'Date of Birth'
+                      = date_field_tag :dob_customer, nil, id: 'dob_customer', class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :age_customer, 'Age'
+                      = number_field_tag :age_customer, nil, id: 'age_customer', class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :occupation_customer, 'Occupation'
+                      = text_field_tag :occupation_customer, nil, class: 'form-control'
+                .row
+                  .col-md-12
+                    .form-group
+                      = label_tag :correspondence_address_customer, 'Correspondence Address'
+                      = text_area_tag :correspondence_address_customer, nil, class: 'form-control', rows: 3
+                  .col-md-3
+                    .form-group
+                      = label_tag :pin_code_customer, 'Pin Code'
+                      = number_field_tag :pin_code_customer, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :city_customer, 'City'
+                      = text_field_tag :city_customer, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :country_customer, 'Country'
+                      = text_field_tag :country_customer, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :residence_customer, 'Residence'
+                      = text_field_tag :residence_customer, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :pan_customer, 'PAN No'
+                      = text_field_tag :pan_customer, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :aadhar_customer, 'Aadhar No'
+                      = text_field_tag :aadhar_customer, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :contact_no_customer, 'Contact No'
+                      = text_field_tag :contact_no_customer, nil, id: 'customerMobile', class: 'form-control', required: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :email_customer, 'Email ID'
+                      = email_field_tag :email_customer, nil, id:'customerEmail', class: 'form-control'
+                      #customer-autocomplete.autocomplete-dropdown
+                %hr
+
+                %h4 CO-APPLICANT DETAILS
+                .row
+                  .col-md-3
+                    .form-group
+                      = label_tag :name_co_applicant, 'Co-Applicant Name'
+                      = text_field_tag :name_co_applicant, nil, id: 'coApplicantDropdown', class: 'form-control autocomplete-input', required: true, data: { url: search_lead_companies_flats_path }
+                      #co-applicant-autocomplete.autocomplete-dropdown
+                  .col-md-3
+                    .form-group
+                      = label_tag :dob_co_applicant, 'Date of Birth'
+                      = date_field_tag :dob_co_applicant, nil, id: 'dob_co_applicant', class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :age_co_applicant, 'Age'
+                      = number_field_tag :age_co_applicant, nil, id: 'age_co_applicant', class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :occupation_co_applicant, 'Occupation'
+                      = text_field_tag :occupation_co_applicant, nil, class: 'form-control'
+                .row
+                  .col-md-12
+                    .form-group
+                      = label_tag :correspondence_address_co_applicant, 'Correspondence Address'
+                      = text_area_tag :correspondence_address_co_applicant, nil, class: 'form-control', rows: 3
+                  .col-md-3
+                    .form-group
+                      = label_tag :pin_code_co_applicant, 'Pin Code'
+                      = number_field_tag :pin_code_co_applicant, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :city_co_applicant, 'City'
+                      = text_field_tag :city_co_applicant, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :country_co_applicant, 'Country'
+                      = text_field_tag :country_co_applicant, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :residence_co_applicant, 'Residence'
+                      = text_field_tag :residence_co_applicant, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :pan_co_applicant, 'PAN No'
+                      = text_field_tag :pan_co_applicant, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :aadhar_co_applicant, 'Aadhar No'
+                      = text_field_tag :aadhar_co_applicant, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :contact_no_co_applicant, 'Contact No'
+                      = text_field_tag :contact_no_co_applicant, nil, id: 'coApplicantMobile', class: 'form-control', required: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :email_co_applicant, 'Email ID'
+                      = email_field_tag :email_co_applicant, nil, id: 'coApplicantEmail', class: 'form-control'
+                %hr
+
+                %h4 UNIT DETAILS
+                .row
+                  .col-md-4
+                    .form-group
+                      = label_tag :tower_no, 'Tower No.'
+                      = text_field_tag :tower_no, @flat_data[:tower_no], class: 'form-control', disabled: true
+                  .col-md-4
+                    .form-group
+                      = label_tag :unit_no, 'Unit No.'
+                      = text_field_tag :unit_no, @flat_data[:unit_no], class: 'form-control', disabled: true
+                  .col-md-4
+                    .form-group
+                      = label_tag :bhk_type, 'BHK Type'
+                      = text_field_tag :bhk_type, @flat_data[:bhk_type], class: 'form-control', disabled: true
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :carpet_area, 'Carpet Area calculated as per RERA'
+                      = text_field_tag :carpet_area, @flat_data[:carpet_area], class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :carpet_area_sq_mtrs, 'Sq.Mtrs'
+                      = text_field_tag :carpet_area_sq_mtrs, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :carpet_area_sq_ft, 'Sq.ft'
+                      = text_field_tag :carpet_area_sq_ft, nil, class: 'form-control'
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :enclosed_balcony_area, 'Area of Enclosed Balcony'
+                      = text_field_tag :enclosed_balcony_area, @flat_data[:enclosed_balcony_area], class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :enclosed_balcony_area_sq_mtrs, 'Sq.Mtrs'
+                      = text_field_tag :enclosed_balcony_area_sq_mtrs, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :enclosed_balcony_area_sq_ft, 'Sq.ft'
+                      = text_field_tag :enclosed_balcony_area_sq_ft, nil, class: 'form-control'
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :balcony_area, 'Area of Balcony'
+                      = text_field_tag :balcony_area, @flat_data[:balcony_area], class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :balcony_area, 'Sq.Mtrs'
+                      = text_field_tag :balcony_area, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :balcony_area, 'Sq.ft'
+                      = text_field_tag :balcony_area, nil, class: 'form-control'
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :terrace_area, 'Area of Terrace'
+                      = text_field_tag :terrace_area, @flat_data[:terrace_area], class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :terrace_area_sq_mtrs, 'Sq.Mtrs'
+                      = text_field_tag :terrace_area_sq_mtrs, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :terrace_area_sq_ft, 'Sq.ft'
+                      = text_field_tag :terrace_area_sq_ft, nil, class: 'form-control'
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :total_area, 'Total Area'
+                      = text_field_tag :total_area, @total_area, class: 'form-control', disabled: true
+                  .col-md-3
+                    .form-group
+                      = label_tag :total_area_sq_mtrs, 'Sq.Mtrs'
+                      = text_field_tag :total_area_sq_mtrs, nil, class: 'form-control'
+                  .col-md-3
+                    .form-group
+                      = label_tag :total_area_sq_ft, 'Sq.ft'
+                      = text_field_tag :total_area_sq_ft, nil, class: 'form-control'
+                %hr
+
+                %h4 PARKING DETAILS
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :parkings_dropdown, 'Select Parking'
+                      = select_tag :parkings_dropdown, options_for_select((@flat_data[:parkings].presence || ['No Parkings Found']), 'No Parkings Found'), class: 'form-control', id: 'parkings_dropdown'
+                  .col-md-6
+                    .form-group
+                      = label_tag :parking_level_dropdown, 'Select Parking Level'
+                      %small.text-danger
+                      (Select parking first)
+                      = select_tag :parking_level_dropdown, options_for_select([['Select Parking Type', ''], 'Ground Floor', 'First Level', 'Second Level']), class: 'form-control', id: 'parking_level_dropdown', disabled: true
+
+                %hr
+
+                / Applicant Amount Detail
+                / %h4 APPLICANT AMOUNT DETAILS
+                / .row
+                /   .col-md-4
+                /     .form-group
+                /       = label_tag :booking_amount, 'Booking Amount'
+                /       = text_field_tag :booking_amount, nil, class: 'form-control'
+                /   .col-md-6
+                /     .form-group
+                /       = label_tag :payment_mode, 'Mode of Payment (UTR/Cheque No.)'
+                /       = text_field_tag :payment_mode, nil, class: 'form-control'
+                /   .col-md-4
+                /     .form-group
+                /       = label_tag :transaction_details
+                /       = text_field_tag :transaction_details, nil, class: 'form-control'
+                /   .col-md-4
+                /     .form-group
+                /       = label_tag :bank_name
+                /       = text_field_tag :bank_name, nil, class: 'form-control'
+                /   .col-md-4
+                /     .form-group
+                /       = label_tag :bank_details
+                /       = text_field_tag :bank_details, nil, class: 'form-control'
+                / %hr
+
+                %h4 OTHER DETAILS
+                .row
+                  .col-md-4
+                    .form-group
+                      = label_tag :agreement_schedule_date, 'Agreement Schedule Date'
+                      = date_field_tag :agreement_schedule_date, nil, class: 'form-control'
+                  .col-md-4
+                    .form-group
+                      = label_tag :funding_mode, 'Self-Funding or Bank Loan'
+                      = select_tag :funding_mode, options_for_select(@flat_data[:fund_sources]), class: 'form-control', required: true
+                  .col-md-4
+                    .form-group
+                      = label_tag :preferred_bank, 'Preferred Bank'
+                      = select_tag :preferred_bank, options_for_select(@flat_data[:loan_providers]), class: 'form-control', required: true
+                %hr
+
+                %h4 BOOKING SOURCE
+                .row
+                  .col-md-4
+                    .form-group
+                      = label_tag :direct, 'Direct', class: 'checkbox-label'
+                      = check_box_tag :direct, '1', false, id: 'direct-checkbox', class: 'custom-checkbox'
+                  
+                  .col-md-4
+                    .form-group
+                      = label_tag :referrals, 'Referrals', class: 'checkbox-label'
+                      = check_box_tag :referrals, '1', false, id: 'referrals-checkbox', class: 'custom-checkbox'
+
+                  .col-md-6#direct-dropdown-container{ style: 'display: none;' }
+                    .form-group
+                      = label_tag :direct_source, 'Select Direct Source'
+                      - sources = current_user.is_marketing_manager? ? current_user.accessible_sources.pluck(:name) : current_user.company.sources.pluck(:name)
+                      = select_tag :direct_source, options_for_select(sources), class: 'form-control', include_blank: 'Select Source'
+
+                .row#referrals-details{ style: 'display: none;' }
+                  .col-md-6
+                    .form-group
+                      = label_tag :referral_name, 'Name'
+                      = text_field_tag :referral_name, nil, class: 'form-control'
+
+                  .col-md-6
+                    .form-group
+                      = label_tag :referral_contact_no, 'Contact NO'
+                      = text_field_tag :referral_contact_no, nil, class: 'form-control'
+                %hr
+
+                %h4 CHANNEL PARTNER DETAILS
+                .row
+                  .col-md-6
+                    .form-group
+                      = label_tag :brokers_dropdown, 'Select Broker'
+                      = text_field_tag :brokers_dropdown, nil, class: 'form-control autocomplete-input', id: 'brokerDropdown', data: { url: search_broker_companies_flats_path }, autocomplete: 'off'
+                      = hidden_field_tag :broker_id, nil, id: 'brokerId'
+                      #broker-autocomplete.autocomplete-dropdown
+
+                %hr
+
+                %h4 PURPOSE OF PURCHASE
+                .row
+                  .col-md-4
+                    .form-group
+                      = label_tag :first_home_end_use, 'First Home-End Use'
+                      = check_box_tag :first_home_end_use, '1', false, id: 'first-home-checkbox', class: 'custom-checkbox'
+
+                  .col-md-4
+                    .form-group
+                      = label_tag :second_home, 'Second Home'
+                      = check_box_tag :second_home, '1', false, id: 'second-home-checkbox', class: 'custom-checkbox'
+
+                  .col-md-4
+                    .form-group
+                      = label_tag :investment, 'Investment'
+                      = check_box_tag :investment, '1', false, id: 'investment-checkbox', class: 'custom-checkbox'
+                %hr
+
+                %h4 COST BREAKUP
+                .row
+                  .col-md-3
+                    .form-group
+                      = label_tag :total_carpet_area, 'Total Carpet Area'
+                      = text_field_tag :total_carpet_area, @flat_data[:carpet_area], class: 'form-control'
+                  - @flat_data[:flat_costs].each do |cost|
+                    .col-md-3
+                      .form-group
+                        = label_tag cost[:name], cost[:name].to_s.humanize
+                        = text_field_tag cost[:name], "₹ #{cost[:amount]}", class: 'form-control'
+                %hr
+
+                %h4 SIGNATURES
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      = label_tag :applicant_signature, 'Applicant Signature'
+                      %canvas#applicant-signature-pad.signature-container{:height => "170", :width => "400"}
+                      = hidden_field_tag :applicant_signature, nil, id: 'applicant-signature-data'
+                      %button#clear-applicant-signature.btn.btn-primary.mt-2{ type: 'button' } Clear
+
+                  .col-md-6.col-lg-4
+                    .form-group
+                      = label_tag :co_applicant_signature, 'Co-Applicant Signature'
+                      %canvas#co-applicant-signature-pad.signature-container{:height => "170", :width => "400"}
+                      = hidden_field_tag :co_applicant_signature, nil, id: 'co-applicant-signature-data'
+                      %button#clear-co-applicant-signature.btn.btn-primary.mt-2{ type: 'button' } Clear
+
+                  .col-md-6.col-lg-4
+                    .form-group
+                      = label_tag :sales_manager_signature, 'Sales Manager Signature'
+                      %canvas#sales-manager-signature-pad.signature-container{:height => "170", :width => "400"}
+                      = hidden_field_tag :sales_manager_signature, nil, id: 'sales-manager-signature-data'
+                      %button#clear-sales-manager-signature.btn.btn-primary.mt-2{ type: 'button' } Clear
+
+                = render partial: 'booking_form_terms_conditions'
+                .col-sm-3.rera-qr-number.order-1.order-sm-2
+                .row
+                  .col-md-12.text-center
+                    = submit_tag 'Submit', class: 'btn btn-primary'
+
+:javascript
+  document.addEventListener('DOMContentLoaded', function () {
+    function calculateAge(dobFieldId, ageFieldId) {
+      const dobField = document.getElementById(dobFieldId);
+      const ageField = document.getElementById(ageFieldId);
+
+      dobField.addEventListener('change', function () {
+        const dob = new Date(dobField.value);
+        const today = new Date();
+
+        if (!isNaN(dob.getTime())) { // Check if the date is valid
+          let age = today.getFullYear() - dob.getFullYear();
+          const monthDiff = today.getMonth() - dob.getMonth();
+          const dayDiff = today.getDate() - dob.getDate();
+
+          if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            age--;
+          }
+
+          ageField.value = age >= 0 ? age : ''; // Set age only if it's non-negative
+        } else {
+          ageField.value = ''; // Clear age if dob is invalid
+        }
+      });
+    }
+
+    calculateAge('dob_customer', 'age_customer');
+    calculateAge('dob_co_applicant', 'age_co_applicant');
+
+    const firsthomeCheckbox = document.getElementById('first-home-checkbox');
+    const secondhomeCheckbox = document.getElementById('second-home-checkbox');
+    const investmentCheckbox = document.getElementById('investment-checkbox');
+
+    const checkboxes = [firsthomeCheckbox, secondhomeCheckbox, investmentCheckbox];
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('click', () => {
+        if (checkbox.checked) {
+          checkboxes.forEach(otherCheckbox => {
+            if (otherCheckbox !== checkbox) {
+              otherCheckbox.checked = false;
+            }
+          });
+        }
+      });
+    });
+
+    const referralsCheckbox = document.getElementById('referrals-checkbox');
+    const referralsDetails = document.getElementById('referrals-details');
+    
+    if (referralsCheckbox && referralsDetails) {
+      referralsCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+          referralsDetails.style.display = 'flex';
+        } else {
+          referralsDetails.style.display = 'none';
+        }
+      });
+    } else {
+      console.error('Checkbox or referral details not found.');
+    }
+
+    const directCheckbox = document.getElementById('direct-checkbox');
+    const directDropdownContainer = document.getElementById('direct-dropdown-container');
+
+    [directCheckbox, referralsCheckbox].forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          const otherCheckbox = this === directCheckbox ? referralsCheckbox : directCheckbox;
+          otherCheckbox.checked = false;
+          
+          if (this === directCheckbox) {
+            directDropdownContainer.style.display = 'block';
+          } else {
+            directDropdownContainer.style.display = 'none';
+          }
+        }
+      });
+    });
+
+    if (directCheckbox.checked) {
+      directDropdownContainer.style.display = 'block';
+    }
+    });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const parkingsDropdown = document.getElementById('parkings_dropdown');
+    const parkingLevelDropdown = document.getElementById('parking_level_dropdown');
+
+    if (parkingsDropdown && parkingLevelDropdown) {
+      const handleParkingChange = () => {
+        if (parkingsDropdown.value === 'No Parkings Found') {
+          parkingLevelDropdown.disabled = true;
+          parkingLevelDropdown.value = ''; // Clear value
+        } else {
+          parkingLevelDropdown.disabled = false;
+        }
+      };
+
+      handleParkingChange();
+
+      parkingsDropdown.addEventListener('change', handleParkingChange);
+    } else {
+      console.error('Dropdown elements not found in DOM.');
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initAutocomplete('customerNameDropdown', 'customer-autocomplete');
+    initAutocomplete('coApplicantDropdown', 'co-applicant-autocomplete');
+
+    function initAutocomplete(inputId, dropdownId) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      let timeoutId;
+
+      input.addEventListener('input', function(e) {
+        clearTimeout(timeoutId);
+        const query = e.target.value.trim();
+        
+        
+
+        timeoutId = setTimeout(() => {
+          fetch(`${input.dataset.url}?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => showResults(data, dropdown))
+            .catch(error => console.error('Error:', error));
+        }, 50);
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    function showResults(results, dropdown) {
+      dropdown.innerHTML = '';
+      if (results.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.textContent = result.name;
+        div.onclick = () => {
+          dropdown.previousElementSibling.value = result.name;
+          dropdown.style.display = 'none';
+        };
+        dropdown.appendChild(div);
+      });
+
+      dropdown.style.display = 'block';
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initAutocomplete(
+      'customerNameDropdown', 
+      'customer-autocomplete', 
+      'customerEmail', 
+      'customerMobile'
+    );
+
+    initAutocomplete(
+      'coApplicantDropdown', 
+      'co-applicant-autocomplete', 
+      'coApplicantEmail', 
+      'coApplicantMobile'
+    );
+
+    function initAutocomplete(inputId, dropdownId, emailFieldId, mobileFieldId) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      const emailField = document.getElementById(emailFieldId);
+      const mobileField = document.getElementById(mobileFieldId);
+      let timeoutId;
+
+      input.addEventListener('input', function(e) {
+        clearTimeout(timeoutId);
+        const query = e.target.value.trim();
+        
+        if (query === '') {
+          emailField.value = '';
+          mobileField.value = '';
+          dropdown.style.display = 'none';
+          return;
+        }
+
+        timeoutId = setTimeout(() => {
+          fetch(`${input.dataset.url}?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => showResults(data, dropdown, emailField, mobileField))
+            .catch(error => console.error('Error:', error));
+        }, 300);
+      });
+
+      function showResults(results, dropdown, emailField, mobileField) {
+        dropdown.innerHTML = '';
+        if (results.length === 0) {
+          dropdown.style.display = 'none';
+          return;
+        }
+
+        results.forEach(result => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.textContent = result.name;
+          
+          div.onclick = () => {
+            input.value = result.name;
+            if (emailField) emailField.value = result.email || '';
+            if (mobileField) mobileField.value = result.mobile || '';
+            dropdown.style.display = 'none';
+          };
+          
+          dropdown.appendChild(div);
+        });
+
+        dropdown.style.display = 'block';
+      }
+
+      document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target) && !input.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("brokerDropdown");
+    const hiddenInput = document.getElementById("brokerId");
+    const dropdown = document.createElement("div");
+    dropdown.classList.add("autocomplete-dropdown");
+    input.parentNode.appendChild(dropdown);
+
+    input.addEventListener("input", function () {
+      const query = input.value.trim();
+      if (query.length < 2) {
+        dropdown.innerHTML = "";
+        return;
+      }
+
+      const url = input.dataset.url + "?query=" + encodeURIComponent(query);
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          dropdown.innerHTML = "";
+          if (data.length === 0) {
+            dropdown.style.display = "none";
+            return;
+          }
+          dropdown.style.display = "block";
+
+          data.forEach(broker => {
+            const item = document.createElement("div");
+            item.classList.add("autocomplete-item");
+            item.textContent = broker.name;
+            item.dataset.id = broker.id;
+
+            item.addEventListener("click", function () {
+              input.value = broker.name;
+              hiddenInput.value = broker.id;
+              dropdown.innerHTML = "";
+            });
+
+            dropdown.appendChild(item);
+          });
+        })
+        .catch(error => console.error("Error fetching brokers:", error));
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.innerHTML = "";
+      }
+    });
+  });
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const signaturePads = [
+      {
+        canvas: document.getElementById("applicant-signature-pad"),
+        field: document.getElementById("applicant-signature-data"),
+        clearBtn: document.getElementById("clear-applicant-signature"),
+      },
+      {
+        canvas: document.getElementById("co-applicant-signature-pad"),
+        field: document.getElementById("co-applicant-signature-data"),
+        clearBtn: document.getElementById("clear-co-applicant-signature"),
+      },
+      {
+        canvas: document.getElementById("sales-manager-signature-pad"),
+        field: document.getElementById("sales-manager-signature-data"),
+        clearBtn: document.getElementById("clear-sales-manager-signature"),
+      }
+    ];
+
+    signaturePads.forEach(({ canvas, field, clearBtn }) => {
+      const pad = new SignaturePad(canvas);
+
+      clearBtn.addEventListener("click", function () {
+        pad.clear();
+        field.value = "";
+      });
+
+      document.querySelector("form").addEventListener("submit", function () {
+        if (!pad.isEmpty()) {
+          field.value = pad.toDataURL();
+        }
+      });
+    });
+  });
+

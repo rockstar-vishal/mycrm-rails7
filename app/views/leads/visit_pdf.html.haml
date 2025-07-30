@@ -1,0 +1,76 @@
+#printMe{style: " padding:30px;"}
+  = image_tag @lead.company.logo.url, style: "width: 200px; margin: 10px auto; display: block;"
+  -# = image_tag wicked_pdf_asset_base64(@visit.lead.company.logo.url), class: "mx-auto mb-8", :style => "margin:10px auto; display:block; width:200px"
+  %h2{style: "font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:bold; margin:20px 0 10px;"}
+  %h2 Personal Details
+  %table{style: "border: 2px solid #dfdfdf; border-collapse: collapse; width: 100%"}
+    %tbody
+      %tr
+        %td{style: "font-weight:800; border-right: none; padding:15px;width:30%"} Full Name
+        %td{style: "font-weight:400;padding:15px"}= @lead.name
+      %tr
+        %td{style: "font-weight:800; border-right: none; padding:15px;width:30%"} Email Address
+        %td{style: "font-weight:400;padding:15px"}= @lead.email
+      %tr
+        %td{style: "font-weight:800; border-right: none; padding:15px;width:30%"} Mobile No.
+        %td{style: "font-weight:400;padding:15px"}= @lead.mobile
+      %tr
+        %td{style: "font-weight:800; border-right: none; padding:15px;width:30%"} Project
+        %td{style: "font-weight:400;padding:15px"}= @lead.project.name
+      %tr
+        %td{style: "font-weight:800; border-right: none; padding:15px;width:30%"} City
+        %td{style: "font-weight:400;padding:15px"}= @lead.city&.name || "-"
+  %h2 Client Additional Details
+  %table{style: "border: 2px solid #dfdfdf; border-collapse: collapse; width: 100%"}
+    %tbody
+      - @company.magic_fields.each do |magic_field|
+        - value = @lead.send(magic_field.name)
+        %tr
+          %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"}= magic_field.pretty_name
+          %td{style: "font-weight:400;padding:15px"}= value.presence || "-"
+  %h2 How do you know our Project
+  %table{style: "border: 2px solid #dfdfdf; border-collapse: collapse; width: 100%"}
+    %tbody
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Source
+        %td{style: "font-weight:400;padding:15px"}
+          = @lead.source.name
+          - if @lead.source.is_cp && @lead.broker.present?
+            = " ( #{@lead.broker&.name_with_firm_name} )"
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Sub Source
+        %td{style: "font-weight:400;padding:15px"}= @lead.enq_subsource&.name || "-"
+  %h2 Any customer reference you can suggest
+  %table{style: "border: 2px solid #dfdfdf; border-collapse: collapse; width: 100%"}
+    %tbody
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Assigned to
+        %td{style: "font-weight:400;padding:15px"}= @lead.user.name
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Closing Executive
+        %td{style: "font-weight:400;padding:15px"}= @lead.postsale_user&.name || "-"
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Visit Date
+        %td{style: "font-weight:400;padding:15px"}= @visit.date
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Other Visit Dates
+        %td{style: "font-weight:400;padding:15px"}= @lead.visits.order(date: :desc).where.not(id: @visit.id).map{|x| x.date.strftime('%d/%m/%Y')}.join(" , ")
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Customer Comments
+        %td{style: "font-weight:400;padding:15px"}= @visit.comment
+  %h2 For office use only
+  %table{style: "border: 2px solid #dfdfdf; border-collapse: collapse; width: 100%"}
+    %tbody
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} 
+          Attended by(Sales Manager)
+        %td{style: "font-weight:400;padding:15px"}
+      %tr
+        %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"} Remark
+        %td{style: "font-weight:400;padding:15px"}
+          %br
+          %hr
+          %br
+          %hr
+          %br
+          %hr

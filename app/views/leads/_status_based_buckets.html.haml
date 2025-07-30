@@ -1,0 +1,8 @@
+.col-md-12
+  - @company.statuses.where(id: @company.card_status.reject(&:blank?)).each do |status|
+    .lead-card
+      %h5
+        = "#{status.name} Leads"
+        = link_to leads_path(is_advanced_search: true, lead_statuses: [status.id]) do
+          .align-fix
+            = @leads.where(status_id: status.id).count

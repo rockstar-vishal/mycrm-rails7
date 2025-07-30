@@ -1,0 +1,51 @@
+.content
+  .container-fluid
+    .row
+      .col-lg-12
+        .card
+          .card-header
+          .card-body
+            %hr
+            %h4 TERMS AND CONDITIONS
+            .row
+              .col-md-12
+                .form-group
+                  .terms-container{style: "max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 20px; margin-bottom: 15px; background-color: #f9f9f9;"}
+                    %ol.terms-list{style: "padding-left: 20px; line-height: 1.6;"}
+                      %li Society maintenance amount is to Rs. 4.50/- per Sq.Ft + Applicable taxes at the time of possession.
+                      
+                      %li Purchaser(s) / Applicant understand that the final allotment of the said flat shall only be by the execution of an agreement of sale of the said flat between Purchaser(s) and the Developer and the entire discretion to reject this application without any reasonable cause.
+                      
+                      %li Other charges towards MSEB, Society Formation charges, Refundable Security Deposit as applicable are not included into rate PSF and are payable separately at actuals.
+                      
+                      %li This is the provisional booking which does not create any right, title or interest of what so ever nature unless and until Agreement to Sale of the said flat is executed and registered.
+                      
+                      %li Purchaser(s) / Applicant are aware and have understood complete details of the unit being purchased and have accepted to procced further to execute the agreement and registration by paying 10% of the agreement value within 10 days from this Application / Booking Form.
+                      
+                      %li In case of cancellation of the booking or withdrawal by the Purchaser(s) / Applicant or if the Applicant defaults in payments, the developer has right to sell / allot the said unit to any other third party without prior intimation, the money paid by the Purchaser(s) / Applicant shall be refunded without any interest after necessary deductions towards Government taxes & Rs. 1,00,000/- as Cancellation Charges.
+                      
+                      %li Incase of delayed payments, interest shall be charged at 18% p.a.
+                      
+                      %li Due payments to be executed within 10 days from the date of the demand note.
+                      
+                      %li No sale or transfer of units till possession.
+                      
+                      %li Purchaser(s) / Applicant have studied the plans, specifications and amenities being provided in the said unit booked and hereby confirm that they will not request or require any change or modification in the same.
+                      
+                      %li The Developer facilitates in getting APF number for loan processing with select few banks, this is value added service, which the developer extends to this customers. But the Developer will not engage with banks for customer home loan requirements and also will not interact, negotiate of follow-up with the banks / bank personal for individual home loan disbursements.
+                      
+                      %li Government Charges / Taxes are subject to change and would be applicable as actuals.
+                      
+                      %li The Applicant(s) has/ will have to deduct the application Tax Deduction at Source (TDS) at the time of making actual payment or while crediting amount to the account of the Developer. Applicant(s) will have to submit the original TDS certificate within the prescribed timelines as mentioned in the Income Tax Act 1961.
+                      
+                      %li The carpet area of the flat represented above is as per RERA.
+                      
+                      %li It is clarified by the Promoter to the Purchaser(s) & it's understood as:
+                      %ul{style: "list-style-type: disc; margin-left: 20px; margin-top: 10px;"}
+                        %li All information, specifications, plans, materials and visual representations detailed in the presentation, model & sample flat are for illustrative purposes only. The Promoter reserves the right to change any such information from time to time and the same shall not form a part of the offer or contract.
+                        %li The list of specifications and Amenities for the said unit to be provided / mentioned in the unit agreement shall be final, and the Purchaser / shall accept the same, as it is without any grievance or dissatisfaction
+                
+                .form-group
+                  .form-check
+                    = check_box_tag :accept_terms, "1", false, class: 'form-check-input', required: true
+                    = label_tag :accept_terms, 'I have read and agree to the above terms and conditions', class: 'form-check-label'

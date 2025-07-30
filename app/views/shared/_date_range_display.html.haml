@@ -1,0 +1,17 @@
+.row
+  .col-md-6
+    .form-group
+      - label = params[:action] == 'call_report' ? 'Call Log From' : 'Created From'
+      = label_tag :start_date, label, class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :start_date, (@start_date.to_date.strftime('%d/%m/%Y') rescue nil), class: 'form-control dateFormat pull-right'
+  .col-md-6
+    .form-group
+      - label = params[:action] == 'call_report' ? 'Call Log Upto' : 'Created Upto'
+      = label_tag :end_date, label, class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :end_date, (@end_date.to_date.strftime('%d/%m/%Y') rescue nil), class: 'form-control dateFormat pull-right'

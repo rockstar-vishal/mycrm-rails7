@@ -1,0 +1,50 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Manage CloudTelephony
+          %h1.m-0 Manage CloudTelephony
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3.d-flex.align-items-center
+                %h5.mb-0 Cloud Telephony Sids
+              .col-md-9
+                .group-link
+                  = link_to 'Add CloudTelephony', new_cloud_telephony_sid_path, remote: true,class: 'btn btn-new ml-auto'
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th Name
+                    %th Vendor
+                    %th Description
+                    %th Status
+                    %th Action
+                %tbody
+                  - @cloud_telephony_sids.each do |cloud_telephony_sid|
+                    %tr
+                      %td
+                        %strong
+                          = cloud_telephony_sid.number
+                      %td 
+                        = cloud_telephony_sid.vendor
+                      %td
+                        %span.more= cloud_telephony_sid.description
+                      %td= (cloud_telephony_sid.is_active? ? "Active" : "Inactive")
+                      %td
+                        = link_to edit_cloud_telephony_sid_path(cloud_telephony_sid), remote: true, class: "btn btn-action btn-edit"  do
+                          = render partial: 'icons/edit'
+                        - if current_user.is_super?
+                          = link_to cloud_telephony_sid_path(cloud_telephony_sid), class: "btn btn-action btn-remove", method: :delete, data: {:confirm => "Would you like to permanently delete CloudTelephony?", "commit-class" => "btn btn-action btn-remove", "cancel-class" => "btn btn-action btn-remove"} do
+                            = fa_icon "trash-o"
+            %br
+              = will_paginate @cloud_telephony_sids,  :class  =>  "ct-pag"

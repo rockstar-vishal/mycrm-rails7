@@ -1,0 +1,24 @@
+.button-holder{ style: "position: absolute; top: 0; right: 0;" }
+  %button.btn.btn-default.dropdown-toggle.dropdown-icon.p-2{"data-toggle" => "dropdown", "aria-expanded" => "false"}
+    %span.sr-only Toggle Dropdown
+
+  .dropdown-menu.px-3.py-2.custom-dropdown-menu.dropdown-menu-right{"role" => "menu"}
+    %span.mb-2.d-block.f-9
+      = link_to 'Booking', booking_form_companies_flat_path(flat['id']), class: "btn btn-success d-block text-white f-12 mt-3 mb-2 fw-600"
+    .container-fluid.project-list
+      .row
+        %dt.col-sm-4.p-0 Flat No: 
+        %dd.col-sm-6.p-0
+          = flat["name"]
+        %dt.col-sm-4.p-0 Carpet Area:
+        %dd.col-sm-6.p-0
+          = "#{flat['carpet_area']} sq.ft"
+        %dt.col-sm-4.p-0 Floor:
+        %dd.col-sm-6.p-0
+          = flat["floor"]
+        %dt.col-sm-4.p-0 Configuration:
+        %dd.col-sm-6.p-0
+          = flat["config"]
+        %dt.col-sm-4.p-0 Facing:
+        %dd.col-sm-6.p-0
+          = flat["facing_name"]

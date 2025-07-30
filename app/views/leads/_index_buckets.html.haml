@@ -1,0 +1,92 @@
+.col-md-12
+  .lead-card.lead-follow-up
+    %h5
+      Today's follow-ups
+      = link_to leads_path(todays_call_only: true, is_advanced_search: true) do
+        %span.today_calls_leads_counts.align-fix
+        = image_tag 'fluent-color--document-folder-24.svg' 
+  .lead-card.lead-backlog
+    %h5
+      Backlogs
+      = link_to leads_path(backlogs_only: true, is_advanced_search: true) do
+        %span.backlog_lead_counts.align-fix
+        = image_tag 'fluent-color--calendar-people-20-red.svg'
+  - if @company.setting.present? && @company.enable_user_incentive && current_user.user_detail.present?
+    .lead-card
+      %h5
+        Earned Incentive
+        = link_to leads_path() do
+          %span.align-fix
+            = current_user.user_detail.earned_incentive
+    .lead-card
+      %h5
+        Paid
+        = link_to leads_path() do
+          %span.align-fix
+            = current_user.user_detail.paid_incentive
+    .lead-card
+      %h5
+        Pendings
+        = link_to leads_path() do
+          %span.align-fix
+            = current_user.user_detail.pending_incentive
+  - if @company.setting.present? && @company.enable_visit_expiring_card
+    .lead-card
+      %h5
+        Visit Expirations
+        = link_to leads_path(visit_expiring: true, is_advanced_search: true) do
+          %span.visit_expiration_count.align-fix
+  - if @company.secondary_source_enabled
+    .lead-card
+      %h5
+        Merge Leads
+        = link_to leads_path(is_advanced_search: true, merged: true) do
+          %span.merge_lead_counts.align-fix
+  - if @company.hot_status_ids.reject(&:blank?).present?
+    .lead-card.lead-hot
+      %h5
+        Hot Leads
+        = link_to leads_path(lead_statuses: @company.hot_status_ids, is_advanced_search: true) do
+          #hot_lead_counts.align-fix
+          = image_tag 'fluent-color--people-team-16.svg'
+
+
+  - if @company.new_status_id.present?
+    .lead-card.lead-new
+      %h5
+        New Leads
+        = link_to leads_path(lead_statuses: [@company.new_status_id], is_advanced_search: true) do
+          #new_lead_counts.align-fix
+          = image_tag 'fluent-color--calendar-people-20.svg'
+
+  - if @company.booking_done_id.present?
+    .lead-card.lead-booked
+      %h5
+        Booked Leads
+        = link_to leads_path(lead_statuses: [@company.booking_done_id], is_advanced_search: true) do
+          #booked_counts.align-fix
+          = image_tag 'fluent-color--calendar-people-20.svg'
+
+  - if @company.dead_status_ids.present?
+    .lead-card
+      %h5
+        Inactive Leads
+        = link_to leads_path(lead_statuses: @company.dead_status_ids, is_advanced_search: true) do
+          #dead_lead_counts.align-fix
+          = image_tag 'fluent-color--people-team-48.svg'
+  - if @company.setting.present? && @company.enable_visit_counter_card
+    .lead-card.lead-visit
+      %h5
+        Visit Counter
+        = link_to leads_path(visit_form: true, is_advanced_search: true) do
+          .visit_counter.align-fix
+          = image_tag 'fluent-color--building-people-16.svg'
+  - if @company.setting.present? && @company.enable_deactivate_leads && current_user.is_super?
+    .lead-card
+      %h5
+        Deactivated
+        = link_to leads_path(deactivated: true, is_advanced_search: true) do
+          .deactivated_count.align-fix
+          %svg.bi.bi-x-octagon{:fill => "currentColor", :height => "20", :viewbox => "0 0 16 16", :width => "20", :xmlns => "http://www.w3.org/2000/svg"}
+            %path{:d => "M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"}
+            %path{:d => "M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"}

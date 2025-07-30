@@ -1,0 +1,86 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{href: "/"} Home
+            %li.breadcrumb-item.active Campaign Report
+          %h1.m-0 Campaign Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-12
+                = render 'campaign_report_search', projects: @projects
+               
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-hover.table-striped.table-sm{style: 'width:100%!important'}
+                %thead.thead-dark
+                  %tr
+                    %th Platforms
+                    %th Duration
+                    %th Targeted Ad Spend
+                    %th Actual Ad Spend
+                    %th Targeted Leads
+                    %th Actual Leads
+                    %th Targeted CPL
+                    %th Actual CPL
+                    %th Targeted QL
+                    %th Actual QL
+                    %th Targeted CPQL
+                    %th Actual CPQL
+                    %th Targeted Site Visits
+                    %th Actual SV
+                    %th Targeted CPSV
+                    %th Actual CPSV
+                    %th Booking
+                    %th CPB
+                    %th Inquiry to Qualified Leads
+                    %th Qualified to SV %
+                    %th Inquiry to SV %
+                    %th SV to Booking %
+                    %th Inquiry to Booking %
+                %tbody
+                  - @campaigns.each do |campaign|
+                    %tr
+                      %td= campaign.source&.name
+                      %td.nowrap= link_to "#{campaign.start_date.strftime('%d-%b-%Y')} to #{campaign.end_date.strftime('%d-%b-%Y')}", campaign_path(uuid: campaign.uuid, source: campaign.source, start_date: campaign.start_date.to_s, end_date: campaign.end_date.to_s), target: '_blank'
+
+                      %td= Utility.to_words(campaign.targeted_ad_spend)
+                      %td= link_to "#{Utility.to_words(campaign.actual_ad_spend)}", campaign_path(uuid: campaign.uuid, source: campaign.source, start_date: campaign.start_date.to_s, end_date: campaign.end_date.to_s), target: '_blank'
+                      %td= (campaign.targeted_leads)
+                      %td
+                        - if campaign.actual_leads > 0
+                          = link_to campaign.actual_leads, leads_path(is_advanced_search: true, source_id: campaign.source_id,created_at_from: campaign.start_date.beginning_of_day,created_at_upto: campaign.end_date.end_of_day), target: '_blank'
+                        - else
+                          = campaign.actual_leads
+                      %td= (campaign.targeted_cpl)
+                      %td= (campaign.actual_cpl)
+                      %td= (campaign.targeted_ql)
+                      %td
+                        - if campaign.actual_ql > 0
+                          = link_to campaign.actual_ql, leads_path(is_advanced_search: true, source_id: campaign.source_id,created_at_from: campaign.start_date.beginning_of_day,created_at_upto: campaign.end_date.end_of_day, is_qualified: true), target: '_blank'
+                        - else
+                          = campaign.actual_ql
+                      %td= (campaign.targeted_cpql)
+                      %td= (campaign.actual_cpql)
+                      %td= (campaign.targeted_sv)
+                      %td= (campaign.actual_sv)
+                      %td= (campaign.targeted_cpsv)
+                      %td= (campaign.actual_cpsv)
+                      %td
+                        - if campaign.booking_count > 0
+                          = link_to campaign.booking_count, leads_path(is_advanced_search: true, source_id: campaign.source_id,created_at_from: campaign.start_date.beginning_of_day,created_at_upto: campaign.end_date.end_of_day, lead_statuses: [campaign.company&.booking_done_id]), target: '_blank'
+                        - else
+                          = campaign.booking_count
+                      %td= (campaign.cpb)
+                      %td= number_to_percentage(campaign.inquiry_to_ql.to_f * 100, precision: 2)
+                      %td= number_to_percentage(campaign.qualified_to_sv.to_f * 100, precision: 2)
+                      %td= number_to_percentage(campaign.inquiry_to_sv.to_f * 100, precision: 2)
+                      %td= number_to_percentage(campaign.sv_to_booking.to_f * 100, precision: 2)
+                      %td= number_to_percentage(campaign.inquiry_to_booking.to_f * 100, precision: 2)

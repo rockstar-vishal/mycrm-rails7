@@ -1,0 +1,63 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Source Inactive Lead Report
+          %h1.m-0 Source Inactive Lead Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+              .col-md-9
+                .group-link
+                  = render 'reports_button', locals: {report_name: :source_wise_inactive}
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
+                    = fa_icon "download"
+                    Export
+              = render 'report_search'
+          .table-body
+            - plottable = {}
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all Source
+                    %th.all Total
+                    - @reasons.each do |reason|
+                      %th.desktop= reason.reason
+                - overall_counts = 0
+                %tbody
+                  - @sources.each do |source|
+                    - this_source_data = @data.where(:source_id=>source.id)
+                    - source_total = this_source_data.count
+                    - plottable[source.name] = source_total
+                    - overall_counts += source_total
+                    %tr
+                      %td= source.name
+                      %td
+                        = link_to dld_path(:source_id=>[source.id]), target: "_blank" do
+                          = source_total
+                      - @reasons.each do |reason|
+                        - this_reason_data = this_source_data.where(:dead_reason_id=>reason.id)
+                        %td
+                          = link_to dld_path(:source_id=>[source.id], :dead_reason_ids=>[reason.id]), target: "_blank" do
+                            = this_reason_data.count
+                - if @data.present?
+                  %td Total
+                  %td
+                    = link_to dld_path(:source_id=>[@sources.ids]), target: "_blank" do
+                      = overall_counts
+                  - @reasons.each do |reason|
+                    %td
+                      = link_to dld_path(:source_id=>[@sources.ids], :dead_reason_ids=>[reason.id]), target: "_blank" do
+                        = @data.where(:dead_reason_id=>reason.id).count
+            - if plottable.present?
+              .chart-canvas.d-none.d-sm-block.pieChart
+                = render partial: "report_chart", locals: {plottable: plottable}

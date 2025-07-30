@@ -1,0 +1,120 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Users
+          %h1.m-0 Users
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-7
+                .search-outer
+                  = form_tag users_path, method: :get do
+                    .search-group 
+                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by name, email or phone"
+                      .search-group-btn
+                        = button_tag type: "submit", class: "btn btn-default search-btn" do
+                          = fa_icon "search"
+                        = link_to users_path, class: "btn btn-default search-btn refresh" do
+                          = fa_icon "refresh"
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
+                    Advanced Search
+                    %i.fa.fa-angle-down
+              .col-md-5
+                .group-link
+                  - if current_user.is_super?
+                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
+                      = fa_icon "download"
+                      Export
+                
+                  - if current_user.may_add_user?
+                    = link_to 'Add New User', new_user_path,
+                      class: 'btn btn-new'
+              #adv-searchbox.box-body
+                = form_tag nil, method: :get, class: "filter-search-menu" do
+                  = hidden_field_tag :is_advanced_search, true
+                  .p-2
+                    .custom-search
+                      .row
+                        .col-12
+                          %h5 Search By Basic Details
+                        .col-xs-6.col-md-3
+                          = label_tag :display_from, 'Name', class: 'control-label'
+                          .form-group
+                            = text_field_tag :name, params[:name], class: "form-control", placeholder: "Name"
+                        .col-xs-6.col-md-3
+                          = label_tag :display_from, 'Email', class: 'control-label'
+                          .form-group
+                            = text_field_tag :email, params[:email], class: "form-control", placeholder: "Email"
+                        .col-xs-6.col-md-3
+                          = label_tag :display_from, 'Mobile', class: 'control-label'
+                          .form-group
+                            = text_field_tag :mobile, params[:mobile], class: "form-control", placeholder: "Mobile No."
+                        .col-xs-6.col-md-3
+                          = label_tag :display_from, 'Role', class: 'control-label'
+                          .form-group
+                            = select_tag "role_ids", options_from_collection_for_select(current_user.accessible_roles, :id, :name, params[:role_ids]), class: "form-control multi-select-list", multiple: true, data: { prompt: 'Select Role' }
+                        .col-12
+                          %h5 Search By Dates
+                        .col-xs-6.col-md-3
+                          .form-group
+                            = label_tag :display_from, 'Created From ', class: 'control-label'
+                            .input-group
+                              .input-group-addon
+                                = fa_icon "calendar"
+                              = text_field_tag :created_at_from, params[:created_at_from], class: "form-control dateFormat"
+                        .col-xs-6.col-md-3
+                          .form-group
+                            = label_tag :display_upto, 'Created Upto', class: 'control-label'
+                            .input-group
+                              .input-group-addon
+                                = fa_icon "calendar"
+                              = text_field_tag :created_at_upto, params[:created_at_upto], class: "form-control dateFormat"
+                        .col-xs-6.col-md-6
+                          = render partial: 'shared/updated_at_filter'
+                        .col-md-12
+                          = button_tag type: "submit", class: "btn btn-primary" do
+                            Search
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th Full Name
+                    %th Email
+                    %th Contact No.
+                    %th Role Name
+                    - if current_user.is_sysad?
+                      %th Company
+                    %th Added On
+                    %th Status
+                    %th Action
+                %tbody
+                  - @users.each do |user|
+                    %tr
+                      %td= link_to user.name, user_path(user.uuid), remote: true
+                      %td= user.email
+                      %td= user.mobile
+                      %td= user.role.name rescue nil
+                      - if current_user.is_sysad?
+                        %td= user.company.name rescue nil
+                      %td= user.created_at.strftime("%d %B %Y : %I.%M %p")
+                      %td= (user.active? ? "Active" : "Inactive")
+                      %td
+                        = link_to edit_user_path(user.uuid), class: "btn btn-action btn-edit" do
+                          = render partial: 'icons/edit'
+                        - if current_user.is_super? && user.id != current_user.id && current_user.company.setting.present? && current_user.company.can_delete_users
+                          = link_to user_path(user.uuid), class: "btn btn-danger", method: :delete,
+                            data: {:confirm => "Would you like to permanently delete this user?", "commit-class" => "btn btn-success", "cancel-class" => "btn btn-danger"}, style: "padding: 0px; width: 20px;" do
+                            = fa_icon "trash-o"
+        - if @users.present?
+          .pagination-custom-holder
+            %strong{style: "margin-left: 0;"} Users Count - #{@users.total_entries}
+            = will_paginate @users, :class  =>  "ct-pag"

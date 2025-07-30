@@ -1,0 +1,22 @@
+%div{}
+  .row
+    .col-md-4
+      %label Title
+      .form-group
+        = text_field_tag "cost_sheet[payment_plans_attributes][#{index}][title]", stage.title, class: "form-control"
+    .col-md-4
+      %label Percentage
+      .form-group
+        = text_field_tag "cost_sheet[payment_plans_attributes][#{index}][percentage]", stage.percentage, class: "form-control"
+    .col-md-4
+      %label Due date
+      .form-group
+        .input-group
+          %span.input-group-addon
+            = fa_icon 'calendar'
+          = text_field_tag "cost_sheet[payment_plans_attributes][#{index}][due_date]","", class: "form-control dateFormat"
+:javascript
+  $('.dateFormat').datetimepicker({
+    timepicker: false,
+    format:'d/m/Y'
+  });

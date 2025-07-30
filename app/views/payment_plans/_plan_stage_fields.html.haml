@@ -1,0 +1,11 @@
+.nested-fields.col-md-12
+  .row
+    .col-md-4.required
+      .form-group
+        = f.text_field :title
+    .col-md-4.required
+      .form-group
+        = f.text_field :percentage
+    .col-md-1{style: "margin-top:25px;"}
+      %center
+        = link_to_remove_association "Remove", f, :class=>"btn btn-danger"

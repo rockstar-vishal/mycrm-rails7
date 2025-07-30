@@ -1,0 +1,45 @@
+
+  
+#adv-searchbox.box-body
+  = form_tag nil, method: :get, class: "filter-search-menu" do
+    .p-2
+      .custom-search
+        .row
+          .col-12
+            %h5.mt-0 Search By Date
+          .col-md-6
+            = render partial: 'shared/date_range_display'
+          .col-md-6
+            = render partial: 'shared/updated_at_filter'
+          - if current_user.company.is_allowed_field?("booking_date") && (params[:action] == 'leads' || params[:action]=='closing_executives')
+            .col-md-6
+              = render partial: 'shared/booking_date_filter'
+          - if params[:action]=='closing_executives'
+            .col-md-6
+              = render partial: 'shared/visited_date_filter'
+            - if current_user.company.setting.present? && current_user.company.setting.visit_filter_enable
+              .col-md-3
+                .form-group
+                  %label Select visit counts
+                  = select_tag :visit_counts, options_for_select(["Fresh Visit", "Revisit", "New Clients"], params[:visit_counts]), prompt: 'Select visit counts', class: "form-control"
+          .col-12
+            %h5.mt-0 Search By Projects details
+          .col-md-3
+            = render partial: 'shared/projects_filter'
+          - if current_user.check_source_presence
+            .col-md-3
+              = render partial: 'shared/sources_filter'
+          - if params[:action] == 'leads'
+            .col-md-3
+              = render partial: 'shared/users_filter'
+            -if current_user.company.open_closed_lead_enabled
+              .col-md-3
+                = render partial: 'shared/date_filter', locals: {label1: 'Re-Enquired From', label2: 'Re-Enquired Upto', field1_name: :reinquired_from, field2_name: :reinquired_upto}
+          .col-md-3
+            = render partial: 'shared/managers_filter'
+          - if current_user.company.is_allowed_field?("customer_type")
+            .col-md-3
+              = render partial: 'shared/customer_type_filter'
+          .col-md-3
+            = button_tag type: "submit", class: "btn btn-new" do
+              Search

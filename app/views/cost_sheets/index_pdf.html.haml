@@ -1,0 +1,122 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "UTF-8"}/
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %title Document
+  %body
+    %table{:cellpadding => "4", :cellspacing => "0", :style => "border: 1px solid #000; font-family:Calibri,Arial; font-size: 16px;"}
+      %tr{:style => "height: 20px;"}
+        %td{:align => "center", :colspan => "7", :style => "font-size: 20px; font-weight: bold; color: #ffffff; background-color: #333f4f; padding-top: 5px; padding-bottom: 5px;"}
+          #{@cost_sheet.company.name} - #{@cost_sheet.project_name} - #{@cost_sheet.topology} Price Sheet
+      %tr
+        %td
+          %table{:cellpadding => "0", :cellspacing => "0", :style => "width: 100%;"}
+            %tr
+              %td{:colspan => "5"}
+      %tr
+        %td{:style => "padding-bottom: 40px;"}
+          %table{:border => "1", :cellpadding => "4", :cellspacing => "0", :style => "width: 100%; border-collapse:collapse; border-style: solid; border-color: #000000;"}
+            %tr{:style => "height: 20px"}
+              %td{:align => "center", :colspan => "4", :dir => "ltr", :style => "font-weight: bold;"} Price Sheet
+              %td{:align => "center", :dir => "ltr", :style => "font-weight: bold;"}
+                =@cost_sheet.building_name
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "5"}
+            %tr{:style => "height: 20px"}
+              %td{:style => "font-weight: bold;"} Date
+              %td{:colspan => "4"} 8-Sep-23
+            %tr{:style => "height: 20px"}
+              %td{:style => "font-weight: bold;"} Project Name
+              %td{:colspan => "4", :dir => "ltr"}
+                =@cost_sheet.project_name
+            %tr{:style => "height: 20px"}
+              %td{:style => "font-weight: bold;"} Client Name
+              %td{:colspan => "4", :style => "background-color: #e2efd9;"}
+                =@cost_sheet.client_name
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "5"}
+            %tr{:style => "height: 20px"}
+              %td{:align => "center", :rowspan => "6", :style => "font-weight: bold;"} Residence Details
+              %td{:colspan => "3"} Tower No.
+              %td{:align => "right"}
+                =@cost_sheet.building_name
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "3"} Flat No.
+              %td{:align => "right"}
+                =@cost_sheet.flat_no
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "3"} Typology
+              %td{:align => "right"}
+                =@cost_sheet.topology
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "3"} Usable Carpet Area (Sq. Ft.)
+              %td{:align => "right"}
+                =@cost_sheet.carpet_area
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "3", :style => "background-color: #deeaf6; font-weight: bold;"} Agreement Value
+              %td{:align => "right", :style => "background-color: #deeaf6; font-weight: bold;"}
+                ₹ #{number_with_delimiter((@cost_sheet.other_items.where(cost_type_id: 1).sum(:amount).to_i), :delimiter => ',')}
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "5"}
+            - data= @cost_sheet.other_items.order("cost_sheets_other_items.created_at ASC").group("section_name, cost_sheets_other_items.name, cost_sheets_other_items.amount, slab_operator, cost_sheets_other_items.created_at").select("section_name, cost_sheets_other_items.name, cost_sheets_other_items.amount, slab_operator, cost_sheets_other_items.created_at").as_json
+            - section_heading=data.map{|k| k["section_name"]}.uniq
+            - section_heading.each do |sh|
+              - items_count=@cost_sheet.other_items.where(section_name: sh).count
+              - add_costs = @cost_sheet.other_items.where(section_name: sh).additional_slabs.sum(:amount)
+              - deduct_costs = @cost_sheet.other_items.where(section_name: sh).deduction_slabs.sum(:amount)
+              - @total_other_item_costs= add_costs - deduct_costs
+              %tr{:style => "height: 20px"}
+              %td{:align => "center", :rowspan => "#{items_count+2}", :style => "font-weight: bold;"}
+                =sh
+              - data.each do |item|
+                - if item["section_name"]==sh
+                  %tr
+                    %td{:colspan => "3"}
+                      =item["name"]
+                    %td{:align => "right"}
+                      %span
+                        - if item["slab_operator"]=="Subtract"
+                          = "-"
+                        ₹ #{number_with_delimiter((item["amount"].to_i), :delimiter => ',')}
+              %tr{:style => "height: 20px"}
+                %td{:colspan => "3", :style => "background-color: #deeaf6; font-weight: bold;"} Total-#{sh}
+                %td{:align => "right", :style => "background-color: #deeaf6; font-weight: bold;"}
+                  ₹ #{number_with_delimiter((@total_other_item_costs), :delimiter => ',')}
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "5"}
+            %tr{:style => "height: 20px"}
+              %td{:align => "center", :colspan => "4", :style => "background-color: #9cc2e5; font-weight: bold;"} Total Cost
+              %td{:align => "right", :style => "background-color: #9cc2e5; font-weight: bold;"}
+                - total_add_costs=@cost_sheet.other_items.additional_slabs.sum(:amount).to_i
+                - total_deduct_costs=@cost_sheet.other_items.deduction_slabs.sum(:amount).to_i
+                - total_items_costs=(total_add_costs-total_deduct_costs)
+                ₹ #{number_with_delimiter((@cost_sheet.agreement_value.to_i+total_items_costs.to_i), :delimiter => ',')}
+      %tr
+        %td{:style => "padding-bottom: 100px;"}
+          %table{:cellpadding => "5", :cellspacing => "0", :style => "border: 1px solid #000;"}
+            %tbody
+              %tr{:style => "height: 20px"}
+                %td
+                %td{:colspan => "5", :style => "font-weight: bold;"} TERMS & CONDTIONS :-
+                %td
+              %tr{:style => "position: static"}
+                %td
+                %td{:colspan => "5"}
+                  =simple_format(@cost_sheet.notes)
+      %tr
+        %td
+          %table{:cellpadding => "0", :cellspacing => "0", :style => "width: 100%;"}
+            %tr{:style => "height: 20px"}
+              %td{:width => "25"}
+              %td{:align => "center", :style => "border-top: 1px solid #000; font-weight: bold;", :width => "200"} Sales Manager Signature
+              %td
+              %td{:align => "center", :style => "border-top: 1px solid #000; font-weight: bold;", :width => "100"} Date
+              %td
+              %td{:align => "center", :style => "border-top: 1px solid #000; font-weight: bold;", :width => "200"} Customer Name & Signature
+              %td{:width => "25"}
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "7"}
+            %tr{:style => "height: 20px"}
+              %td{:colspan => "7"}

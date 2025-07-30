@@ -1,0 +1,21 @@
+.flat-content
+  #bldga.tab-pane.fade.active.show{"aria-labelledby" => "bldga-tab", :role => "tabpanel"}
+    - if @flats.present?
+      .row
+        .col-md-12
+          = render partial: 'flat_count', locals: { flats: @flats }
+          - @floors.each do |f|
+            - this_flat_data = @flats.select { |k| k["floor"] == f }
+            .card.elevation-3
+              .card-header.p-3
+                %h3.card-title
+                  Floor #{f}
+              .card-body.p-2
+                - this_flat_data.each do |flat|
+                  .flat-grid-holder
+                    .flat-grid{ class: flat_status_class(flat["status_id"]) }
+                      %p.inner-text
+                        Flat no :
+                        %strong
+                          = flat["name"]
+                    = render partial: 'flat_dropdown', locals: { flat: flat } if flat["status_name"] != "Booked" && current_user.company.booking_form_enabled

@@ -1,0 +1,95 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Campaigns
+          %h1.m-0.text-dark Campaigns
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+              
+              .col-md-9
+                .group-link
+                  = link_to 'Add Campaign', new_campaign_path, remote: true, class: 'btn btn-new ml-auto'
+             
+
+          .table-body
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all Sr.
+                    %th.all Title
+                    %th.all Start Date
+                    %th.all End Date
+                    %th.all Budget
+                    %th.all Source
+                    %th.all Project
+                    %th.all Spend
+                    %th.all Action
+                %tbody
+                  - @campaigns.each.with_index(1) do |camp,i|
+                    %tr
+                      %td
+                        = i
+                      %td
+                        = camp.title
+                      %td
+                        = camp.start_date
+                      %td
+                        = camp.end_date
+                      %td
+                        = fa_icon "rupee"
+                        = Utility.to_words(camp.budget)
+                      %td
+                        = camp.source&.name
+                      %td
+                        = (camp.projects.pluck(:name).join(', ') rescue "")
+                      %td
+                        = link_to "Import", campaigns_path, remote: true, class: "btn btn-action import-spend", data: {toggle: "modal", target: "#spendModal", campaign_id: camp.uuid}
+                      %td
+                        = link_to edit_campaign_path(camp.uuid), remote: true, class: "btn btn-action btn-edit" do
+                          = render partial: 'icons/edit'
+                        = link_to campaign_path(uuid: camp.uuid, source: camp.source, start_date: camp.start_date.to_s, end_date: camp.end_date.to_s), class: "btn btn-action btn-mailer", title: "View Campaign" do
+                          = render partial: 'icons/view'
+                        = link_to campaign_path(camp.uuid), class: "btn btn-action btn-remove", method: :delete,
+                            data: {:confirm => "Would you like to permanently delete this Campaign?", "commit-class" => "btn btn-action", "cancel-class" => "btn btn-action btn-remove"} do
+                          = fa_icon "trash-o"
+          - if @campaigns.present?
+            .pagination-custom-holder
+              %strong{style: "margin-left: 0;"} Templates Count - #{@campaigns.count}
+              = will_paginate @campaigns, :class  =>  "ct-pag"
+          .modal.fade#spendModal{tabindex: "-1", role: "dialog"}
+            .modal-dialog.modal-dialog-centered{role: "document"}
+              .modal-content
+                .modal-header
+                  %h5.modal-title Import Spend
+                  %button.close{"data-dismiss" => "modal", "aria-label" => "Close"}
+                    %span{"aria-hidden" => "true"} ×
+                .modal-body
+                  = form_for :campaign, url: import_spend_campaigns_path, remote: true, html: {id: "spend-form", multipart: true} do |f|
+                    .form-group
+                      = f.label :csv_file, "Upload CSV File"
+                      = f.file_field :csv_file, class: "form-control", accept: ".csv", required: true
+                    = f.hidden_field :campaign_id, id: "campaign_id_hidden_field"
+                    = f.submit "Upload", class: "btn btn-primary mb-4"
+                    .form-group
+                      = link_to "Download Sample CSV", download_sample_csv_campaigns_path(format: :csv), class: "btn btn-download"
+
+:javascript
+  $(document).on("click", ".import-spend", function () {
+    let campaignId = $(this).data("campaign-id");
+    console.log("Campaign ID:", campaignId);
+    console.log("this.data:", $(this).data);
+    $("#campaign_id_hidden_field").val(campaignId);
+    $("#spendModal").modal("show");
+  });
+

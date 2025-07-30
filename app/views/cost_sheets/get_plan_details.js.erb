@@ -1,0 +1,3 @@
+<% @plans.each_with_index do |p, index| %>
+  $('#plan_details').append("<%= escape_javascript(render partial: 'plan_details', locals: {stage: p, index: index})%>");
+<% end %>

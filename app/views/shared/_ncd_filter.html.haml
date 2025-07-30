@@ -1,0 +1,15 @@
+.row
+  .col-md-6
+    .form-group
+      = label_tag :ncd_from, 'NCD From ', class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :ncd_from, (params[:ncd_from].to_date rescue nil), class: 'form-control dateFormat pull-right'
+  .col-md-6
+    .form-group
+      = label_tag :ncd_upto, 'NCD Upto', class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :ncd_upto, (params[:ncd_upto].to_date rescue nil), class: 'form-control dateFormat pull-right'

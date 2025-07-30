@@ -1,0 +1,48 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    - if current_user.blank? || current_user.is_sysad?
+      - company = Company.find_by_domain(request.host)
+      - title = company.present? ? company.name : 'Corelto'
+      %title CRM - #{title}
+      = favicon_link_tag 'favicon.png'
+    - else
+      %title CRM - #{current_user.company.name}
+      = favicon_link_tag current_user.company.favicon.url(:original)
+    = javascript_include_tag "https://cdn.jsdelivr.net/npm/sweetalert2@11"
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'https://js.pusher.com/7.0/pusher.min.js'
+    = javascript_include_tag 'application'
+    = javascript_include_tag 'https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js'
+    = Gon::Base.render_data
+    = csrf_meta_tags
+    %script{ src: "https://cdnjs.cloudflare.com/ajax/libs/signature_pad/4.1.5/signature_pad.umd.min.js" }
+
+  %body.hold-transition.sidebar-mini.layout-fixed.layout-navbar-fixed.sidebar-collapse
+    = render partial: 'layouts/modal'
+    .wrapper
+      - if user_signed_in?
+        - if current_user.is_sysad?
+          = render partial: 'layouts/sysad_sidebar'
+        - elsif current_user.is_supervisor?
+          = render partial: 'layouts/supervisor_sidebar'
+        - elsif current_user.is_marketing_manager?
+          = render partial: 'layouts/marketing_manager_sidebar'
+        - else
+          = render partial: 'layouts/sidebar'
+      = flash_messages
+      = yield
+      = render partial: 'layouts/footer'
+      - if flash[:sweet_alert_success]
+        :javascript
+          document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+              icon: 'success',
+              title: 'Thank you!',
+              text: '#{j flash[:sweet_alert_success]}',
+              showConfirmButton: false,
+              showCloseButton: true,
+              timer: 6000
+            });
+          });

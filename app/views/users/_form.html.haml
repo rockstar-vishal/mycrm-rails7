@@ -1,0 +1,309 @@
+= bootstrap_form_for @user, url: (@user.new_record? ? users_path : user_path(@user.uuid)) do |f|
+  - if @user.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@user.errors.count, "error")
+        prohibited this User from being saved:
+      %ul
+        - @user.errors.full_messages.each do |message|
+          %li= message
+  #userEditForm.accordion
+    .search-card
+      #headingOne.card-header.p-0.border-0
+        %h2.mb-0
+          %button.btn.btn-link.btn-block.text-left.text-dark{"aria-controls" => "collapseOne", "aria-expanded" => "true", "data-target" => "#collapseOne", "data-toggle" => "collapse", type: "button"}
+            Basic Settings
+            %i.right.pl-2.fa.fa-angle-right
+      #collapseOne.collapse.show{"aria-labelledby" => "headingOne", "data-parent" => "#userEditForm"}
+        .card-body
+          - if current_user.is_sysad?
+            %hr
+            .row
+              .col-md-12
+                .form-group
+                  = f.select :company_id, options_from_collection_for_select(Company.all, :id, :name, (f.object.company_id rescue nil)), :prompt=>'Select Company', label: "Select Company", class: 'form-control'
+
+          .row
+            .col-md-3.required
+              .form-group
+                = f.text_field :name, class: "form-control", placeholder: "Name"
+            .col-md-3.required
+              .form-group
+                = f.text_field :email, class: "form-control", placeholder: "Email"
+            .col-md-3.required
+              .form-group
+                = f.text_field :mobile, class: "form-control", placeholder: "Mobile Number"
+            .col-md-3.required
+              .form-group
+                = f.select :role_id, options_from_collection_for_select(current_user.accessible_roles, :id, :name, (f.object.role_id rescue nil)), {include_blank: "Select Role", label: 'Role'},{class: 'form-control', data: {supervisor_value: current_user.accessible_roles.supervisor.ids, user_project_access: (current_user.company.setting.present? && current_user.company.enabled_project_wise_access && current_user.is_super?)}}
+            .col-md-3
+              .form-group
+                = f.password_field :password, class: 'form-control', placeholder: "Password"
+            .col-md-3
+              .form-group
+                = f.password_field :password_confirmation, class: 'form-control', placeholder: "Confirm Password"
+            .col-xs-8.col-md-3
+              .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                %label
+                  = f.check_box :active, checked: true
+          %hr
+          .row
+            .col-md-3
+              .form-group
+                = f.select :city_id, options_from_collection_for_select(City.all, :id, :name, (f.object.city_id rescue nil)), :prompt=>'Select City', class: 'form-control'
+            .col-md-3
+              .form-group
+                = f.text_field :state, class: "form-control", placeholder: "State"
+            .col-md-3
+              .form-group
+                = f.text_field :country, class: "form-control", placeholder: "Country"
+          - if current_user.is_super?
+            %hr
+            .row
+              - if current_user.company.setting.present? && current_user.company.enable_meeting_executives
+                .col-md-3
+                  .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                    %label
+                      = f.check_box :is_meeting_executive
+              - if current_user.company.is_allowed_for_visits?('user_id')
+                .col-md-3
+                  .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                    %label
+                      = f.check_box :is_calling_executive, 'Is Calling Executive?'
+              .col-md-3
+                .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                  %label
+                    = f.check_box :can_import
+              .col-md-3
+                .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                  %label
+                    = f.check_box :can_export
+              - if f.object.company.setting.present? && f.object.company.enable_user_wise_assign_all_users && !f.object.company.can_assign_all_users
+                .col-md-3
+                  .checkbox.icheck{:style => "margin-left:20px;margin-top: 40px;"}
+                    %label
+                      = f.check_box :assign_all_users_permission
+              .col-md-3
+                .checkbox.icheck{:style => "margin-left:20px;margin-top: 40px;"}
+                  %label
+                    = f.check_box :can_delete_lead
+              .col-md-3
+                .checkbox.icheck{:style => "margin-left:20px;margin-top: 40px;"}
+                  %label
+                    = f.check_box :disable_create_lead
+              .col-md-3
+                .checkbox.icheck{:style => "margin-left:20px;margin-top: 40px;"}
+                  %label
+                    = f.check_box :disable_lead_edit
+              - if @user.company.round_robin_enabled?
+                .col-md-3
+                  .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                    %label
+                      = f.check_box :round_robin_enabled
+              - if !@user.is_super?
+                .col-md-3
+                  .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                    %label
+                      = f.check_box :can_access_project
+    - if current_user.is_super?      
+      .search-card
+        #headingTwo.card-header.p-0.border-0
+          %h2.mb-0
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseTwo", "aria-expanded" => "false", "data-target" => "#collapseTwo", "data-toggle" => "collapse", type: "button"}
+              Cloud Telephony Settings
+              %i.right.pl-2.fa.fa-angle-right
+        #collapseTwo.collapse{"aria-labelledby" => "headingTwo", "data-parent" => "#userEditForm"}
+          .card-body
+            - if current_user.is_super?
+              .row
+                - if current_user.company.exotel_enabled?
+                  .col-md-3
+                    .form-group#exotel_sid
+                      = f.select :exotel_sid_id, options_from_collection_for_select(current_user.company.exotel_sids.active, :id, :number, f.object.exotel_sid_id), {:prompt =>"Select Click To Calling Number"}, class: 'form-control'
+                - if current_user.company.mcube_enabled?
+                  .col-md-3
+                    .form-group#exotel_sid
+                      = f.select :mcube_sid_id, options_from_collection_for_select(current_user.company.mcube_sids.active, :id, :number, f.object.mcube_sid_id), {:prompt =>"Select Click To Calling Number"}, class: 'form-control'
+                - if current_user.company.other_cloud_telephony_active?
+                  .col-md-3
+                    .form-group#exotel_sid
+                      = f.select :cloud_telephony_sid_id, options_from_collection_for_select(current_user.company.cloud_telephony_sids.active, :id, :caller_id, f.object.cloud_telephony_sid_id), {:prompt =>"Select Click To Calling Number", label: 'Calling Sid'}, class: 'form-control'
+                - if @user.company.setting.present? && @user.company.setting.enable_callerdesk_sid
+                  .col-md-3.ch-select
+                    .form-group
+                      = f.select :caller_desk_project_id, options_from_collection_for_select(@user.company.projects.active, :id, :name, @user.caller_desk_project_id), {prompt: true, label: 'CallDesk Project'}, class: 'form-control chosen-select'
+                - if current_user.company.czentrixcloud_enable
+                  .col-md-3#czentrixcloud
+                    .form-group
+                      = f.text_field :agent_id, class: "form-control", placeholder: "CZentrixCloud"
+                - if current_user.company.teleteemtech_integration.present?
+                  .col-md-3
+                    .form-group
+                      = f.text_field :ivr_id, class: "form-control", placeholder: "IVR"
+                .col-xs-8.col-md-3
+                  .checkbox.icheck{:style => "margin-left:20px;    margin-top: 40px;"}
+                    %label
+                      = f.check_box :click_to_call_enabled
+      - if @user.company.setting.present? && @user.company.enable_user_incentive
+        .search-card
+          #headingThree.card-header.p-0.border-0
+            %h2.mb-0
+              %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseThree", "aria-expanded" => "false", "data-target" => "#collapseThree", "data-toggle" => "collapse", type: "button"}
+                User Incentives
+                %i.right.pl-2.fa.fa-angle-right
+          #collapseThree.collapse{"aria-labelledby" => "headingThree", "data-parent" => "#userEditForm"}
+            .card-body
+              .row
+                = f.fields_for :user_detail do |det|
+                  .col-md-3
+                    = det.number_field :earned_incentive,  label: 'Earned Incentive', :class=>"form-control"
+                  .col-md-3
+                    = det.number_field :pending_incentive,  label: 'Pending Incentive', :class=>"form-control"
+                  .col-md-3
+                    = det.number_field :paid_incentive,  label: 'Paid Incentive', :class=>"form-control"
+      .search-card
+        #headingFour.card-header.p-0.border-0
+          %h2.mb-0
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseFour", "aria-expanded" => "false", "data-target" => "#collapseFour", "data-toggle" => "collapse", type: "button"}
+              User Manager
+              %i.right.pl-2.fa.fa-angle-right
+        #collapseFour.collapse{"aria-labelledby" => "headingFour", "data-parent" => "#userEditForm"}
+          .card-body
+            .row
+              .col-md-12
+                .form-group
+                  #user_managers.row
+                    = f.fields_for :manager_mappings do |manager_mapping|
+                      = render "manager_mapping_fields", :f => manager_mapping
+                    .links
+                      = link_to_add_association "Add Managers", f, :manager_mappings, class: "btn btn-primary m-3"
+    - if @user.company.present? && @user.company.secondary_level_round_robin
+      .search-card
+        #headingFive.card-header.p-0.border-0
+          %h2.mb-0
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseFive", "aria-expanded" => "false", "data-target" => "#collapseFive", "data-toggle" => "collapse", type: "button"}
+              Round Robin Settings
+              %i.right.pl-2.fa.fa-angle-right
+        #collapseFive.collapse{"aria-labelledby" => "headingFive", "data-parent" => "#userEditForm"}
+          .card-body
+            .row
+              .col-md-12
+                .form-group
+                  #user_managers.row
+                    = f.fields_for :round_robin_settings do |rrs|
+                      = render "round_robin_setting_fields", :f => rrs
+                    .links
+                      = link_to_add_association "Add Round Robin Configuration", f, :round_robin_settings, class: "btn btn-primary m-3"
+    #users-projects-sec{ style: ( (current_user.company.setting.present? && current_user.company.enabled_project_wise_access && current_user.is_super?) || current_user.accessible_roles.supervisor.ids.include?(f.object.role_id) ? "" : "display:none" ) }
+      .search-card
+        #headingSix.card-header.p-0.border-0
+          %h2.mb-0
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSix", "aria-expanded" => "false", "data-target" => "#collapseSix", "data-toggle" => "collapse", type: "button"}
+              Users Projects
+              %i.right.pl-2.fa.fa-angle-right
+        #collapseSix.collapse{"aria-labelledby" => "headingSix", "data-parent" => "#userEditForm"}
+          .card-body
+            .row
+              .col-md-12
+                .form-group
+                  #user_managers.row
+                    = f.fields_for :users_projects do |project|
+                      = render "users_project_fields", :f => project
+                    .links
+                      = link_to_add_association "Add Projects", f, :users_projects, class: "btn btn-primary m-3"
+    #users-sources-sec{:style => ("display:none;" unless current_user.accessible_roles.marketing_manager.ids.include?(f.object.role_id))}
+    .search-card{"id" => "marketing-manager-card", style: "display: none;"}
+      #headingSeven.card-header.p-0.border-0
+        %h2.mb-0
+          -# %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSeven", "aria-expanded" => "false", "data-target" => "#collapseSeven", "data-toggle" => "collapse", type: "button"}
+          %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSeven", "aria-expanded" => "false", "data-target" => "#collapseSeven", "data-toggle" => "collapse", type: "button", id: "source-button"}
+            Accessible Sources
+            %i.right.pl-2.fa.fa-angle-right
+      #collapseSeven.collapse{"aria-labelledby" => "headingSeven", "data-parent" => "#userEditForm"}
+        .card-body
+          .row
+            .col-md-12
+              .form-group
+                #user_managers.row
+                  = f.fields_for :users_sources do |source|
+                    = render "users_source_fields", :f => source
+                  .links
+                    = link_to_add_association "Add Sources", f, :users_sources, class: "btn btn-primary m-3"    
+  .w-100
+  %hr
+  %div
+    .col-md-12
+      .form-group
+        = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+          
+          Save
+        = link_to :back, class: "btn btn-delete" do
+          
+          Cancel
+
+:javascript
+  var toggleExotelSid = function(shouldShowExotelSid){
+    if(shouldShowExotelSid){
+      $("#exotel_sid").show();
+    }else{
+      $("#exotel_sid").hide();
+
+    }
+  }
+  toggleExotelSid($("#user_click_to_call_enabled").is(':checked'));
+  $("#user_click_to_call_enabled").on("change", function(e){
+    toggleExotelSid($(this).is(':checked'));
+  });
+
+  var toggleczentrixcloud = function(shouldshowczentrixcloud){
+    if(shouldshowczentrixcloud){
+      $("#czentrixcloud").show();
+    }else{
+      $("#czentrixcloud").hide();
+
+    }
+  }
+  toggleczentrixcloud($("#user_click_to_call_enabled").is(':checked'));
+  $("#user_click_to_call_enabled").on("change", function(e){
+    toggleczentrixcloud($(this).is(':checked'));
+  });
+  $("#user_role_id").change(function () {
+    var role_value = $(this).val();
+    if (($('#user_role_id').data('user-project-access'))) {
+      return;
+    }
+    var supervisor = $('#user_role_id').data('supervisor-value');
+    var is_supervisor = (supervisor !=null && supervisor.includes(parseInt(role_value)));
+    if (is_supervisor){
+      $('#users-projects-sec').show();
+    } else {
+      $('#users-projects-sec').hide();
+    }
+  });
+  document.addEventListener("DOMContentLoaded", function() {
+    const roleSelect = document.getElementById("user_role_id");
+    const SourceAccordion = document.getElementById("marketing-manager-card");
+    const sourceButton = document.getElementById("source-button");
+    const collapseSeven = document.getElementById("collapseSeven");
+
+    roleSelect.addEventListener("change", function() {
+      if (roleSelect.options[roleSelect.selectedIndex].text === "Marketing Manager") {
+        SourceAccordion.style.display = "block";
+        collapseSeven.classList.add("show");
+        sourceButton.setAttribute("aria-expanded", "true");
+      } else {
+        SourceAccordion.style.display = "none";
+        collapseSeven.classList.remove("show");
+        managerButton.setAttribute("aria-expanded", "false");
+      }
+    });
+    roleSelect.dispatchEvent(new Event("change"));
+  });
+
+:css
+  .right{
+    transition: 0.3s;
+  }
+  .card-header .btn-link:not(.collapsed) .right {
+    transform: rotate(90deg) translateX(-2px);
+  }

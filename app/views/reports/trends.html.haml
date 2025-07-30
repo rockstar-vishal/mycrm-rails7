@@ -1,0 +1,53 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Lead Volume Report
+          %h1.m-0 Lead Volume Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+                %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary btn-sm"}
+                  Advanced Search
+                  %i.fa.fa-angle-down
+              .col-md-9
+                .group-link
+                  = render 'reports_button', locals: {report_name: :trends}
+            #adv-searchbox.box-body
+              = form_tag nil, method: :get, class: "filter-search-menu" do
+                .p-2
+                  .custom-search
+                    .row
+                      .col-12
+                        %h5.mt-0 Search By Date
+                      .col-md-6
+                        = render partial: 'shared/trends_range_selector'
+                      .col-12
+                        %h5.mt-0 Search Project Date
+                      .col-md-4
+                        = render partial: 'shared/projects_filter'
+                      - if current_user.check_source_presence
+                        .col-md-4
+                          = render partial: 'shared/sources_filter'
+                      .col-12
+                        %h5.mt-0 Search User/Managers
+                      .col-md-3
+                        = render partial: 'shared/users_filter'
+                      .col-md-4
+                        = render partial: 'shared/managers_filter'
+                      .col-md-12
+                        .form-group
+                        
+                          = button_tag type: "submit", class: "btn btn-new" do
+                            Search
+          .table-body
+            .chart-canvas.d-none.d-sm-block
+              = area_chart [{name: "Leads Generated", data: @lead_gen.map{|k| [k['created_date'], k['count']]}}, {name: "Visits Done", data: @visits.map{|k| [k['visit_date'], k['count']]}}, {name: "Conversions", data: @conversions.map{|k| [k['conversion_date'], k['count']]}}], download: true, zeros: true, library: {animation: {easing: 'easeOutQuart'}}

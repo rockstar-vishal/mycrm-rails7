@@ -1,0 +1,56 @@
+= bootstrap_form_for @broker,  url: (@broker.new_record? ? brokers_path : broker_path(@broker.uuid)), remote: true do |f|
+  - if @broker.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@broker.errors.count, "error")
+        prohibited this from being saved:
+      %ul
+        - @broker.errors.full_messages.each do |message|
+          %li= message
+  - broker_form = current_user.company.broker_configuration
+  = f.hidden_field :enable_partner_integration, value: true
+  .row
+    .col-md-6.required
+      .form-group
+        = f.text_field :name, class: "form-control", placeholder: "Name"
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("email"))}
+      .form-group
+        = f.text_field :email, class: "form-control", placeholder: "Email"
+  .row
+    .col-md-6.required
+      .form-group
+        = f.text_field :mobile, class: "form-control", placeholder: "Mobile"
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("other_contacts"))}
+      .form-group
+        = f.text_field :other_contacts, class: "form-control", placeholder: "Other Contact"
+  .row
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("firm_name"))}
+      .form-group
+        = f.text_field :firm_name, class: "form-control", placeholder: "Firm Name"
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("locality"))}
+      .form-group
+        = f.text_field :locality, class: "form-control", placeholder: "Locality"
+  .row
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("rm_id"))}
+      .form-group
+        = f.select :rm_id, options_from_collection_for_select(@company.users, :id, :name, (f.object.rm_id || current_user.id)), {include_blank: "Select RM", label: 'RM'}, class: "form-control"
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("rera_number"))}
+      .form-group
+        = f.text_field :rera_number, class: "form-control", placeholder: "Rera Number"
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("rera_status"))}
+      .form-group
+        = f.select :rera_status, options_for_select(Broker::RERA_STATUS, f.object.rera_status), {include_blank: "Select"}
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("rera_document_file_name"))}
+      = f.file_field :rera_document, label: 'RERA Certificate', class: "form-control"
+    .col-md-6{class: ("required" if broker_form.present? && broker_form.required_fields.include?("cp_code"))}
+      .form-group
+        = f.text_field :cp_code, class: "form-control", placeholder: "Unique Code"
+    .col-md-12{class: ("required" if broker_form.present? && broker_form.required_fields.include?("address"))}
+      .form-group
+        = f.text_field :address, class: "form-control", placeholder: "Address" 
+  .row
+    .col-md-12
+      .form-group
+        = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+          Save
+        

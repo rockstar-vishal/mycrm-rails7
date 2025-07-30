@@ -1,0 +1,8 @@
+.row
+  .col-md-12
+    .form-group
+      %label Select Sub Sources
+      - if current_user.company.is_allowed_field?("enquiry_sub_source_id")
+        = select_tag :sub_source_ids, options_from_collection_for_select(current_user.company.sub_sources, :id, :name, params[:sub_source_ids]), multiple: true, class: "form-control multi-select-list"
+      - elsif current_user.company.is_allowed_field?("sub_source")
+        = text_field_tag :sub_source, params[:sub_source], class: "form-control", placeholder: "Sub source"

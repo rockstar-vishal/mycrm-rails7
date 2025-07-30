@@ -1,0 +1,5 @@
+- if current_user.company.setting.present? && current_user.company.chart_type == "Bar Chart"
+  .chart-custom
+    = bar_chart(plottable, library: { animation: {easing: 'easeOutQuart'}}, width: "50% !important")
+- else
+  = pie_chart(plottable, library: {animation: {easing: 'easeOutQuart'}})

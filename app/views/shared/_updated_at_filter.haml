@@ -1,0 +1,15 @@
+.row
+  .col-md-6
+    .form-group
+      = label_tag :log_updated_from, 'Log Updated From ', class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :log_updated_from, (params[:log_updated_from].to_date rescue nil), class: 'form-control dateFormat pull-right'
+  .col-md-6
+    .form-group
+      = label_tag :log_updated_upto, 'Log Updated Upto', class: 'control-label'
+      .input-group
+        %span.input-group-addon
+          = fa_icon 'calendar'
+        = text_field_tag :log_updated_upto, (params[:log_updated_upto].to_date rescue nil), class: 'form-control dateFormat pull-right'

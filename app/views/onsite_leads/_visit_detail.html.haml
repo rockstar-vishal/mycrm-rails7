@@ -1,0 +1,23 @@
+.modal-header
+  %h5.modal-title Preview Visits
+  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+    %span{"aria-hidden" => "true"} ×
+.modal-body
+  - if @lead.visits.present?
+    .table-responsive
+      %table.table.table-bordered.table-hover
+        %thead
+          %tr
+            %th #
+            %th Date
+            %th Source
+            %th 
+        %tbody
+          - @lead.visits.includes(:user).order(created_at: :desc).each.with_index(1) do |visit, i|
+            %tr
+              %td= i
+              %td= visit.date.strftime("%d %B %Y")
+              %td= (visit.source&.name rescue "")
+              %td
+                = link_to edit_visit_onsite_lead_path(@lead, visit), remote: true, class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                  = fa_icon "pencil"

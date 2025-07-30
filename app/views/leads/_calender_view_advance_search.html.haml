@@ -1,0 +1,41 @@
+#adv-searchbox.box-body
+  = form_tag nil, method: :get, class: "filter-search-menu", id: "calender_view_search" do
+    = hidden_field_tag :is_advanced_search, true
+    .row.ml-0.mr-0
+      .col-xs-6.col-md-3
+        .form-group
+          = label_tag "Customer Name"
+          = text_field_tag :name, params[:name], class: "form-control", placeholder: "Customer Name"
+      .col-xs-6.col-md-3
+        .form-group
+          = label_tag "Mobile No."
+          = text_field_tag :mobile, params[:mobile], class: "form-control", placeholder: "Mobile No."
+      .col-xs-6.col-md-3
+        .form-group
+          = label_tag "Project"
+          = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects.sorted, :id, :name, params[:project_ids]), multiple: true, class: "form-control multi-select-list"
+      .col-xs-6.col-md-3
+        .form-group
+          = label_tag "Lead Number"
+          = text_field_tag :lead_no, params[:lead_no], class: "form-control", placeholder: "Lead Number"
+      - if current_user.check_source_presence
+        - sources = current_user.is_marketing_manager? ? current_user.accessible_sources : current_user.company.sources
+        .col-xs-6.col-md-3
+          .form-group
+            = label_tag "Source"
+            = select_tag :source_id, options_from_collection_for_select(sources, :id, :name, params[:source_id]), prompt: "Lead Source", class: "form-control multi-select-list", multiple: true
+      .col-xs-6.col-md-3
+        .form-group
+          = label_tag 'Status'
+          = select_tag "lead_statuses", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true
+      .col-xs-6.col-md-3
+        .form-group
+          - users = @company.can_assign_all_users ? @company.users.active : @company.users.active.where(:id=>current_user.manageable_ids)
+          = label_tag "Assigned To"
+          = select_tag "assigned_to[]", options_from_collection_for_select(users, :id, :name, params[:assigned_to]), class: "form-control multi-select-list", multiple: true
+      .w-100
+      .col-xs-6.col-md-3
+        .form-group
+          = button_tag type: "submit", class: "btn btn-primary btn-flatbtn" do
+            = fa_icon "search"
+            Search

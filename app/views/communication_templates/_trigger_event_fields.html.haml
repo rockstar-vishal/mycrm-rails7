@@ -1,0 +1,43 @@
+= javascript_include_tag 'notification_templates'
+.nested-fields.col-md-12#event-nested_fields{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
+  .row
+    .col-md-3
+      .form-group
+        = f.label :object_entity, 'Object Entity'
+        = f.collection_select :object_entity, ['Lead'], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect", required: true
+    .col-md-3
+      .form-group
+        = f.label :receiver_type, 'Receiver Type'
+        = f.collection_select :receiver_type, ['Lead', 'User'], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect", required: true
+    .col-md-3
+      .form-group
+        = f.label :trigger_hook_type, 'Event Hook Type'
+        = f.collection_select :trigger_hook_type, ["Status", "Assigned To"], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect trigger-type"
+    .col-md-3
+      .form-group
+        = f.label :trigger_type, 'Trigger Type'
+        = f.collection_select :trigger_type, ["On Create", "On Update"], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect", required: true
+    .col-md-3
+      .form-group
+        = f.label :template_id, 'Template ID'
+        = f.text_field :template_id, class: "form-control", placeholder: "Enter Template ID", hide_label: true, required: true
+    .col-md-6#trigger-fields
+      .row
+        .col-md-6
+          .form-group
+            = f.label :from_status, 'From Status'
+            = f.collection_select :from_status, @template.company.statuses, :id, :name, { include_blank: 'Please Select', hide_label: true },{class: "form-control multiselect"}
+        .col-md-6
+          .form-group
+            = f.label :to_status, 'To Status'
+            = f.collection_select :to_status, @template.company.statuses, :id, :name, { include_blank: 'Please Select', hide_label: true },{class: "form-control multiselect"}
+    .col-md-12
+      .form-group
+        %label.col-sm-6.control-label{:for => "exampleInputFile"} Notification Template:
+        #communication_attributes.row
+          = f.fields_for :communication_attributes do |attribute|
+            = render "communication_attribute_fields", :f => attribute
+          .links.m-4
+            = link_to_add_association "Add Text & Attribute", f, :communication_attributes, class: "btn btn-primary"
+  %center
+    = link_to_remove_association "Remove", f, class: "btn btn-danger btn-sm"

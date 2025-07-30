@@ -1,0 +1,57 @@
+- if !@template.persisted? && @template.company_id.blank?
+  = form_tag new_communication_template_path, method: :get do |f|
+    .row
+      .col-md-4
+        .form-group
+          = select_tag :company_id, options_from_collection_for_select(Company.all, :id, :name, @template.company_id), { prompt: 'Select Company', label: 'Company', class: 'form-control chosen-select' }
+      .col-md-10
+        .pull-right
+          = link_to 'Cancel', communication_templates_path, class: 'btn btn-danger btn-sm'
+          = button_tag type: "submit", class: "btn btn-primary btn-sm chosen-select", data: {disable_with: "Please Wait..."} do
+            = fa_icon "floppy-o"
+            Next
+- else
+  = bootstrap_form_for @template,  url: (@template.new_record? ? communication_templates_path : communication_template_path(@template)),remote: true do |f|
+    - if @template.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@template.errors.count, "error")
+          prohibited this Number from being saved:
+        %ul
+          - @template.errors.full_messages.each do |message|
+            %li= message
+    .row
+      .col-md-4
+        .form-group
+          = f.text_field :template_name, class: "form-control", placeholder: "Name", required: true
+      .col-md-4
+        .form-group
+          = f.select :notification_type, options_for_select([["SMS", "SMS"], ["WhatsApp", "WhatsApp"], ["Email", "Email"]] , @template.notification_type), { label: 'Notification Type', include_blank: 'Select' }, { class: 'form-control custom-select', required: true }
+      .col-md-4
+        = f.hidden_field :company_id, value: @template.company_id
+        .form-group
+          = f.select :company_id, options_from_collection_for_select(Company.all, :id, :name, @template.company_id), { prompt: 'Select Company', label: 'Company', class: 'form-control', required: true }, disabled: true
+    .row
+      .col-md-4
+        .form-group
+          = f.check_box :active, class: 'custom-checkbox'
+    .col-md-12
+      .form-group
+        %label.col-sm-6.control-label{:for => "exampleInputFile"} Notification Triggers:
+        #trigger_events.row
+          = f.fields_for :trigger_events do |event|
+            = render "trigger_event_fields", :f => event, template: @template
+          .links.m-4
+            = link_to_add_association "Add Triggers", f, :trigger_events, class: "btn btn-primary"
+            
+    %div{align: "center"}
+      .col-md-12
+        .form-group
+          = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+            = fa_icon "floppy-o"
+            Save
+          = link_to "Back",  new_communication_template_path, class: "btn btn-danger"
+          = link_to communication_templates_path, class: "btn btn-danger" do
+            = fa_icon "close"
+            Cancel
+

@@ -1,0 +1,25 @@
+= bootstrap_form_for @sub_source,  url: (@sub_source.new_record? ? sub_sources_path : sub_source_path(@sub_source.uuid)), remote: true do |f|
+  - if @sub_source.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@sub_source.errors.count, "error")
+        prohibited this from being saved:
+      %ul
+        - @sub_source.errors.full_messages.each do |message|
+          %li= message
+  .row
+    .col-md-6.required
+      = f.text_field :name, class: "form-control", placeholder: "Name"
+    - if current_user.company.setting.present? && current_user.company.enable_source_wise_sub_source
+      .col-md-6
+        .form-group
+          = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), {include_blank: "Source"}, {class: 'form-control'}
+  .row
+    .col-md-12
+      .form-group
+        = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+          
+          Save
+        = link_to sub_sources_path, class: "btn btn-delete" do
+          
+          Cancel 

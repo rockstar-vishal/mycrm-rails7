@@ -1,0 +1,31 @@
+.table-responsive
+  %table.table.table-bordered.table-condensed.table-striped.tablesorter
+    %thead
+      %tr
+        %th.all Name
+        %th.all Lead No
+        %th.all Project
+        %th.all Status
+        %th.all Source
+        %th.all CP
+        %th.all Assigned To
+        %th.all Closing Manager
+        %th Created At
+        %th Action
+    %tbody
+      - @leads.sort_by! { |k| k["id"].to_i }.each do |lead|
+        %tr
+          %td= lead["name"]
+          %td= lead["lead_no"]
+          %td= lead["project"]
+          %td= lead["status"]
+          %td= lead["source"]
+          %td= lead["cp"]
+          %td= lead["user"]
+          %td= lead["closing_executive"]
+          %td= DateTime.parse(lead["created_at"]).strftime("%d-%b-%Y %H:%M %p")
+          %td
+            = link_to partner_lead_edit_onsite_lead_path(lead), remote: true, class: "icon-lead"  do
+              = fa_icon "pencil"
+
+    

@@ -1,0 +1,280 @@
+.modal-header
+  %h5.modal-title Edit Lead #{@lead.name}
+  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+    %span{"aria-hidden" => "true"} ×
+.modal-body
+  = bootstrap_form_for @lead, remote: true do |f|
+    - if @lead.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@lead.errors.count, "error")
+          prohibited this Lead from being saved:
+        %ul
+          - @lead.errors.full_messages.each do |message|
+            %li= message
+    .row
+      - if @company.is_pop_fields?('name')
+        .col-md-6{class: ("required" if @company.is_required_fields?("name"))}
+          .form-group
+            = f.text_field :name, class: "form-control", placeholder: "Name", required: @company.is_required_fields?("name")
+      - users = (current_user.assign_all_users_permission || @company.can_assign_all_users) ? @company.users.active : @company.users.active.where(:id=>current_user.manageable_ids)
+      - if @company.is_pop_fields?('user_id') && users.ids.include?(f.object.user_id)
+        .col-md-6{class: ("required" if @company.is_required_fields?("user_id"))}
+          .form-group
+            = f.select :user_id, options_from_collection_for_select(users.order('name'), :id, :name, @lead.user_id), {prompt: true, label: 'Assign To'}, class: 'form-control', required: @company.is_required_fields?("user_id")
+      - can_show = (@company.managerwise_closing_executive_active && !current_user.is_meeting_executive? && current_user.is_executive?) ? (f.object.closing_executive.blank? ? true : false) : (@company.can_assign_all_users ? true : users.ids.include?(f.object.closing_executive) || f.object.closing_executive.blank?)
+      - closing_executive_label = @company.find_label("closing_executive").present? ? (@company.find_label("closing_executive").custom_value.present? ? @company.find_label("closing_executive").custom_value : @company.find_label("closing_executive").default_value) : 'Closing Executive'
+      - if @company.setting.present? && @company.enable_meeting_executives && @company.is_pop_fields?('closing_executive') && can_show
+        .col-md-6
+          .form-group
+            - if @company.managerwise_closing_executive_active
+              - users = current_user.is_executive? ? current_user.company.users.managers_role : (@company.can_assign_all_users ? @company.users.active : @company.users.active.where(:id=>current_user.manageable_ids))
+            - else
+              - users = @company.can_assign_all_users ? @company.users.active : @company.users.active.where(:id=>current_user.manageable_ids)
+            = f.select :closing_executive, options_from_collection_for_select(users.meeting_executives.order('name'), :id, :name, @lead.closing_executive), {include_blank: "Closing Executive", label: "#{closing_executive_label}"}, class: 'form-control'
+      - if @company.is_pop_fields?('status_id')
+        - if @company.role_statuses.present?
+          - statuses = current_user.statuses_roles
+          .col-md-6.required
+            .form-group
+              = f.select :status_id, options_from_collection_for_select(statuses.latest_first, :id, :name, f.object.status_id), {include_blank: "Lead Status"}, {class: 'form-control', data: { booked_id: @company.booking_done_id, dead_status_id:  @company.dead_status_ids, visit_planned_id: (@company.expected_visit_ids.reject(&:blank?) | [@company.expected_site_visit_id.to_s]), company_hide_ncd: @company.setting&.hide_next_call_date, is_tentative_date_required: @company.is_required_fields?("tentative_visit_planned")}}
+        - else
+          .col-md-6.required
+            .form-group
+              = f.select :status_id, options_from_collection_for_select(@company.statuses.latest_first, :id, :name, f.object.status_id), {include_blank: "Lead Status"}, {class: 'form-control', data: {enable_booked_loan_fields: (@company.setting.present? && @company.enable_booking_loan_fields), enable_booked_fields: (@company.setting.present? && @company.enable_booking_done_fields),booked_id: @company.booking_done_id, dead_status_id:  @company.dead_status_ids, token_status_id: @company.token_status_ids, visit_planned_id: (@company.expected_visit_ids.reject(&:blank?) | [@company.expected_site_visit_id.to_s]), company_hide_ncd: @company.setting&.hide_next_call_date,is_tentative_date_required: @company.is_required_fields?("tentative_visit_planned")}}
+        - if @company.is_pop_fields?("project_id")
+          - label = @company.find_label("project_id").present? ? (@company.find_label("project_id").custom_value.present? ? @company.find_label("project_id").custom_value : @company.find_label("project_id").default_value) : 'Project'
+          .col-md-3.required.ch-select
+            .form-group
+              = f.select :project_id, options_from_collection_for_select(@company.projects.active.sorted, :id, :name, @lead.project_id), {prompt: true, label: label}, class: 'form-control chosen-select',disabled: f.object.can_disable?
+        - if @company.token_status_ids.reject(&:blank?).present?
+          .col-md-3.required#token_status_fields{:style => ("display:none;" unless @company.token_status_ids.include?(@lead.status_id.to_s))}
+            .form-group
+              = f.text_field :token_date, :value=>(Date.parse(@lead.token_date.to_s) rescue nil), class: "form-control pull-right datetimepicker", placeholder: "Token Date"
+        - site_visit_ids=(@company.expected_visit_ids.reject(&:blank?) | [@company.expected_site_visit_id.to_s])
+        .col-md-6#tentative-visit-planned{:style => ("display:none;" unless site_visit_ids.include? @lead.status_id.to_s), class: ("required" if @company.is_required_fields?("tentative_visit_planned"))}
+          .form-group
+            = f.text_field :tentative_visit_planned, :value=>(Time.zone.parse(@lead.tentative_visit_planned.to_s).to_s rescue nil), label: 'Tentative Visit Planned', class: "form-control pull-right datetimepicker", placeholder: "Planned Visit Date & Time"
+        - if @company.setting.present? && @company.enable_booking_done_fields
+          .col-md-12#booking-done-fields.row{:style => ("display:none;" unless @lead.status_id == @company.booking_done_id)}
+            .col-md-6.required
+              = f.text_field :booking_date, :value=>(Date.parse(@lead.booking_date.to_s) rescue nil), class: "form-control pull-right datetimepicker", placeholder: "Booking Date"
+            .col-md-6.required
+              = f.file_field :booking_form, label: 'Booking Form', class: "form-control"
+        - if @company.setting.present? && @company.enable_booking_loan_fields
+          .col-md-12#booking-loan-fields.row{:style => ("display:none;" unless @lead.status_id == @company.booking_done_id)}
+            .col-md-6.required
+              .form-group
+                = f.text_field :booked_flat_no, class: "form-control", placeholder: "Flat No.", label: "Flat No."
+            .col-md-6.required
+              .form-group
+                = f.text_field :bank_loan_name, class: "form-control", placeholder: "Loan Name", label: "Loan Name"
+            .col-md-6.required
+              .form-group
+                = f.text_field :bank_person_name, class: "form-control", placeholder: "Bank Person Name", label: "Bank Person Name"
+            .col-md-6.required
+              .form-group
+                = f.text_field :bank_person_contact, class: "form-control", placeholder: "Bank Person Contact", label: "Bank Person Contact"
+            .col-md-6.required
+              .form-group
+                = f.text_field :bank_sales_person, class: "form-control", placeholder: "Sales Person", label: "Sales Person"
+        .col-md-12#dead-reason{:style => ("display:none;" unless @company.dead_status_ids.include?(f.object.status_id.to_s))}
+          .row
+            .col-md-6.required
+              .form-group
+                = f.select :dead_reason_id, options_from_collection_for_select(@company.reasons.active, :id, :reason, f.object.dead_reason_id), {include_blank: "Dead Reason"},{class: "form-control multiselect"}
+            .col-md-6
+              .form-group
+                = f.text_field :dead_sub_reason, class: "form-control", placeholder: "Sub Reason"
+      - if @company.is_pop_fields?('presale_stage_id')
+        .col-md-3{class: ("required" if @company.is_required_fields?("presale_stage_id"))}
+          = f.select :presale_stage_id, options_from_collection_for_select(f.object.selectable_company_stages, :stage_id, :stage_name, f.object.presale_stage_id), {include_blank: "Select Lead Stage"}, {required: @company.is_required_fields?("presale_stage_id")}
+      = render partial: 'custom_field', locals: {f: f, custom_fields: @company.magic_fields.where(is_popup_field: true)}
+      - if @company.is_pop_fields?('ncd')
+        .col-md-6#ncd_{:style => ("display:none;" if @company.setting&.hide_next_call_date && @company.dead_status_ids.include?(f.object.status_id.to_s)), class: ("required" if f.object.is_ncd_required?)}
+          .form-group
+            = f.text_field :ncd, :value=>(Time.zone.parse(@lead.ncd.to_s).to_s rescue nil), class: "form-control datetimepickerncd_modal", placeholder: "Next Call Date", label: "Next Call Date", data: {ncd_required: @company.is_required_fields?("ncd"), non_mandatory: @company.setting.present? && @company.set_ncd_non_mandatory_for_booked_status}, required: f.object.is_ncd_required?
+      - if @company.is_pop_fields?('is_qualified')
+        .col-md-12
+          .checkbox
+            = f.check_box :is_qualified, id: "lead_qualified"
+      - if @company.is_pop_fields?('city_id')
+        .col-md-6{class: ("required" if @company.is_required_fields?("city_id"))}
+          = f.select :city_id, options_from_collection_for_select(City.all, :id, :name, f.object.city_id), {include_blank: "Select City"}, class: 'form-control', required: @company.is_required_fields?("city_id")
+      - if @company.is_pop_fields?('sub_source')
+        .col-md-6{class: ("required" if @company.is_required_fields?("sub_source"))}
+          .form-group
+            = f.text_field :sub_source, class: "form-control sub_source", placeholder: "Sub Source", label: "Sub source", required: @company.is_required_fields?("sub_source")
+      - if @company.is_pop_fields?('locality_id')
+        .col-md-6{class: ("required" if @company.is_required_fields?("locality_id"))}
+          .form-group
+            = f.select :locality_id, options_from_collection_for_select(f.object.city_id.present? ? f.object.city_localities : Locality.all, :id, :name, f.object.locality_id), {include_blank: "Select Locality"}, class: 'form-control', required: @company.is_required_fields?("locality_id")
+    .w-100
+      - if @company.is_pop_fields?('comment')
+        .form-group.col-md-12{:class=> ("required" if @company.is_required_fields?("comment"))}
+          %span.lead-title Comment
+          %span.lead-info
+            -#= f.object.comment&.gsub(/\n/, '<br/>')&.html_safe
+            = f.object.comment.to_s.strip.gsub(/\r\n?/, "\n").gsub(/\n+/, '<br/>').gsub(/(<br\/>){3,}/, '<br/><br/>').html_safe
+            = f.text_area :comment, class: "form-control", value: '', placeholder: "Comment", rows: "4", required: @company.is_required_fields?("comment"), hide_label: true
+    %div
+      .col-md-12
+        .form-group
+          = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+            Save
+          = link_to :back, class: "btn btn-delete" do
+            Cancel
+:javascript
+  var date = new Date();
+  var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  $('.datetimepickerncd_modal').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
+  $("#lead_status_id").change(function () {
+    if($(this).val()){
+      var stage_url = "/leads/" + $(this).val() + "/stages";
+      $("#lead_presale_stage_id").empty();
+      $.getJSON(stage_url, function(json){
+      $("#lead_presale_stage_id").append($('<option>').text("Select Stage").attr('value', ''));
+      $.each(json, function(i, obj){
+        $("#lead_presale_stage_id").append($('<option>').text(obj.name).attr('value', obj.id));
+      });
+      });
+    }
+    var site_visit = $('#lead_status_id').data('visit-planned-id')
+    var status_value = $(this).val()
+    var is_tentative_date_required = $('#lead_status_id').data('is-tentative-date-required')
+    if(site_visit.includes(status_value.toString())){
+      if(is_tentative_date_required){
+        $("#lead_tentative_visit_planned").attr("required", true)
+      }else{
+        $("#lead_tentative_visit_planned").attr("required", false)
+      }
+      $('#tentative-visit-planned').show();
+    } else {
+      $("#lead_tentative_visit_planned").attr("required", false);
+      $('#tentative-visit-planned').hide();
+    }
+    if($("#lead_status_id").data('token-status-id')){
+      var tokenStatusIds =$("#lead_status_id").data('token-status-id').filter(function(x){return x!==''});
+      tokenStatusLoad(tokenStatusIds);
+    }
+
+    var bookedDoneId = $("#lead_status_id").data('booked-id');
+    if(bookedDoneId){
+      bookedFieldsLoad(bookedDoneId);
+      bookedLoanFieldsLoad(bookedDoneId);
+    }
+    var deadReasonIds = $("#lead_status_id").data('dead-status-id')
+    if (deadReasonIds.includes($(this).val())){
+      $('#dead-reason').show();
+      $('#lead_dead_reason_id').attr('required', true)
+    }
+    else{
+      $('#dead-reason').hide();
+      $('#lead_dead_reason_id').attr('required', false)
+    }
+    var hide_ncd = $("#lead_status_id").data('company-hide-ncd')
+    if (deadReasonIds.includes($(this).val()) && hide_ncd.toString() == "true"){
+      $('#ncd_').hide();
+    }
+    else{
+      $('#ncd_').show();
+    }
+    var inactive_status = JSON.parse(JSON.stringify(deadReasonIds));
+    if(bookedDoneId){
+      inactive_status.push(bookedDoneId.toString())
+    }
+    var inactive_ids = inactive_status.filter(function(x){return x!==''})
+    var ncd_require = $("#lead_ncd").data('ncd-required')
+    var ncd_non_mandatory = $('#lead_ncd').data('non-mandatory')
+    if (ncd_require){
+      if (ncd_non_mandatory && inactive_ids.includes($('#lead_status_id').val().toString())){
+        $('#lead_ncd').attr('required', false)
+        $('#ncd_').removeClass("required");
+      }else{
+        $('#lead_ncd').attr('required', true)
+        $('#ncd_').addClass("required");
+      }
+    }else{
+      $('#lead_ncd').attr('required', false)
+    }
+  });
+  function bookedLoanFieldsLoad(booking_done_id){
+    if (booking_done_id && $('#lead_status_id').data('enable-booked-loan-fields')){
+      if (booking_done_id == $('#lead_status_id').val()){
+        if ($('#lead_status_id').data('enable-booked-loan-fields')){
+          $('#lead_booked_flat_no, #lead_bank_sales_person, #lead_bank_person_name, #lead_bank_person_contact, #lead_bank_loan_name').attr('required', true)
+        }else{
+          $('#lead_booked_flat_no, #lead_bank_sales_person, #lead_bank_person_name, #lead_bank_person_contact, #lead_bank_loan_name').attr('required', false)
+        }
+        $('#booking-loan-fields').show();
+      }else{
+        $('#booking-loan-fields').hide();
+        $('#lead_booked_flat_no, #lead_bank_sales_person, #lead_bank_person_name, #lead_bank_person_contact, #lead_bank_loan_name').attr('required', false)
+      }
+    }
+  }
+  function bookedFieldsLoad(booking_done_id){
+    if (booking_done_id && $('#lead_status_id').data('enable-booked-fields')){
+      if (booking_done_id == $('#lead_status_id').val()){
+        if ($('#lead_status_id').data('enable-booked-fields')){
+          $('#lead_booking_date').attr('required', true)
+        }else{
+          $('#lead_booking_date').attr('required', false)
+          $('#lead_booking_form').attr('required', false)
+        }
+        $('#booking-done-fields').show();
+      }else{
+        $('#booking-done-fields').hide();
+        $('#lead_booking_form').attr('required', false)
+        $('#lead_booking_date').attr('required', false)
+      }
+    }
+  }
+  function tokenStatusLoad(token_status_ids){
+    if (token_status_ids.length > 0){
+      if (token_status_ids.includes($('#lead_status_id').val().toString())){
+        $('#token_status_fields').show();
+        $('#lead_token_date').attr('required', true)
+      }
+      else{
+        $('#lead_token_date').attr('required', false)
+        $('#token_status_fields').hide();
+      }
+    }
+  }
+  if($("#lead_status_id").data('token-status-id')){
+    var tokenStatusIds = $("#lead_status_id").data('token-status-id').filter(function(x){return x!==''});
+    tokenStatusLoad(tokenStatusIds);
+  }
+
+  $('.chosen-select').chosen({
+    allow_single_deselect: true,
+    no_results_text: 'No results matched',
+    width: '350px'
+  });
+
+  $("#lead_presale_stage_id").change(function() {
+    if($(this).val() == "16") {
+      $("#lead_qualified").prop("checked", true);
+    }
+  });
+
+  $(document).ready(function() {
+    if($("#lead_presale_stage_id").val() == "16") {
+      $("#lead_qualified").prop("checked", true);
+    }
+  });
+
+  $("#lead_presale_stage_id").change(function() {
+    if($(this).val() == "16") {
+      $("#lead_qualified").prop("checked", true).prop("disabled", true);
+    } else {
+      $("#lead_qualified").prop("disabled", false);
+    }
+  });
+
+  $(document).ready(function() {
+    if($("#lead_presale_stage_id").val() == "16") {
+      $("#lead_qualified").prop("checked", true).prop("disabled", true);
+    }
+  });

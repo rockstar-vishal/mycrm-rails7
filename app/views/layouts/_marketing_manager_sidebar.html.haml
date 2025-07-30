@@ -1,0 +1,152 @@
+%nav.main-header.navbar.navbar-expand.navbar-white.navbar-light
+  %ul.navbar-nav
+    %li.nav-item
+      %a.nav-link.menu-iconfix{"data-widget" => "pushmenu", :href => "#"}
+        = fa_icon('bars')
+    %li.nav-item.d-none.d-sm-inline-block
+      = link_to root_path, class: 'nav-link' do
+        Home
+  %ul.navbar-nav.ml-auto
+    %li.nav-item
+      %a.nav-link.pt-0{"data-slide" => "true", "data-widget" => "control-sidebar", :href => "#"}
+        .user-panel.d-flex
+          .image
+            - if current_user.image.present?
+              = image_tag("#{current_user.img_url}", size: "160x160", alt: "User Image", class: 'img-circle')
+            - else
+              = image_tag  "user2-160x160.jpg", class: 'img-circle'
+          .info
+            = current_user.name
+            = fa_icon('angle-down')
+%aside.main-sidebar.sidebar-dark-primary.elevation-4
+  = link_to root_path, class: "brand-link logo-switch" do
+    - company = current_user.company
+    - if company.icon.present?
+      = image_tag  "#{company.icon.url}", class: 'brand-image-xl logo-xs'
+    - else
+      = image_tag  "small-logo.jpg", class: 'brand-image-xl logo-xs'
+    - if company.logo.present?
+      = image_tag  "#{company.logo.url}", class: 'brand-image-xs logo-xl'
+    - else
+      = image_tag  "logo.jpg", class: 'brand-image-xs logo-xl'
+  .sidebar
+    %nav.mt-2
+      %ul.nav.nav-pills.nav-sidebar.flex-column{"data-accordion" => "false", "data-widget" => "treeview", :role => "menu"}
+        %li.nav-item
+          %li.nav-item.has-treeview{class: "#{['leads', 'users/search_histories'].include?(params[:controller]) ? 'menu-open' : ''}"}
+            = link_to '#', class: "nav-link #{'active' if ['leads','users/search_histories'].include?(params[:controller])}" do
+              %i.nav-icon.fa.fa-tasks.ct-settings-icon
+              %p
+                Lead Management
+              %i.right.fa.fa-angle-left
+            %ul.nav.nav-treeview
+              %li.nav-item
+                = link_to leads_path, class: "nav-link #{'active' if (params[:controller] =="leads" && params[:action] == 'index')}" do
+                  %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                  %p Pipeline
+          %li.nav-item.has-treeview{class: "#{['reports'].include?(params[:controller]) ? 'menu-open' : ''}"}
+            = link_to '#', class: "nav-link #{'active' if ['reports'].include?(params[:controller])}" do
+              %i.nav-icon.fa.fa-tasks.ct-settings-icon
+              %p
+                Reports
+              %i.right.fa.fa-angle-left
+            %ul.nav.nav-treeview
+              - if current_user.can_access_presale?
+                - if current_user.is_super? || current_user.is_sl_admin?
+                  %li.nav-item
+                    = link_to reports_trends_path, class: "nav-link #{'active' if (params[:action] == 'trends')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Lead Volume Report
+                %li.nav-item
+                  = link_to reports_leads_path, class: "nav-link #{'active' if (params[:action] == 'leads')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p Team PRF Report
+                %li.nav-item
+                  = link_to reports_projects_path, class: "nav-link #{'active' if (params[:action] == 'projects')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p Projects Report
+                - if current_user.check_source_presence
+                  %li.nav-item
+                    = link_to reports_source_path, class: "nav-link #{'active' if (params[:action] == 'source')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Sources Report
+                - if current_user.company.setting.present? && current_user.company.enable_source_wise_report
+                  %li.nav-item
+                    = link_to reports_source_report_path, class: "nav-link #{'active' if (params[:action] == 'source_report')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Sources Wise Report
+                - if current_user.company.setting.present? && current_user.company.enable_sub_source_report
+                  %li.nav-item
+                    = link_to reports_sub_source_path, class: "nav-link #{'active' if (params[:action] == 'sub_source')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Sub Sources Report
+                - if (current_user.is_super? || (current_user.company.setting.present? && !current_user.company.disable_marketing_roi_executive_access))
+                  %li.nav-item
+                    = link_to reports_campaigns_path, class: "nav-link #{'active' if (params[:action] == 'campaigns')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Marketing ROI Report
+                - if current_user.company.setting.present? && current_user.company.enable_site_visit_planned_tracker && (current_user.company.expected_visit_ids.present? || current_user.company.expected_site_visit_id.present?)
+                  %li.nav-item
+                    = link_to reports_site_visit_planned_tracker_path, class: "nav-link #{'active' if (params[:action] == 'site_visit_planned_tracker')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p SVP Tracker
+                - if current_user.company.setting.present? && current_user.company.enable_call_center_dashboard
+                  %li.nav-item
+                    = link_to reports_call_report_path, class: "nav-link #{'active' if (params[:action] == 'call_report')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Calls report
+                %li.nav-item
+                  = link_to reports_backlog_path, class: "nav-link #{'active' if (params[:action] == 'backlog')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p Backlog Report
+                %li.nav-item
+                  = link_to reports_closing_executive_backlog_path, class: "nav-link #{'active' if (params[:action] == 'closing_executive_backlog')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p Closing Manager Backlog Report
+                %li.nav-item
+                  = link_to reports_dead_path, class: "nav-link #{'active' if (params[:action] == 'dead')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p Inactive Lead Report
+                %li.nav-item
+                  = link_to reports_visits_path, class: "nav-link #{'active' if (params[:action] == 'visits')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p SVC Report
+                - if current_user.company.setting.present? && current_user.company.setting.enable_presale_user_visits_report
+                  %li.nav-item
+                    = link_to reports_presale_visits_path, class: "nav-link #{'active' if (params[:action] == 'presale_visits')}" do
+                      %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                      %p Presale User Visits Report
+                = render partial: 'layouts/reports/company_wise_report'
+              - if current_user.can_access_postsale?
+                %li.nav-item
+                  = link_to reports_closing_executives_path, class: "nav-link #{'active' if (params[:action] == 'closing_executives')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p
+                      #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Closing Manager'} Report
+              - if current_user.is_super? && current_user.company.is_allowed_for_visits?('user_id')
+                %li.nav-item
+                  = link_to reports_site_visit_userwise_path, class: "nav-link #{'active' if (params[:action] == 'site_visit_userwise')}" do
+                    %i.nav-icon.fa.fa-circle-o.ct-city-icon
+                    %p Presale Visit Report
+          %li.nav-item.has-treeview{class: "#{['call_ins', 'users', 'projects', 'notification_templates', 'companies/api_keys'].include?(params[:controller]) ? 'menu-open' : ''}"}
+            = link_to '#', class: "nav-link #{'active' if ['call_ins', 'users', 'projects'].include?(params[:controller])}" do
+              %i.nav-icon.fa.fa-tasks.ct-settings-icon
+              %p
+                Settings
+              %i.right.fa.fa-angle-left
+            %ul.nav.nav-treeview
+              %li.nav-item
+                = link_to projects_path, class: "nav-link #{'active' if params[:controller] == 'projects'}" do
+                  %i.nav-icon.fa.fa-circle-o.ct-statuses-icon
+                  %p Manage Projects
+%aside.control-sidebar.control-sidebar-dark
+  %div
+    %ul.profile-menu
+      %li
+        = link_to edit_profile_users_path, class: '' do
+          %i.icon.ion-md-person.ct-profile-icon.fa.fa-user>
+          Profile
+      %li
+        = link_to destroy_user_session_path, method: :delete, class: '' do
+          %i.icon.ion-md-lock.ct-logout-icon.fa.fa-lock
+          Logout

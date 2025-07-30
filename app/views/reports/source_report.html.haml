@@ -1,0 +1,137 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Source Wise Report
+          %h1.m-0 Source Wise Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+              - if current_user.company.setting.present? && current_user.company.enabled_source_wise_search_access
+                %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:-2px;", :class=>"btn btn-primary btn-sm"}
+                  Advanced Search
+                  %i.fa.fa-angle-down
+              .col-md-9
+                .group-link
+                  = render 'reports_button', locals: {report_name: :source_report}
+            #adv-searchbox.box-body
+              = form_tag nil, method: :get, class: "filter-search-menu" do
+                .card-header
+                  .custom-search
+                    .row
+                      .col-md-6
+                        = render partial: 'shared/date_range_display'
+                      .col-md-6
+                        = render partial: 'shared/updated_at_filter'
+                      .col-md-3
+                        = render partial: 'shared/projects_filter'
+                      .col-md-3
+                        = render partial: 'shared/users_filter'
+                      - if current_user.company.is_allowed_field?("enquiry_sub_source_id")
+                        .col-md-3
+                          = render partial: 'shared/sub_source_filter'
+                      .col-md-3
+                        .form-group
+                          %label.label-block &nbsp;
+                          = button_tag type: "submit", class: "btn btn-primary btn-sm pd-fixes align-fixes" do
+                            = fa_icon "search"
+                          = link_to nil, class: "btn btn-primary btn-sm pd-fixes align-fixes" do
+                            = fa_icon "refresh"
+            .card-body
+              - plottable = {}
+              .table-responsive
+                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                  %thead
+                    %tr
+                      %th Source
+                      %th No Of Leads Generated
+                      %th No Of Walk-in
+                      %th Avg Tat(from lead generated to first call)
+                      %th Avg Tat(from date of calling to walk-in)
+                      %th Avg Tat(from date of first walk-in to booking)
+                      %th No of Revisit Before Booking
+                      %th No of Booking
+                      %th spend
+                  - overall_counts = 0
+                  - total_tats = 0
+                  - total_no_rbb = 0
+                  - total_avg_tat_to_first_call = 0
+                  - total_avg_tat_from_first_call = 0
+                  %tbody
+                    - @sources.each do |source|
+                      - this_source_data = @data.select{|k| k["source_id"] == source.id}
+                      - spend = @campaigns.where(source_id: source.id).sum(:budget)
+                      - if this_source_data.present?
+                        - lead_ids = this_source_data.map{|t| t["lead_ids"]}.flatten
+                        - source_total = (this_source_data.map{|k| k["lead_ids"].count}.sum rescue 0)
+                        - plottable[source.name] = source_total
+                        - overall_counts += source_total
+                        %tr
+                          %td= source.name
+                          %td
+                            = link_to ld_path(source_id: [source.id]), target: "_blank" do
+                              = source_total
+                          %td
+                            = link_to ld_path(source_id: [source.id], lead_statuses: [@site_visit_done_id]), target: "_blank" do
+                              = this_source_data.sum { |k| k["status_id"] == @site_visit_done_id ? k["lead_ids"].count : 0 }
+                          %td
+                            - to_first_call_leads = @leads.select { |lead| lead_ids.include?(lead["id"]) && lead["first_status_edit_audit_date"].present? }
+                            - avg_tat_to_first_call = to_first_call_leads.present? ? (to_first_call_leads.sum { |lead| TimeDifference.between(lead["first_status_edit_audit_date"], lead["created_at"]).in_days.to_i } / to_first_call_leads.size) : 0.0
+                            - total_avg_tat_to_first_call += avg_tat_to_first_call
+                            = format_duration(avg_tat_to_first_call)
+                          %td
+                            - from_first_call_leads = @leads.select { |lead| lead_ids.include?(lead["id"]) && lead["first_visit_date"].present? && lead["first_status_edit_audit_date"].present? }
+                            - avg_tat_from_first_call = from_first_call_leads.present? ? (from_first_call_leads.sum { |lead| TimeDifference.between(lead["first_visit_date"], lead["first_status_edit_audit_date"]).in_days.to_i } / from_first_call_leads.size) : 0.0
+                            - total_avg_tat_from_first_call += avg_tat_from_first_call
+                            = format_duration(avg_tat_from_first_call)
+                          %td
+                            - leads = Lead.joins{visits}.where.not(leads_visits: { date: nil }).where(id: lead_ids).where.not(status_id: @dead_status_ids, booking_date: nil)
+                            - difference_sum = leads.map { |lead| lead.day_difference }.sum
+                            - avg_tat = leads.count > 0 ? difference_sum / leads.count : 0
+                            - total_tats += avg_tat
+                            = format_duration(avg_tat)
+                          %td
+                            - visits = Leads::Visit.joins(:lead).where(leads: { id: lead_ids, revisit: true, booking_date: nil }).where.not(leads: {status_id: @dead_status_ids}).count
+                            - total_no_rbb += visits
+                            = visits
+                          %td
+                            = link_to ld_path(source_id: [source.id], lead_statuses: [@booking_done_id]), target: "_blank" do
+                              = this_source_data.sum { |k| k["status_id"] == @booking_done_id ? k["lead_ids"].count : 0 }
+                          %td
+                            = fa_icon "rupee"
+                            = Utility.to_words(spend)
+                  - if @data.present?
+                    %tbody
+                      %tr
+                        %td Total
+                        %td
+                          = link_to ld_path(source_id: @sources.ids), target: "_blank" do
+                            = overall_counts
+                        %td
+                          = link_to ld_path(source_id: @sources.ids, lead_statuses: [@site_visit_done_id]), target: "_blank" do
+                            = @data.sum { |k| k["status_id"] == @site_visit_done_id ? k["lead_ids"].count : 0 }
+                        %td
+                          = format_duration(total_avg_tat_to_first_call)
+                        %td
+                          = format_duration(total_avg_tat_from_first_call)
+                        %td
+                          = format_duration(total_tats)
+                        %td
+                          = total_no_rbb
+                        %td
+                          = link_to ld_path(source_id: @sources.ids, lead_statuses: [@booking_done_id]), target: "_blank" do
+                            = @data.sum { |k| k["status_id"] == @booking_done_id ? k["lead_ids"].count : 0 }
+                        %td
+                          = fa_icon "rupee"
+                          = Utility.to_words(@campaigns.where(source_id: @sources.ids).sum(:budget))
+              - if plottable.present?
+                .chart-canvas.d-none.d-sm-block.pieChart
+                  = render partial: "report_chart", locals: {plottable: plottable}

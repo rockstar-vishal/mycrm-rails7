@@ -1,0 +1,9 @@
+class CreateProjectConfigurations < ActiveRecord::Migration
+  def change
+    create_table :project_configurations do |t|
+      t.integer "company_id"
+      t.text    "allowed_fields", default: [], array: true
+      t.timestamps
+    end
+  end
+end

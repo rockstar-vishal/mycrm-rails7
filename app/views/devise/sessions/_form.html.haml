@@ -1,0 +1,49 @@
+.bg-login-main
+  
+  .flex-container
+    .login-artwork
+      .brand-logo
+        - company = Company.find_by(domain: request.host)
+        - if company.present?
+          - log_url = company.logo.url.present? ? "#{company.logo.url(:original)}" : 'logo.jpg'
+        -else
+          - log_url = 'logo.png'
+        = image_tag  "#{log_url}", class: 'logo-fix-size'
+    .holder-login
+      #login
+        %div.login-outer
+          %h1.login-heading
+            Sign In
+          %p.login-text
+            Access the Lead Quest panel
+          .login-form
+            = form_for('user', url: user_session_path, html: {class: 'form-horizontal'}) do |f|
+              = devise_error_messages!
+              .form-group
+                %label Email
+                = f.email_field :email, autofocus: true, placeholder: 'Email', class: 'form-control'
+              .form-group#show_hide_password
+                %label Password
+                .inner-addon.right-addon
+                  %a{ href: ''}
+                    = fa_icon 'eye-slash'
+                  = f.password_field :password,
+                    autocomplete: 'off',
+                    placeholder: 'Password',
+                    class: 'form-control'
+              .row
+                .col-sm-12
+                  = f.submit 'Login', class: 'btn btn-primary btn-block mt-3'
+  = image_tag  "bg-login-artwork.png", class: 'login-artwork-bg'
+                    
+       
+             
+
+:css
+  .logo-fix-size{
+    max-width: 250px;
+    max-height: 150px;
+  }
+
+
+

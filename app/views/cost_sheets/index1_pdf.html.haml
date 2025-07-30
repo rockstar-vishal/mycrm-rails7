@@ -1,0 +1,84 @@
+!!!
+%html{lang: "en"}
+  %head
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{charset: "UTF-8"}/
+    %meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}/
+    %title Document
+  %body
+    %table{style: "font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 800px; border-collapse: collapse;"}
+      %tr
+        %td{style: "font-weight: bold; text-align: center; font-size: 18px; border: 1px solid #000; padding: 8px;"}
+          =@cost_sheet.company.name.upcase
+        %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+          =@cost_sheet.topology
+      %tr
+        %td{style: "border: 1px solid #000; padding: 8px;"} RERA Carpet Area (Sq. ft)
+        %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+          =@cost_sheet.carpet_area
+      %tr
+        %td{style: "border: 1px solid #000; padding: 8px;"} Flat No.
+        %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+          =@cost_sheet.flat_no
+      %tr
+        %td{style: "font-weight: bold; text-align: center; font-size: 15px; border: 1px solid #000; padding: 8px;"} TOTAL AGREEMENT VALUE ( I )
+        %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px; font-weight: bold;"}
+          #{number_with_delimiter((@cost_sheet.other_items.where(cost_type_id: 1).sum(:amount).to_i), :delimiter => ',')}
+      %tr
+        %td{colspan: "3", style: "border: 1px solid #000; padding: 8px; font-size: 12px;"}
+          Kindly note above Total Consideration includes: 1 Podium Parking + 2Two-wheeler Parking
+
+      - data = @cost_sheet.other_items.order("cost_sheets_other_items.created_at ASC").group("section_name, cost_sheets_other_items.name, cost_sheets_other_items.amount, slab_operator, cost_sheets_other_items.created_at").select("section_name, cost_sheets_other_items.name, cost_sheets_other_items.amount, slab_operator, cost_sheets_other_items.created_at").as_json
+      - section_heading = data.map{|k| k["section_name"]}.uniq
+      - total_items = @cost_sheet.other_items.where(section_name: section_heading, cost_type_id: [2, nil])
+      - agreement_value = @cost_sheet.other_items.where(cost_type_id: 1).sum(:amount)
+      - section_heading.each do |sh|
+        - items = @cost_sheet.other_items.where(section_name: sh, cost_type_id: [2, nil])
+        - is_zero_amount_item = (items.where(amount: 0).count == (items.count - 1) )
+        - total_amount = items.pluck("amount").sum
+        - if items.present?
+          %tr
+            %td{style: "font-weight: bold; text-align: center; font-size: 15px; border: 1px solid #000; padding: 8px;"}
+              =sh
+            %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+          - items.each_with_index do |item, index|
+            - if is_zero_amount_item
+              - if index == 0
+                %tr
+                  %td{style: "border: 1px solid #000; padding: 8px;"}
+                    ==item["name"]
+                  %td{style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+                  %td{rowspan: items.size, style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+                    #{number_with_delimiter((total_amount.to_i), :delimiter => ',')}
+              - else
+                %tr
+                  %td{style: "border: 1px solid #000; padding: 8px;"}
+                    =item["name"]
+                  %td{style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+            - else
+              %tr
+                %td{style: "border: 1px solid #000; padding: 8px;"}
+                  =item["name"]
+                %td{style: "text-align: center; width: 40px; border: 1px solid #000; padding: 8px;"}
+                  =((item["amount"].to_i * 100) % agreement_value.to_i).zero? ? "#{((item["amount"].to_i * 100) / agreement_value.to_i)}%" : ""
+                %td{style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+                  #{number_with_delimiter((item["amount"].to_i), :delimiter => ',')} 
+          %tr
+            %td{style: "font-weight: bold; border: 1px solid #000; padding: 8px;"} Total
+            %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px; font-weight: bold;"}
+              #{number_with_delimiter((total_amount.to_i), :delimiter => ',')}   
+      %tr
+        %td{style: "font-weight: bold; border: 1px solid #000; padding: 8px;"} Total Cost
+        %td{colspan: "2", style: "text-align: center; border: 1px solid #000; padding: 8px;"}
+          #{number_with_delimiter((agreement_value.to_i + (total_items.present? ? total_items.pluck(:amount).sum.to_i : 0)), :delimiter => ',')}
+      %tr{style: "height: 30px;"}
+        %td{colspan: "3", style: "border: 1px solid #000; padding: 8px;"}
+      %tr
+        %td{colspan: "3", style: "border: 1px solid #000; padding: 8px;"}
+          %table{style: "font-family: Arial, Helvetica, sans-serif; font-size: 14px; max-width: 800px; text-align: left; padding-left: 16px; padding-right: 16px; padding-bottom: 16px; padding-top: 16px; border-collapse: collapse;"}
+            %tr
+              %td{colspan: "3", style: "font-weight: bold; padding-bottom: 10px; text-decoration: underline; border: 1px solid #000; padding: 8px;"}
+                Terms and Conditions :-
+            %tr
+              %td{colspan: "3", style: "padding-bottom: 4px; font-size: 12px; border: 1px solid #000; padding: 8px;"}
+                =simple_format(@cost_sheet.notes)

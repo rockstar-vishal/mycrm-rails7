@@ -1,0 +1,36 @@
+!!!
+%html
+  %head
+    %title Client Mail Ravima
+    :css
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+  %body
+    .deviceWidth{:style => "width: 740px;background: #fff;font-family: 'Roboto', Arial, sans-serif; margin:0 auto; padding: 30px 30px 40px;"}
+      %a{:href => "https://ravima.in/"}
+        %img{:alt => "", :src => "http://propertypistol.in/mailer/client-mail-ravima/logo.jpg", :style => "display: table; margin: 20px 0 30px; max-width: 250px;"}/
+      .deviceWidth{:style => "width: 100%;background: #FFF;font-family: 'Roboto', Arial, sans-serif; margin:0 auto;  border-radius: 45px;"}
+        %table{:align => "center", :border => "0", :cellpadding => "0", :cellspacing => "0", :style => "font-family: 'Roboto', Arial, sans-serif;line-height: 28px; background: #fff; border-radius: 45px; border:1px solid #dfdfdf", :width => "100%"}
+          %tbody
+            %tr
+              %td{:colspan => "2", :style => " padding: 0 0;  border-radius: 45px;"}
+                %img{:alt => "", :src => "http://propertypistol.in/mailer/client-mail-ravima/bg-image-new.jpg", :style => "display: block; margin: 0 0 50px;  border-radius: 45px 45px 0 0; width:100%"}/
+                %div{:style => "margin:0 auto 50px; padding:0  30px;"}
+                  %h1{:style => "font-weight: 500;font-size: 14px;color: #000; margin:0"} Dear Customer
+                  %p{:style => "font-size: 14px; font-weight: 400; color: #000; text-align: left; margin:0 0 10px; line-height: 20px;"}
+                    Greetings from Ravima venture,
+                  %p{:style => "font-size: 14px; font-weight: 400; color: #000; text-align: left; margin:0 0 10px; line-height: 20px;"}
+                    We thank you for enquiring. We have received your contact details and email I'd we assure you of our response.
+                  %p{:style => "font-size: 14px; font-weight: 400; color: #000; text-align: left; margin:0 0 10px; line-height: 20px;"}
+                    We take this opportunity to sincerely thank you for the trust and interest shown in us. Assuring you of our best services at all times.
+            %tr
+              %td{:colspan => "2", :style => "background: #EF4139; padding: 10px 20px; text-align: center; border-radius: 0px 0px 45px 45px;"}
+                %p{:style => "color: #fff; font-size:12px; font-weight: 400; margin:0"} Customer Delight Department.
+                %p{:style => "color: #fff; font-size:12px; font-weight: 400; margin:0"}
+                  Should you need immediate assistance, please call our Sales Person
+                  %a{:href => "tel:#{@contact_num}", :style => "font-size: 14px; font-weight: 700; text-decoration: none; color: #fff;"} #{@contact_num}
+                %p{:style => "color: #fff; font-size:12px; font-weight: 400; margin:0"}
+                  Write us at:
+                  %a{:href => "mailto:#{@contact_mail}", :style => "font-size: 14px; font-weight: 700; text-decoration: none; color: #fff;"} #{@contact_mail}
+                  %span{:style => "padding: 0 5px;"} or
+                  Website:
+                  %a{:href => "https://ravima.in/", :style => "font-size: 14px; font-weight: 700; text-decoration: none; color: #fff;"} www.ravima.in

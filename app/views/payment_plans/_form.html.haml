@@ -1,0 +1,31 @@
+= bootstrap_form_for(@payment_plan) do |f|
+  - if @payment_plan.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@payment_plan.errors.count, "error")
+        prohibited this payment plan from being saved:
+      %ul
+        - @payment_plan.errors.full_messages.each do |message|
+          %li= message
+  .row
+    .col-md-3.required
+      .form-group
+        = f.text_field :title, class: "form-control", placeholder: "Payment Plan Name", label: "Payment Plan Name"
+    .w-100
+    .col-md-12
+      .form-group
+        %label.col-sm-2.control-label{:for => "exampleInputFile"}
+        #company_stages.row
+          = f.fields_for :plan_stages do |reason|
+            = render "plan_stage_fields", :f => reason
+          .links.m-4
+            = link_to_add_association "Add", f, :plan_stages, class: "btn btn-primary"
+    %div{align: "center"}
+      .col-md-12
+        .form-group
+          = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+            = fa_icon "floppy-o"
+            Save
+          = link_to payment_plans_path, class: "btn btn-danger" do
+            = fa_icon "close"
+            Cancel

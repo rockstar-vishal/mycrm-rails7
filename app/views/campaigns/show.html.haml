@@ -1,0 +1,141 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{href: "/"} Home
+            %li.breadcrumb-item
+              %a{href: campaigns_path} Campaigns
+            %li.breadcrumb-item.active= @campaign.title
+          %h1.m-0 Campaign Details
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3.d-flex.align-items-center
+                %h5.mb-0= @campaign.title 
+              .col-md-9
+                .group-link
+                  = link_to 'Back', reports_campaigns_report_path, class: 'btn btn-primary ml-auto'
+          .table-body
+            .row
+              .col-md-6
+                %table.table.table-bordered.table-striped
+                  %tbody
+                    %tr
+                      %th{style: "width: 30%"} Title
+                      %td= @campaign.title
+                    %tr
+                      %th Start Date
+                      %td= @campaign.start_date
+                    %tr
+                      %th End Date
+                      %td= @campaign.end_date
+                    %tr
+                      %th Budget
+                      %td= "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.budget)}".html_safe
+                    %tr
+                      %th Source
+                      %td= @campaign.source_name
+              .col-md-6
+                %table.table.table-bordered.table-striped
+                  %tbody
+                    %tr
+                      %th{style: "width: 30%"} Targeted Leads
+                      %td= @campaign.targeted_leads || 'N/A'
+                    %tr
+                      %th Targeted QL
+                      %td= @campaign.targeted_ql || 'N/A'
+                    %tr
+                      %th Targeted SV
+                      %td= @campaign.targeted_sv || 'N/A'
+                    %tr
+                      %th Targeted Bookings
+                      %td= @campaign.targeted_bookings || 'N/A'
+                    %tr
+                      %th Projects
+                      %td= @campaign.projects.pluck(:name).join(', ') rescue "N/A"
+
+      .row.mt-4
+        .card-body
+          - if @campaign.spends.any?
+            .table-responsive
+              %table.table.table-bordered.table-hover
+                %thead
+                  %tr
+                    %th Date
+                    %th Amount
+                %tbody
+                  - @campaign.spends.order(spend_date: :desc).each do |spend|
+                    %tr
+                      %td= spend.spend_date
+                      %td= "#{fa_icon 'rupee'} #{Utility.to_words(spend.spend_amount)}".html_safe
+            .row
+              .col-md-12
+                %h5.text-right
+                  %strong Total Spend: 
+                  = "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.spends.sum(:spend_amount))}".html_safe
+          - else
+            .alert.alert-info No spends recorded for this campaign yet.
+
+      - if @leads.present?
+        .row.mt-4
+          .col-lg-12
+            .card
+              .card-header
+                %h4.mb-0 Campaign Metrics
+              .card-body
+                - @campaign.calculate_metrics(@leads)
+                .row
+                  .col-md-6
+                    %table.table.table-bordered
+                      %thead
+                        %tr
+                          %th Metric
+                          %th Targeted
+                          %th Actual
+                      %tbody
+                        %tr
+                          %th Ad Spend
+                          %td= "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.targeted_ad_spend)}".html_safe
+                          %td= "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.actual_ad_spend)}".html_safe
+                        %tr
+                          %th Leads
+                          %td= @campaign.targeted_leads || 'N/A'
+                          %td= @campaign.actual_leads
+                        %tr
+                          %th Qualified Leads
+                          %td= @campaign.targeted_ql || 'N/A'
+                          %td= @campaign.actual_ql
+                        %tr
+                          %th Site Visits
+                          %td= @campaign.targeted_sv || 'N/A'
+                          %td= @campaign.actual_sv
+                  .col-md-6
+                    %table.table.table-bordered
+                      %thead
+                        %tr
+                          %th Cost Metric
+                          %th Targeted
+                          %th Actual
+                      %tbody
+                        %tr
+                          %th CPL
+                          %td= @campaign.targeted_cpl
+                          %td= @campaign.actual_cpl
+                        %tr
+                          %th CPQL
+                          %td= @campaign.targeted_cpql
+                          %td= @campaign.actual_cpql
+                        %tr
+                          %th CPSV
+                          %td= @campaign.targeted_cpsv
+                          %td= @campaign.actual_cpsv
+                        %tr
+                          %th CPB
+                          %td= 'N/A'
+                          %td= @campaign.cpb

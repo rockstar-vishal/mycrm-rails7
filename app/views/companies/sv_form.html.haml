@@ -1,0 +1,144 @@
+.content-wrapper
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .card
+            .card-header
+              %h4.mb-0#newFormTitle Site Visit Form for #{@company.name}
+            .card-body
+              = bootstrap_form_for @company, url: update_sv_form_company_path, method: :post do |f|
+                - if @company.errors.any?
+                  #error_explanation
+                    %h2
+                      = pluralize(@company.errors.count, "error")
+                      prohibited this property configuration from being saved:
+                    %ul
+                      - @company.errors.full_messages.each do |message|
+                        %li= message
+                .w-100
+                .col-md-12
+                  .form-group
+                    #custom_labels.row
+                      = f.fields_for :sv_form do |sf|
+                        .col-md-4
+                          = sf.text_field :title, class: 'form-control'
+                        .col-md-2
+                          = sf.text_field :domain,  :class=>"form-control"
+                        .col-md-2
+                          = sf.text_field :bg_color,  :class=>"form-control"
+                        .col-md-2
+                          = sf.text_field :primary_color,  :class=>"form-control"
+                        .col-md-2
+                          = sf.text_field :dark_color_fix,  :class=>"form-control"
+                        .col-md-4
+                          = sf.check_box :seperate_firm_name_broker_name
+                        .col-md-4
+                          = sf.check_box :hide_image_upload_option
+                        .col-md-4
+                          = sf.check_box :break_name_field
+                        .w-100
+                        .col-md-12
+                          .col-md-4
+                            .form-group
+                              %label.col-sm-12.control-label{:for => "exampleInputFile"} Upload SV Logo:
+                              .col-sm-10
+                                = image_tag "blank_user.jpg", class: "edit-profile-img img-circle", alt: "Add Logo"
+                                = sf.file_field :sv_logo, :class => 'form-control ', hide_label: true
+                                %p.help-block Jpg, Png Format allowed max size 500 KB
+                          - if sf.object.sv_logo.present?
+                            .col-md-4
+                              = link_to "View Uploaded Image", sf.object.sv_logo.url, class: "btn  bg-gradient-primary elevation-1 btn-sm mr-2", target: "_blank"
+                        .col-md-12
+                          .form-group
+                            %label.col-sm-2.control-label{:for => "exampleInputFile"} Sv Form Fields:
+                            #magic_fields.row
+                              = sf.fields_for :structure_fields do |sv|
+                                = render "structure_field_fields", :f => sv
+                              .links.m-4
+                                = link_to_add_association "Add SV Field", sf, :structure_fields, class: "btn btn-primary"
+                .col-md-12
+                  .form-group
+                    %label.col-sm-2.control-label{:for => "exampleInputFile"} Custom Fields:
+                    #magic_fields.row
+                      = f.fields_for :magic_fields, @magic_fields do |mf|
+                        = render "custom_sv_fields", :f => mf
+                      .links.m-4
+                        = link_to_add_association "Add Custom Fields", f, :magic_fields, class: "btn btn-primary", partial: "custom_sv_fields"
+                .w-100
+                .col-md-12
+                  .form-group
+                    #custom_labels.row
+                      = f.fields_for :sv_form do |sf|
+                        .col-md-12
+                          = sf.select :disabled_sv_fields, options_for_select((@company.sv_form.structure_fields.pluck(:name).map{|k| [k.humanize, k]}), sf.object.disabled_sv_fields),{},{class: "form-control multiselect", multiple: true}
+                        .col-md-12
+                          = sf.check_box :enable_otp, label: "Enable OTP"
+                        #otp-fields{style: (sf.object.enable_otp ? '' : 'display: none;')}
+                          .row
+                            .col-md-4
+                              = sf.select :otp_type, options_for_select([['SMS','sms']], (sf.object.otp_type)),{ hide_label: 'true',include_blank: "Select" }, {class: "form-control"}
+                            .col-md-4
+                              = sf.select :request_method, options_for_select([['POST','post'], ['GET','get']], (sf.object.request_method)),{ hide_label: 'true',include_blank: "Select" }, {class: "form-control"}
+                            .col-md-12
+                              %label{style: "opacity: 0.5;font-style: italic;"} Please use {{number}} for the variables, for mobile and otp please use {{1}} & {{2}} respectively.
+                              = sf.text_area :otp_url, id: 'template-text', class: "form-control", rows: "4"
+                            #input-fields
+                .row
+                  %div{align: "center"}
+                    .col-md-12
+                      .form-group
+                        = button_tag type: "submit", class: "sub-btn btn btn-primary" do
+                          = fa_icon "floppy-o"
+                          Save
+                        = link_to companies_path, class: "btn btn-danger" do
+                          = fa_icon "close"
+                          Cancel
+:javascript
+  $('.multiselect').multiSelect();
+  document.addEventListener('DOMContentLoaded', function() {
+    var otpEnabledCheckbox = document.getElementById('company_sv_form_attributes_enable_otp');
+    var otpFields = document.getElementById('otp-fields');
+
+    otpEnabledCheckbox.addEventListener('change', function() {
+      if (otpEnabledCheckbox.checked) {
+        otpFields.style.display = 'block';
+      } else {
+        otpFields.style.display = 'none';
+      }
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    var templateText = document.getElementById('template-text');
+    var inputFieldsContainer = document.getElementById('input-fields');
+
+    templateText.addEventListener('input', function() {
+      var template = templateText.value;
+
+      var regex = /{{(\d+)}}/g;
+      var placeholders = template.match(regex) || [];
+
+      inputFieldsContainer.innerHTML = placeholders.map(function(placeholder) {
+        var index = parseInt(placeholder.match(/\d+/)[0]);
+        var inputField;
+        if (index === 1 || index === 2) {
+          inputField = `
+            <select name="values[]" id="input-value-${index}" class="">
+              <option value="mobile">Mobile</option>
+              <option value="otp">OTP</option>
+            </select>
+          `;
+        } else {
+          inputField = `<input type="text" name="values[]" id="input-value-${index}" />`;
+        }
+
+        return `
+          <label for="input-key-${index}">Key:</label>
+          <input type="text" name="keys[]" id="input-key-${index}" value="${index}" />
+          <label for="input-value-${index}">Value:</label>
+          ${inputField}
+        `;
+      }).join('');
+      //updateHiddenJsonField();
+    });
+  });

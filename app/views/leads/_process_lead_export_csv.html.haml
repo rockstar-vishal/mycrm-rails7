@@ -1,0 +1,16 @@
+.modal-header.text-center
+  %h5.modal-title Export
+  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+    %span{"aria-hidden" => "true"} ×
+
+.modal-body.text-center
+  .row.mt-3.mb-3 
+    .col-12.mb-3
+      - log_url = 'download_export.webp'
+      = image_tag "#{log_url}", style: "width: 10%"
+    .col-12
+      Export Generating, Please download it from download section in sometime
+    .col-12
+      .text-center
+        Lead Management /
+        = link_to "Download Exports", file_exports_path

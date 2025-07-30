@@ -1,0 +1,104 @@
+.content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-12
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Channel Partner Report
+          %h1.m-0 Channel Partner Report
+  .content
+    .container-fluid
+      .row
+        .col-lg-12
+          .search-card
+            .row
+              .col-md-3
+                %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
+                  Advanced Search
+                  %i.fa.fa-angle-down
+              .col-md-9
+                .group-link
+                  = render 'reports_button', locals: {report_name: :channel_partner}
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm" do
+                    = fa_icon "download"
+                    Export
+            #adv-searchbox.box-body
+              = form_tag nil, method: :get, class: "filter-search-menu" do
+                .p-2
+                  .custom-search
+                    .row
+                      .col-12
+                        %h5.mt-0 Search By Date
+                      .col-md-6
+                        = render partial: 'shared/date_range_display'
+                      .col-md-6
+                        = render partial: 'shared/updated_at_filter'
+                      .col-12
+                        %h5.mt-0 Search By Project Details
+                      .col-md-3
+                        = render partial: 'shared/projects_filter'
+                      .col-md-3
+                        = render partial: 'shared/users_filter'
+                      .col-md-3
+                        = render partial: 'shared/managers_filter'
+                      .col-md-3
+                        .form-group
+                          %label Select Firm Name
+                          - firm_names = current_user.company.brokers.pluck(:firm_name).reject(&:blank?).map(&:downcase).uniq
+                          = select_tag :firm_names, options_for_select(firm_names, params[:firm_names]), multiple: true, class: "form-control multi-select-list"
+                      .col-md-3
+                        .form-group
+                          %label Broker Name
+                          %input#broker_name{name: "broker_name", type: "text", class:"form-control"}
+                      - if current_user.company.is_allowed_field?("customer_type")
+                        .col-md-3
+                          = render partial: 'shared/customer_type_filter'
+                      - if current_user.company.is_allowed_field?("booking_date")
+                        .col-md-6
+                          = render partial: 'shared/booking_date_filter'
+                      .col-md-12
+                        = button_tag type: "submit", class: "btn btn-new" do
+                          Search
+          .table-body
+            - plottable = {}
+            .table-responsive
+              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all Channel Partner
+                    %th.all Total
+                    - @statuses.each do |status|
+                      %th.desktop= status.name
+                - overall_counts = 0
+                %tbody
+                  - @brokers.each do |broker|
+                    - this_broker_data = @data.select{|k| k["broker_id"] == broker.id}
+                    - if this_broker_data.present?
+                      - broker_total = (this_broker_data.map{|k| k["lead_ids"].count}.sum rescue 0)
+                      - plottable[broker.name] = broker_total
+                      - overall_counts += broker_total
+                      %tr
+                        %td= "#{broker.name} - (#{broker.firm_name})"
+                        %td
+                          = link_to ld_path(broker_ids: [broker.id]), target: "_blank" do
+                            = broker_total
+                        - @statuses.each do |status|
+                          - this_status_data = this_broker_data.detect{|k| k["status_id"] == status.id}
+                          %td
+                            = link_to ld_path(broker_ids: [broker.id], lead_statuses: [status.id]), target: "_blank" do
+                              = this_status_data["lead_ids"].count rescue 0
+                - if @data.present?
+                  %tbody
+                    %tr
+                      %td Total
+                      %td
+                        = link_to ld_path(broker_ids: @brokers.ids, source_id: current_user.company.cp_sources&.ids), target: "_blank" do
+                          = overall_counts
+                      - @statuses.each do |status|
+                        %td
+                          = link_to ld_path(:lead_statuses=>[status.id], broker_ids: @brokers.ids, source_id: current_user.company.cp_sources&.ids), target: "_blank" do
+                            = @data.collect{|k| k["lead_ids"].count if k["status_id"] == status.id}.compact.sum rescue 0
+            .chart-canvas.d-none.d-sm-block.pieChart
+              = pie_chart(plottable, library: {animation: {easing: 'easeOutQuart'}})
