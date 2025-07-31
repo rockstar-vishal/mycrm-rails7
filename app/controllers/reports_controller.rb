@@ -53,7 +53,7 @@ class ReportsController < ApplicationController
   end
 
   def call_report
-    @data = Leads::CallLog.includes(:user).where("leads_call_logs.user_id IN (?) AND leads_call_logs.created_at BETWEEN ? AND ?", current_user.manageables.ids, @start_date, @end_date)
+    @data = current_user.company.call_logs.where("leads_call_logs.user_id IN (?) AND leads_call_logs.created_at BETWEEN ? AND ?", current_user.manageables.ids, @start_date, @end_date)
     if params[:is_advanced_search].present?
       @data = @data.advance_search(call_log_report_params)
     end

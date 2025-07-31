@@ -79,7 +79,7 @@ module Api
       start_date = params[:start_date].present? ? Time.zone.parse(params[:start_date]).beginning_of_day : (Time.zone.now - 7.days).beginning_of_day
       end_date = params[:end_date].present? ? Time.zone.parse(params[:end_date]).end_of_day : Time.zone.now.end_of_day
 
-      base_scoped_data = Leads::CallLog.includes(:user, :lead).where("leads_call_logs.user_id IN (?) AND leads_call_logs.created_at BETWEEN ? AND ?", @current_app_user.manageables.ids, start_date, end_date)
+      base_scoped_data = @current_app_user.company.call_logs.where("leads_call_logs.user_id IN (?) AND leads_call_logs.created_at BETWEEN ? AND ?", @current_app_user.manageables.ids, start_date, end_date)
       base_scoped_data = base_scoped_data.advance_search(bs: params[:bs]) if params[:bs].present?
       if params["status"].present? && ["incoming", "outgoing", "missed"].include?(params[:status])
         base_scoped_data = base_scoped_data.send(params[:status])
@@ -87,30 +87,6 @@ module Api
       total_count = base_scoped_data.count
       base_scoped_data = base_scoped_data.paginate(page: params[:page], per_page: PER_PAGE)
       render json: {data: base_scoped_data.as_api_response(:call_log_details), total_count: total_count, per_page: PER_PAGE}, status: 200 and return
-      # categorized_data = categorized_call_logs_data(base_scoped_data)
-
-      # if params[:status].present? && categorized_data.key?("#{params[:status]}_call_logs".to_sym)
-      #   categorized_data = { "#{params[:status]}_call_logs".to_sym => categorized_data["#{params[:status]}_call_logs".to_sym] }
-      # end
-
-      # response = categorized_data.each_with_object({ per_page: PER_PAGE }) do |(key, scope), result|
-      #   paginated_data = scope.paginate(page: params[:page], per_page: PER_PAGE).as_api_response(:call_log_details)
-      #   result[key] = paginated_data
-      #   result[:count] ||= {}
-      #   result[:count][key] = scope.count
-      # end
-      # render json: response, status: 200
     end
-
-    private
-
-    # def categorized_call_logs_data(data)
-    #   {
-    #     all_call_logs: data,
-    #     incoming_call_logs: data.incoming,
-    #     outgoing_call_logs: data.outgoing,
-    #     missed_call_logs: data.missed
-    #   }
-    # end
   end
 end

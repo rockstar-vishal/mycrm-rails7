@@ -40,7 +40,8 @@ class ExotelSidsController < ApplicationController
   end
 
   def statistics
-    @call_logs = Leads::CallLog.includes(:lead).joins{lead}.where(leads: {user_id: current_user.manageables.ids})
+    @call_logs = current_user.company.call_logs.joins{lead}.where(leads: {user_id: current_user.manageables.ids})
+    # @call_logs = Leads::CallLog.none
   end
 
 	def destroy

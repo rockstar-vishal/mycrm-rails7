@@ -453,7 +453,7 @@ class LeadsController < ApplicationController
   end
 
   def call_logs
-    @call_logs = Leads::CallLog.includes(:lead).joins{lead}.where(leads: {user_id: current_user.manageables.ids})
+    @call_logs = @company.call_logs.joins{lead}.where(leads: {user_id: current_user.manageables.ids})
     if params[:is_external].present?
       @call_logs = @call_logs.advance_search(call_logs_search_params)
     elsif params[:is_advanced_search].present?
@@ -480,14 +480,14 @@ class LeadsController < ApplicationController
   end
 
   def download_call_log_recording
-    @call_log = Leads::CallLog.find_by(id: params[:call_log_id])
+    @call_log = @company.call_logs.find_by(id: params[:call_log_id])
     recording_url = @call_log.recording_url
     filename = File.basename(URI.parse(recording_url).path)
     send_data open(recording_url).read, type: 'audio/mp3', filename: filename
   end
 
   def outbound_logs
-    @call_logs = Leads::CallLog.not_incoming.includes(:lead).where(user_id: current_user.manageables.ids)
+    @call_logs = @company.call_logs.not_incoming.where(user_id: current_user.manageables.ids)
     if params[:is_advanced_search].present?
       @call_logs = @call_logs.advance_search(outbound_search_params)
     else
