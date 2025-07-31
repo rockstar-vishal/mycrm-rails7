@@ -17,6 +17,7 @@ class Company < ActiveRecord::Base
   has_many :system_smses, class_name: "::SystemSms", dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :leads
+  has_many :call_logs, through: :leads
   has_many :integrations, dependent: :destroy, class_name: "::Companies::Integration"
   has_many :brokers, dependent: :destroy
   has_many :api_keys, class_name: "::Companies::ApiKey", dependent: :destroy
