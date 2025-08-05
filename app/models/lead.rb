@@ -606,12 +606,12 @@ class Lead < ActiveRecord::Base
         leads = leads.where("leads.status_id= ? AND booking_date <= ?",booked_id, booking_date_to)
       end
       if params[:visited_date_from].present?
-        visited_date_from = Date.parse(params[:visited_date_from])
+        visited_date_from = Date.parse(params[:visited_date_from]).beginning_of_day
         lead_ids = leads.joins{visits}.where("leads_visits.date >= ?", visited_date_from).ids.uniq
         leads=leads.where(id: lead_ids)
       end
       if params[:visited_date_upto].present?
-        visited_date_to = Date.parse(params[:visited_date_upto])
+        visited_date_to = Date.parse(params[:visited_date_upto]).end_of_day
         lead_ids = leads.joins{visits}.where("leads_visits.date <= ?", visited_date_to).ids.uniq
         leads=leads.where(id: lead_ids)
       end
@@ -707,10 +707,10 @@ class Lead < ActiveRecord::Base
         reinquired_upto = Time.zone.parse(search_params["reinquired_upto"]).at_end_of_day
       end
       if search_params["visited_date_from"].present?
-        visited_date_from = Date.parse(search_params["visited_date_from"])
+        visited_date_from = Date.parse(search_params["visited_date_from"]).beginning_of_day
       end
       if search_params["visited_date_upto"].present?
-        visited_date_upto = Date.parse(search_params["visited_date_upto"])
+        visited_date_upto = Date.parse(search_params["visited_date_upto"]).end_of_day
       end
       if search_params["token_date_from"].present?
         token_date_from = Date.parse(search_params["token_date_from"])
@@ -894,8 +894,8 @@ class Lead < ActiveRecord::Base
           visits = visits.where(is_visit_executed: true)
         end
 
-        visits = visits.where("date >= ?", visited_date_from) if visited_date_from.present?
-        visits = visits.where("date <= ?", visited_date_upto) if visited_date_upto.present?
+        visits = visits.where("leads_visits.date >= ?", visited_date_from) if visited_date_from.present?
+        visits = visits.where("leads_visits.date <= ?", visited_date_upto) if visited_date_upto.present?
         leads = leads.where(id: visits.pluck(:lead_id))
       end
       if search_params["visit_counts"].present?
