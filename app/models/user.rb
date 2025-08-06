@@ -54,12 +54,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :users_sources, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :user_detail, reject_if: :all_blank, allow_destroy: true
 
-  has_attached_file :image,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
-  validates_attachment_content_type  :image,
-                    content_type: ['image/jpeg', 'image/png'],
-                    size: { in: 0..2.megabytes }
+  has_one_attached :image
 
   scope :active, -> { where(:active=>true) }
   scope :superadmins, -> { where(:role_id=>2)}
@@ -78,8 +73,8 @@ class User < ActiveRecord::Base
   end
 
   def img_url
-    if self.image.present?
-      self.image.url
+    if self.image.attached?
+      Rails.application.routes.url_helpers.rails_blob_url(self.image, only_path: true)
     end
   end
 

@@ -1,0 +1,31 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# Use Amazon S3 to store uploaded files.
+#
+# Add the `aws-sdk-s3` gem to your Gemfile:
+#
+#   gem "aws-sdk-s3", require: false
+#
+# The `require: false` is important to avoid loading the AWS SDK when
+# the Active Storage service is not used.
+#
+# Uncomment and edit the following lines to use a different AWS region:
+#
+# amazon:
+#   service: S3
+#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+#   region: us-east-1
+#   bucket: your_own_bucket-<%= Rails.env %>
+
+# Remember not to checkin your credentials file. Instead, use the following:
+#
+#   rails credentials:edit
+#
+# This will create a new credentials file with the AWS access key and secret. 

@@ -1,2 +1,3 @@
-require 'aws-sdk-v1'
-AWS.config(access_key_id: CRMConfig.s3_access_key, secret_access_key: CRMConfig.s3_secret, region: 'ap-south-1')
+# AWS SDK v3 configuration
+# The new AWS SDK v3 is configured through environment variables or credentials file
+# No explicit configuration needed here as it's handled by the aws-sdk-s3 gem
