@@ -37,7 +37,7 @@ class ProcessGbkgroupWhatsappTrigger
     end
 
     def site_visit_planned(lead, arg)
-      { campagin_name: "SiteVisitPlanned", template_params: [lead.name, lead.project.name, lead.tentative_visit_planned.strftime("%d-%B-%Y, %H:%M %p"), lead.user.name] }
+      { campagin_name: "SiteVisitPlanned", template_params: [lead.name, lead.project.name, lead.tentative_visit_planned&.strftime("%d-%B-%Y, %H:%M %p") || "Date & Time", lead.user.name] }
     end
 
     def site_visit_done(lead, extra_param)
