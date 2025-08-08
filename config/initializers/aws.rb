@@ -5,7 +5,7 @@
 begin
   if Rails.application.credentials.dig(:aws, :access_key_id).present?
     Aws.config.update({
-      region: Rails.application.credentials.dig(:aws, :region) || 'us-east-1',
+      region: Rails.application.credentials.dig(:aws, :region) || 'ap-south-1',
       credentials: Aws::Credentials.new(
         Rails.application.credentials.dig(:aws, :access_key_id),
         Rails.application.credentials.dig(:aws, :secret_access_key)
@@ -13,7 +13,7 @@ begin
     })
   elsif ENV['AWS_ACCESS_KEY_ID'].present?
     Aws.config.update({
-      region: ENV['AWS_REGION'] || 'us-east-1',
+      region: ENV['AWS_REGION'] || 'ap-south-1',
       credentials: Aws::Credentials.new(
         ENV['AWS_ACCESS_KEY_ID'],
         ENV['AWS_SECRET_ACCESS_KEY']
@@ -25,4 +25,4 @@ rescue => e
 end
 
 # Paperclip S3 configuration for aws-sdk-s3 compatibility
-Paperclip::Attachment.default_options[:s3_region] = Rails.application.credentials.dig(:aws, :region) || ENV['AWS_REGION'] || 'us-east-1'
+Paperclip::Attachment.default_options[:s3_region] = Rails.application.credentials.dig(:aws, :region) || ENV['AWS_REGION'] || 'ap-south-1'
