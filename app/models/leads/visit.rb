@@ -62,7 +62,7 @@ class Leads::Visit < ActiveRecord::Base
   def set_lead_revisit
     if self.lead.visits.executed.count > 1 && self.is_visit_executed
       unless self.lead.revisit
-        self.lead.update_attributes(revisit: true)
+        self.lead.update(revisit: true)
       end
     end
   end

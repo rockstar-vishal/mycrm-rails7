@@ -33,7 +33,7 @@ class ProcessSystemSms
       message = e.to_s
       @process_system_sms_logger.info("processing sms-#{id} - 4")
     end
-    sms.update_attributes(:response=>message, :sent=>sent)
+    sms.update(:response=>message, :sent=>sent)
     @process_system_sms_logger.info("processing sms-#{id} - 6")
     return true
   end

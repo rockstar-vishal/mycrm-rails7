@@ -43,7 +43,7 @@ class Otp < ActiveRecord::Base
   end
 
   def use
-    if self.update_attributes(:used=>true)
+    if self.update(:used=>true)
       return true
     else
       return false

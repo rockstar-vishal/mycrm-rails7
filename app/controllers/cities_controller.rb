@@ -49,7 +49,7 @@ class CitiesController < ApplicationController
   end
 
   def update
-    if @city.update_attributes(city_params)
+    if @city.update(city_params)
       flash[:notice] = 'City Updated Successfully'
       xhr_redirect_to redirect_to: cities_path
     else

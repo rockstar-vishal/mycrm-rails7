@@ -50,7 +50,7 @@ module Public
       phone = external_lead_params[:mobile] rescue ""
       lead = @company.leads.where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND mobile LIKE ?)", email, "#{phone.last(10) if phone.present?}").last
       if lead.present?
-        if lead.update_attributes(external_lead_params.merge(status_id: @company.expected_site_visit&.id))
+        if lead.update(external_lead_params.merge(status_id: @company.expected_site_visit&.id))
           render json: {message: "Updated Successfuly", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
         else
           render json: {message: "Failed", errors: lead.errors.full_messages.join(', ')}, status: 422 and return
@@ -132,7 +132,7 @@ module Public
       lead = @company.leads.where("project_id = ? AND ((email IS NOT NULL AND email != '' AND email = ?) OR (mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = ?))", project_id, lead_params[:email].to_s.strip, lead_params[:mobile].last(10)).last
 
       if lead.present?
-        if lead.update_attributes(lead_params.slice(:comment))
+        if lead.update(lead_params.slice(:comment))
           render json: {status: true, message: "Lead Updated Successfuly"}, status: 200 and return
         else
           render json: {status: false, message: lead.errors.full_messages.join(', ')}, status: 422 and return
@@ -227,7 +227,7 @@ module Public
       lead = @company.leads.where("RIGHT(REPLACE(mobile,' ', ''), 10) LIKE ? AND project_id = ?", mobile.last(10), project_id).last rescue nil
 
       if lead.present? && params[:sv]
-        if lead.update_attributes(lead_params.slice(:visit_date, :visit_comments, :comment))
+        if lead.update(lead_params.slice(:visit_date, :visit_comments, :comment))
           lead.visits.create(date: lead_params[:visit_date], comment: lead_params[:visit_comments])
           render json: {status: true, message: "Visit Details Updated Successfuly"}, status: 200 and return
         else

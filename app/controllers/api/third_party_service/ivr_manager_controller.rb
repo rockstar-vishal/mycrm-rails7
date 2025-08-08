@@ -19,7 +19,7 @@ module Api
         user_id = @company.users.active.find_by(mobile: ivr_params[:destinationNumber])&.id || @company.users.active.superadmins.first.id
         @lead = @company.leads.where("RIGHT(REPLACE(mobile,' ', ''), 10) LIKE ?", ivr_params[:sourceNumber].last(10)).last
         if @lead.present?
-          @lead.update_attributes(project_id: project_id)
+          @lead.update(project_id: project_id)
         else
           @lead = @company.leads.build(
             name: '--',

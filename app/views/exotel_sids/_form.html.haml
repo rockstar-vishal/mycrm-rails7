@@ -16,7 +16,7 @@
         = f.text_field :description, class: "form-control", placeholder: "Description"
     .col-md-6
       .form-group
-        = f.select :project_id, options_from_collection_for_select(@current_user.company.projects, :id, :name, f.object.project_id), {prompt: true, label: 'Project'}, class: 'form-control multiselect', required: true
+        = f.select :project_id, options_from_collection_for_select(@current_user.company.projects, :id, :name, f.object.project_id), {prompt: true, label: 'Project'}, class: 'form-control', required: true
     .col-md-6
       .form-group
         = f.select :source_id, options_from_collection_for_select(@current_user.company.sources, :id, :name, f.object.source_id), {prompt: true, label: 'Source'}, class: 'form-control'

@@ -66,7 +66,7 @@ class Api::ThirdPartyService::McubesController < PublicApiController
       user_id = (@company.users.active.find_by(email: mcube_params[:empemail]&.downcase) || @company.users.active.superadmins.first).id
     end
     if @lead.present?
-      @lead.update_attributes(project_id: project || @company.default_project&.id)
+      @lead.update(project_id: project || @company.default_project&.id)
     else
       @lead = @company.leads.build(
         name: mcube_params[:callername].present? ? mcube_params[:callername] :  '--',

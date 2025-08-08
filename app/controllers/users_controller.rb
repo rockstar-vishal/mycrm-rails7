@@ -46,13 +46,9 @@ class UsersController < ApplicationController
   end
 
   def update
-    if params[:user][:password].blank?
-      params[:user].delete(:password)
-      params[:user].delete(:password_confirmation)
-    end
-    if @user.update_attributes(user_params)
-      flash[:notice] = "User updated successfully"
-      redirect_to users_path and return
+    if @user.update(user_params)
+      flash[:notice] = "User Updated Successfully"
+      redirect_to users_path
     else
       render 'edit'
     end
@@ -68,11 +64,11 @@ class UsersController < ApplicationController
       params[:user].delete(:password)
       params[:user].delete(:password_confirmation)
     end
-    if @user.update_attributes(user_profile_params)
-      flash[:success] = 'Updated Successfully'
-      redirect_to request.referer and return
+    if @user.update(user_profile_params)
+      flash[:notice] = "Profile Updated Successfully"
+      redirect_to users_path
     else
-      render 'edit_profile'
+      render 'edit'
     end
   end
 
@@ -106,11 +102,11 @@ class UsersController < ApplicationController
   def enable_round_robin
     current_user.manageables.each do |user|
       if params[:users_list].present?
-        params[:users_list].include?(user.id.to_s) ? user.update_attributes(:round_robin_enabled => true) : user.update_attributes(:round_robin_enabled => false)
+        params[:users_list].include?(user.id.to_s) ? user.update(:round_robin_enabled => true) : user.update(:round_robin_enabled => false)
       end
     end
     company = current_user.company
-    if company.update_attributes(:round_robin_enabled => true)
+    if company.update(:round_robin_enabled => true)
       flash[:notice] = "Round Robin Assignment enabled successfully"
     else
       flash[:alert] = "Cannot enable Round Robin Assignment - #{company.errors.full_messages.join(', ')}"
@@ -122,7 +118,7 @@ class UsersController < ApplicationController
     company = current_user.company
     current_user.manageables.round_robin_users.each do |user|
       if params[:users_list].present?
-        params[:users_list].include?(user.id.to_s) ? user.update_attributes(:round_robin_enabled => true) : user.update_attributes(:round_robin_enabled => false)
+        params[:users_list].include?(user.id.to_s) ? user.update(:round_robin_enabled => true) : user.update(:round_robin_enabled => false)
       else
         flash[:alert] = "Atleast one user should have round robin enabled"
         redirect_to request.referer and return
@@ -137,7 +133,7 @@ class UsersController < ApplicationController
       end
     end
 
-    if users.count > 1 || (users.count == 1 && company.update_attributes(:round_robin_enabled => false))
+    if users.count > 1 || (users.count == 1 && company.update(:round_robin_enabled => false))
       flash[:notice]  = "Round Robin Assignment disabled successfully"
     else
       flash[:alert] = "Cannot disable this functionality - #{company.errors.full_messages.join(',')}"

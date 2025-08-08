@@ -33,7 +33,7 @@ class McubeSidsController < ApplicationController
   end
 
   def update
-    if @mcube_sid.update_attributes(mcube_params)
+    if @mcube_sid.update(mcube_params)
       flash[:notice] = 'McubeSid Updated Successfully'
       xhr_redirect_to redirect_to: mcube_sids_path
     else

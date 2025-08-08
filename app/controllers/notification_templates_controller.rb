@@ -29,7 +29,7 @@ class NotificationTemplatesController < ApplicationController
   end
 
   def update
-    if @template.update_attributes(template_params)
+    if @template.update(template_params)
       flash[:success] = "Template updated successfully"
       xhr_redirect_to redirect_to: notification_templates_path
     else

@@ -1,3 +1,14 @@
+@import "bootstrap";
+@import "adminlte";
+@import "datatables";
+@import "font-awesome";
+@import "chosen";
+@import "crm";
+@import "fullcalendar";
+@import "jquery-tablesorter/theme.default";
+@import "jquery.datetimepicker";
+@import "multi-select";
+
 /*
  * This is a manifest file that'll be compiled into application.css, which will include all the files
  * listed below.
@@ -13,12 +24,3 @@
  *= require_tree .
  *= require_self3
  */
-@import "bootstrap";
-@import "adminlte";
-@import "datatables";
-@import "font-awesome";
-@import "chosen";
-@import "crm";
-@import "fullcalendar";
-@import "jquery-tablesorter/theme.default";
-@import "jquery.datetimepicker";

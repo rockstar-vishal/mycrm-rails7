@@ -30,7 +30,7 @@ class SourcesController < ApplicationController
   end
 
   def update
-    if @source.update_attributes(source_params)
+    if @source.update(source_params)
       flash[:notice] = 'Source Updated Successfully'
       xhr_redirect_to redirect_to: sources_path
     else

@@ -53,11 +53,11 @@
                         %td= cost_sheet.created_at.strftime("%d-%b-%y %H:%M %p")
                         %td
                           - if cost_sheet.company.cost_sheet_letter_types.include?('letter1')
-                            %span{class: "badge bg-gradient", title: "letter1", "data-toggle": "tooltip"}
+                            %span{class: "badge bg-gradient", title: "letter1", "data-bs-toggle": "tooltip"}
                               = link_to cost_sheets_path(cost_sheet_id: cost_sheet, letter_type: 'index', format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
                                 %i.fa.fa-print{"aria-hidden" => "true"}
                           - if cost_sheet.company.cost_sheet_letter_types.include?('letter2')
-                            %span{class: "badge bg-gradient", title: "letter2", "data-toggle": "tooltip"}
+                            %span{class: "badge bg-gradient", title: "letter2", "data-bs-toggle": "tooltip"}
                               = link_to cost_sheets_path(cost_sheet_id: cost_sheet, letter_type: 'index1', format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
                                 %i.fa.fa-print{"aria-hidden" => "true"}
                           = link_to edit_cost_sheet_path(cost_sheet), class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do

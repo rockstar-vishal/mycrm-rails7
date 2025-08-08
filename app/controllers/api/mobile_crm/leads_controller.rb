@@ -102,7 +102,7 @@ module Api
       end
 
       def update
-        if @lead.update_attributes(lead_params)
+        if @lead.update(lead_params)
           render json: {lead: @lead.reload.as_api_response(:meta_details_with_detail)}, status: 200 and return
         else
           render json: {status: false, message: @lead.errors.full_messages.join(",")}, status: 400 and return

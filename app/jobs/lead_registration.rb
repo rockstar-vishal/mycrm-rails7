@@ -25,7 +25,7 @@ class LeadRegistration
       message = e.to_s
       @lead_registration_logger.info("processing sms-#{id} - 4")
     end
-    sms.update_attributes(:response=>message, :sent=>sent)
+    sms.update(:response=>message, :sent=>sent)
     @lead_registration_logger.info("processing sms-#{id} - 6")
     return true
   end

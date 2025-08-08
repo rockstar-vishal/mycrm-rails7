@@ -12,12 +12,12 @@
         %span.logo-lg
           = image_tag "logo.jpg", class: "img-responsive"
     %nav.navbar.navbar-static-top{:role => "navigation"}
-      %a.sidebar-toggle{"data-toggle" => "offcanvas", :href => "#", :role => "button"}
+      %a.sidebar-toggle{"data-bs-toggle" => "offcanvas", :href => "#", :role => "button"}
         %span.sr-only Toggle navigation
       .navbar-custom-menu
         %ul.nav.navbar-nav
           %li.dropdown.user.user-menu
-            %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+            %a.dropdown-toggle{"data-bs-toggle" => "dropdown", :href => "#"}
               - if current_user.profile_image_present?
                 = image_tag user_profile_image_path(current_user), class: "user-image", alt: "User Image"
               - else

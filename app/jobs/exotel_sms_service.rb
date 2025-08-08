@@ -23,7 +23,7 @@ class ExotelSmsService
       message = e.to_s
       @exotel_sms_service_logger.info("processing sms-#{id} - 4")
     end
-    sms.update_attributes(:response=>message, :sent=>sent)
+    sms.update(:response=>message, :sent=>sent)
     @exotel_sms_service_logger.info("processing sms-#{id} - 6")
     return true
   end

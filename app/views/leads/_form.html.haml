@@ -74,7 +74,7 @@
     #dead-reason.row{:style => ("display:none;" unless @company.dead_status_ids.include?(f.object.status_id.to_s))}
       .col-md-3.required
         .form-group
-          = f.select :dead_reason_id, options_from_collection_for_select(@company.reasons.active, :id, :reason, f.object.dead_reason_id), {include_blank: "Dead Reason"},{class: "form-control multiselect"}
+          = f.select :dead_reason_id, options_from_collection_for_select(@company.reasons.active, :id, :reason, f.object.dead_reason_id), {include_blank: "Dead Reason"},{class: "form-control", required: @company.is_required_fields?('dead_reason_id')}
       - dead_sub_reason_required = @company.is_required_fields?("dead_sub_reason")
       .col-md-3{:class=> ("required" if dead_sub_reason_required)}
         .form-group

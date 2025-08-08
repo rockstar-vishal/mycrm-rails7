@@ -174,7 +174,7 @@
                                   - source_def_data = lead.source&.name
                                   
                                   - if lead.source.present?
-                                    %span{class: "badge bg-gradient-#{find_class(lead.source)}", title: source_def_data, "data-toggle": "tooltip"}
+                                    %span{class: "badge bg-gradient-#{find_class(lead.source)}", title: source_def_data, "data-bs-toggle": "tooltip"}
                                       = source_def_data
                             - if magic_index_fields.include?("firm_name")
                               %td= lead.firm_name
@@ -210,7 +210,7 @@
                                     - visit_count = lead.visits.count
                                   - unless visit_count.zero?
                                     %br
-                                    = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
+                                    = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-bs-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
                                       = "Visits: #{visit_count}"
                             -if company_index_fields.include?('presale_stage_id')
                               %td= lead.presales_stage&.name

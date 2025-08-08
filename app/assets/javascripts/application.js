@@ -56,11 +56,21 @@ $(document).ready(function() {
     cssClass: ''
   });
 
+  // Initialize multiselect elements
+  $('.multiselect').multiSelect({
+    keySelect: [32],
+    selectableOptgroup: false,
+    disabledClass: 'disabled',
+    dblClick: false,
+    keepOrder: false,
+    cssClass: ''
+  });
+
   // clipboard js
 
   // Initialize tooltips for Bootstrap 5
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 

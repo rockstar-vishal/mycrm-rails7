@@ -63,7 +63,7 @@ class Internal::BrokersController < InternalController
       @leads = @leads.where(project_id: project_id)
       @leads = @leads.where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(mobile, 10) LIKE ?)", email, "#{mobile.last(10) if mobile.present?}")
       if @leads.present?
-        @leads.first.update_attributes(:status_id=>company.dead_status_ids.reject(&:blank?).first.to_i, dead_sub_reason: "Inactive due to visit with Lead No: #{lead_no}")
+        @leads.first.update(:status_id=>company.dead_status_ids.reject(&:blank?).first.to_i, dead_sub_reason: "Inactive due to visit with Lead No: #{lead_no}")
       end
     end
   end

@@ -33,7 +33,7 @@ class StagesController < ApplicationController
   end
 
   def update
-    if @stage.update_attributes(stage_params)
+    if @stage.update(stage_params)
       flash[:notice] = "Stage updated successfully"
       xhr_redirect_to redirect_to: stages_path
     else

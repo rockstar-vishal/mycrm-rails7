@@ -88,7 +88,7 @@ class CompaniesController < ApplicationController
   end
 
   def update
-    if @company.update_attributes(company_params)
+    if @company.update(company_params)
       flash[:notice] = "Company Updated Successfully"
       redirect_to companies_path
     else
@@ -97,7 +97,7 @@ class CompaniesController < ApplicationController
   end
 
   def update
-    if @company.update_attributes(company_params)
+    if @company.update(company_params)
       flash[:notice] = "Company Updated Successfully"
       redirect_to companies_path
     else
@@ -138,7 +138,7 @@ class CompaniesController < ApplicationController
   end
 
   def update_sv_form
-    if @company.update_attributes(company_params)
+    if @company.update(company_params)
       if params[:keys].present? && params[:values].present?
         sv_form = @company.sv_form || @company.build_sv_form
         other_data = {}

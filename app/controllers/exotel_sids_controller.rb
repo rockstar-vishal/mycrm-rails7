@@ -31,7 +31,7 @@ class ExotelSidsController < ApplicationController
   end
 
   def update
-    if @exotel_sid.update_attributes(exotel_params)
+    if @exotel_sid.update(exotel_params)
       flash[:notice] = 'ExoPhone Updated Successfully'
       xhr_redirect_to redirect_to: exotel_sids_path
     else

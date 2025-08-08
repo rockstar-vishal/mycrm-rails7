@@ -12,9 +12,9 @@ class User < ActiveRecord::Base
   has_many :emails, as: :receiver, class_name: 'Email'
   has_many :call_attempts
   has_many :call_logs, class_name: "::Leads::CallLog"
-  belongs_to :exotel_sid
-  belongs_to :mcube_sid
-  belongs_to :cloud_telephony_sid
+  belongs_to :exotel_sid, optional: true
+  belongs_to :mcube_sid, optional: true
+  belongs_to :cloud_telephony_sid, optional: true
 
   has_many :brokers, foreign_key: :rm_id
   has_many :manager_mappings, class_name: "::Users::Manager", foreign_key: :user_id
@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
   has_one :user_detail
   has_many :file_exports, class_name: 'FileExport'
   
-  belongs_to :city
+  belongs_to :city, optional: true
 
   validates :name, :mobile, :role, :email, :company, presence: true
   validates :password, confirmation: true

@@ -35,7 +35,7 @@ class RegionsController < ApplicationController
   end
 
   def update
-    if @region.update_attributes(region_params)
+    if @region.update(region_params)
       flash[:notice] = "#{@region.name} - Region Updated Successfully"
       xhr_redirect_to redirect_to: regions_path
     else

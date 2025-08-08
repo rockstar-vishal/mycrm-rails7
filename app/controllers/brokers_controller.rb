@@ -53,7 +53,7 @@ class BrokersController < ApplicationController
 
   # PATCH/PUT /brokers/1
   def update
-    if @broker.update_attributes(broker_params)
+    if @broker.update(broker_params)
       flash[:notice] = "Broker updated successfully"
       xhr_redirect_to redirect_to: brokers_path
     else

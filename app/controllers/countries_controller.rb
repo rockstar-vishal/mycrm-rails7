@@ -32,7 +32,7 @@ class CountriesController < ApplicationController
     end
   
     def update
-      if @country.update_attributes(country_params)
+      if @country.update(country_params)
         flash[:notice] = "#{@country.name} - country Updated Successfully"
         xhr_redirect_to redirect_to: countries_path
       else

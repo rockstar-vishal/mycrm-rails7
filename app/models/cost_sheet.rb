@@ -14,7 +14,7 @@ class CostSheet < ActiveRecord::Base
     percentage_slab.each do |slab|
       amount = ((slab.percentage/100.0)*(total_amount)).round()
       percentage = nil
-      slab.update_attributes(amount: amount, percentage: percentage)
+      slab.update(amount: amount, percentage: percentage)
     end
   end
 

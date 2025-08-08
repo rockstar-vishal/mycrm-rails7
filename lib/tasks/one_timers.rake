@@ -39,7 +39,7 @@ namespace :one_timers do
   task :populate_missing_user_id_in_audits  => :environment do
     company_id = 14
     ::Audited::Audit.where(associated_id: company_id, associated_type: 'Company').where(user_id: nil, auditable_type: 'Lead').find_each do |audit|
-      audit.update_attributes(user_id: audit.auditable&.user_id, user_type: 'User')
+      audit.update(user_id: audit.auditable&.user_id, user_type: 'User')
       puts "Done For #{audit&.auditable&.lead_no}"
     end
   end
@@ -179,7 +179,7 @@ namespace :one_timers do
   task :set_lead_revisit=> :environment do
     company = Company.find(36)
     company.leads.joins(:visits).select{|x| x.visits.count > 1}.each do |lead|
-      lead.update_attributes(revisit: true)
+      lead.update(revisit: true)
     end
   end
 
@@ -222,7 +222,7 @@ namespace :one_timers do
   task :set_lead_site_visit_planned => :environment do
     company = Company.find(36)
     company.leads.where.not(tentative_visit_planned: nil).each do |lead|
-      lead.update_attributes(is_site_visit_scheduled: true)
+      lead.update(is_site_visit_scheduled: true)
     end
   end
 
@@ -692,7 +692,7 @@ namespace :one_timers do
       comment=row["Comment"]
       created_at=row["Visit date"].strip
       if lead.present?
-        lead.update_attributes(created_at: created_at, comment: comment)
+        lead.update(created_at: created_at, comment: comment)
         puts "Lead id: #{lead_id} updated."
       end
     end

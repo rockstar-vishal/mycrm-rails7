@@ -32,7 +32,7 @@ class Companies::ApiKeysController < ApplicationController
   end
 
   def update
-    if @key.update_attributes(key_params)
+    if @key.update(key_params)
       flash[:notice] = "API Keys updated successfully"
       xhr_redirect_to redirect_to: companies_api_keys_path
     else

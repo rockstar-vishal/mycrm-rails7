@@ -43,7 +43,7 @@ module Api
           if params[:end_point].present? && params[:end_point]=="CP"
             if is_new_record
               lead_no = create_partner_lead user, @lead.project
-              @lead.update_attributes(partner_lead_no: lead_no)
+              @lead.update(partner_lead_no: lead_no)
             else
               add_partner_visit @lead
             end
@@ -72,7 +72,7 @@ module Api
       #     @lead = @leads.where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(REPLACE(mobile,' ',''), 10) LIKE ?)", email, "#{phone.strip.last(10) if phone.present?}").last
       #     if @lead.present? && !@company.restrict_sv_form_duplicate_lead_visit
       #       gre_user=@company.enable_sv_closing_executive_assignment ? (@company.users_projects.find_by_project_id(lead_params[:project_id]).user.id rescue nil) : (lead_params[:closing_executive].present? ? lead_params[:closing_executive] : @lead.closing_executive)
-      #       if @lead.update_attributes(lead_params.merge(:status_id=>status_id, closing_executive: gre_user))
+      #       if @lead.update(lead_params.merge(:status_id=>status_id, closing_executive: gre_user))
       #         @visit = create_site_visit
       #         if @company.setting.present? && @company.enable_gre_partner_access
       #           inactive_partner_lead

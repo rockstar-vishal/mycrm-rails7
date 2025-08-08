@@ -48,7 +48,7 @@ class LocalitiesController < ApplicationController
   end
 
   def update
-    if @locality.update_attributes(locality_params)
+    if @locality.update(locality_params)
       flash[:notice] = "#{@locality.name} - Locality Updated Successfully"
       xhr_redirect_to redirect_to: localities_path
     else

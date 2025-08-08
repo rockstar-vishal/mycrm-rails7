@@ -14,7 +14,7 @@ class ProcessVisitDoneMail
       message = e.to_s
       @process_email_logger.info("processing email-#{id} - 4")
     end
-    email.update_attributes(:response=>message, :sent=>sent)
+    email.update(:response=>message, :sent=>sent)
     @process_email_logger.info("processing email-#{id} - 6")
     return true
   end

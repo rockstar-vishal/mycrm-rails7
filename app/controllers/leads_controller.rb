@@ -155,7 +155,7 @@ class LeadsController < ApplicationController
 
   def create_visit
     @default_tab = 'site-visit-detail'
-    if @lead.update_attributes(lead_params)
+    if @lead.update(lead_params)
       flash[:notice] = 'Visit Detail Updated Successfully'
       if current_user.is_supervisor?
         render_modal("onsite_leads/visit_detail", {class: 'right'})
@@ -216,7 +216,7 @@ class LeadsController < ApplicationController
   end
 
   def update
-    is_save = @lead.update_attributes(lead_params)
+    is_save = @lead.update(lead_params)
     respond_to do |format|
       format.js do
         if is_save

@@ -29,18 +29,18 @@ class Lead < ActiveRecord::Base
   belongs_to :source
   belongs_to :project
   belongs_to :user
-  belongs_to :presale_user, class_name: 'User', foreign_key: :presale_user_id
-  belongs_to :postsale_user, class_name: 'User', foreign_key: :closing_executive
+  belongs_to :presale_user, class_name: 'User', foreign_key: :presale_user_id, optional: true
+  belongs_to :postsale_user, class_name: 'User', foreign_key: :closing_executive, optional: true
   belongs_to :last_lead_modified_user, class_name: 'User', foreign_key: :last_modified_by
   belongs_to :status
-  belongs_to :call_in
-  belongs_to :city
-  belongs_to :locality
-  belongs_to :broker
-  belongs_to :enq_subsource, :class_name=> 'SubSource', foreign_key: :enquiry_sub_source_id
-  belongs_to :stage
-  belongs_to :presales_stage, class_name: 'Stage', foreign_key: :presale_stage_id
-  belongs_to :dead_reason, :class_name=>"::Companies::Reason"
+  belongs_to :call_in, optional: true
+  belongs_to :city, optional: true
+  belongs_to :locality, optional: true
+  belongs_to :broker, optional: true
+  belongs_to :enq_subsource, :class_name=> 'SubSource', foreign_key: :enquiry_sub_source_id, optional: true
+  belongs_to :stage, optional: true
+  belongs_to :presales_stage, class_name: 'Stage', foreign_key: :presale_stage_id, optional: true
+  belongs_to :dead_reason, :class_name=>"::Companies::Reason", optional: true
   has_many :leads_secondary_sources, class_name: "::Leads::SecondarySource"
   has_many :secondary_sources, through: :leads_secondary_sources, source: :source
   has_many :call_logs, class_name: "Leads::CallLog", dependent: :destroy
@@ -408,7 +408,7 @@ class Lead < ActiveRecord::Base
   end
 
   def set_presale_user
-    self.update_attributes(presale_user_id: self.user_id)
+    self.update(presale_user_id: self.user_id)
   end
 
   def is_ncd_required?

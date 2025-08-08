@@ -7,14 +7,14 @@
   .modal-dialog
     .modal-content
       .modal-header
-        %button.close{"aria-hidden" => "true", "data-dismiss" => "success-connected-modal", :type => "button"} ×
+        %button.close{"aria-hidden" => "true", "data-bs-dismiss" => "modal", :type => "button"} ×
       .modal-body
         = image_tag 'EnConnected.gif', style: "width: 102%"
 .modal#failed-connected-modal{style: "display:none"}
   .modal-dialog
     .modal-content
       .modal-header
-        %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+        %button.close{"aria-hidden" => "true", "data-bs-dismiss" => "modal", :type => "button"} ×
       .modal-body
         = image_tag 'EnFailed.gif', style: "width: 102%"
         %h5#failed-modal-text{style: "text-align:center;"}
