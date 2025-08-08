@@ -12,7 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require datatables
+//= require dataTables/jquery.dataTables
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require popper
 //= require moment
 //= require fullcalendar
