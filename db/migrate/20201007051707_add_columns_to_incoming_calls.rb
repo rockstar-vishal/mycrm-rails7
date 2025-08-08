@@ -1,4 +1,4 @@
-class AddColumnsToIncomingCalls < ActiveRecord::Migration
+class AddColumnsToIncomingCalls < ActiveRecord::Migration[7.1]
   def change
     add_column :incoming_calls, :to_number, :string
     add_column :incoming_calls, :end_time, :datetime

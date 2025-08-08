@@ -1,11 +1,13 @@
-class AddAttachmentSiteVisitFormToLeadsVisits < ActiveRecord::Migration
+class AddAttachmentSiteVisitFormToLeadsVisits < ActiveRecord::Migration[7.1]
   def self.up
-    change_table :leads_visits do |t|
-      t.attachment :site_visit_form
-    end
+    # Active Storage handles file attachments automatically
+    # change_table :leads_visits do |t|
+    #   t.attachment :site_visit_form
+    # end
   end
 
   def self.down
-    remove_attachment :leads_visits, :site_visit_form
+    # Active Storage handles file attachments automatically
+    # remove_attachment :leads_visits, :site_visit_form
   end
 end

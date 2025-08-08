@@ -1,4 +1,4 @@
-class AddColumnsInMagicFields < ActiveRecord::Migration
+class AddColumnsInMagicFields < ActiveRecord::Migration[7.1]
   def change
     add_column :magic_fields, :fb_form_field, :boolean, default: false
     add_column :magic_fields, :fb_field_name, :string

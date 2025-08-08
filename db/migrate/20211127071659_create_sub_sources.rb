@@ -1,4 +1,4 @@
-class CreateSubSources < ActiveRecord::Migration
+class CreateSubSources < ActiveRecord::Migration[7.1]
   def change
     create_table :sub_sources do |t|
       t.string :name

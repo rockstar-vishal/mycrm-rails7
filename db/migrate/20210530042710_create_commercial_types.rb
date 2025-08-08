@@ -1,4 +1,4 @@
-class CreateCommercialTypes < ActiveRecord::Migration
+class CreateCommercialTypes < ActiveRecord::Migration[7.1]
   def change
     create_table :commercial_types do |t|
       t.string :property_type

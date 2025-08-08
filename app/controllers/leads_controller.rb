@@ -564,7 +564,6 @@ class LeadsController < ApplicationController
     render json: sub_sources, status: 200 and return
   end
 
-  private
     def set_lead
       @lead = @leads.find(params[:id])
     end
@@ -626,6 +625,7 @@ class LeadsController < ApplicationController
         *magic_fields,
         :name, :visited, :visit_expiring, :backlogs_only, :todays_call_only, :visit_form, :merged, :ncd_from,:exact_ncd_upto, :exact_ncd_from, :created_at_from, :updated_at_from, :updated_at_upto, :expired_from, :expired_upto, :created_at_upto, :visited_date_from, :booking_date_from, :booking_date_to, :token_date_to, :token_date_from, :visited_date_upto, :ncd_upto, :agreement_date_from, :agreement_date_upto, :booking_cancelled_date_from, :booking_cancelled_date_upto, :email,:state, :mobile, :other_phones, :comment, :lead_no, :manager_id, :budget_from, :site_visit_done, :site_visit_planned, :revisit, :booked_leads, :token_leads, :visit_cancel, :postponed, :budget_upto, :visit_counts, :visit_counts_num, :sub_source, :customer_type, :deactivated, :site_visit_from, :site_visit_upto,:reinquired_from, :reinquired_upto, :is_qualified, :source_id, dead_reason_ids: [], project_ids: [], :assigned_to => [], :lead_statuses => [], city_ids: [], locality_ids: [],  :source_id=>[],lead_stages: [], :presale_user_id=>[], :sub_source_ids=>[], :lead_ids=>[], broker_ids: [], country_ids: [], closing_executive: [], dead_reasons: [], sv_user: [], :project_ids=>[], manager_ids: [])
     end
+    helper_method :search_params
 
     def call_logs_search_params
       params.permit(

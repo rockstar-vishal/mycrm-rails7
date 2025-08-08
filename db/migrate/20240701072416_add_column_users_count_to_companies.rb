@@ -1,5 +1,6 @@
-class AddColumnUsersCountToCompanies < ActiveRecord::Migration
+class AddColumnUsersCountToCompanies < ActiveRecord::Migration[7.1]
   def change
-    add_column :companies, :users_count, :integer, index: true
+    add_column :companies, :users_count, :integer
+    add_index :companies, :users_count
   end
 end

@@ -1,4 +1,4 @@
-class CreatePlanStages < ActiveRecord::Migration
+class CreatePlanStages < ActiveRecord::Migration[7.1]
   def change
     create_table :plan_stages do |t|
       t.string :title

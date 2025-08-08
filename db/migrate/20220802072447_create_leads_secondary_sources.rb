@@ -1,4 +1,4 @@
-class CreateLeadsSecondarySources < ActiveRecord::Migration
+class CreateLeadsSecondarySources < ActiveRecord::Migration[7.1]
   def change
     create_table :leads_secondary_sources do |t|
       t.integer :lead_id

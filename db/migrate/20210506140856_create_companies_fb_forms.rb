@@ -1,4 +1,4 @@
-class CreateCompaniesFbForms < ActiveRecord::Migration
+class CreateCompaniesFbForms < ActiveRecord::Migration[7.1]
   def change
     create_table :companies_fb_forms do |t|
       t.integer :company_id

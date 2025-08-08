@@ -1,4 +1,4 @@
-class AddColumnIsDefaultToProjects < ActiveRecord::Migration
+class AddColumnIsDefaultToProjects < ActiveRecord::Migration[7.1]
   def change
     add_column :projects, :is_default, :boolean, default: false
   end

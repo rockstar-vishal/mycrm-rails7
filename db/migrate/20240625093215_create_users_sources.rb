@@ -1,4 +1,4 @@
-class CreateUsersSources < ActiveRecord::Migration
+class CreateUsersSources < ActiveRecord::Migration[7.1]
   def change
     create_table :users_sources, force: :cascade do |t|
       t.integer "source_id", index: true

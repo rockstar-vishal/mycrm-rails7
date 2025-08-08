@@ -1,4 +1,4 @@
-class CreateExportLogs < ActiveRecord::Migration
+class CreateExportLogs < ActiveRecord::Migration[7.1]
   def change
     create_table :export_logs do |t|
       t.integer :company_id

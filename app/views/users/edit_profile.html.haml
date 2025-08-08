@@ -38,7 +38,7 @@
                       = f.text_field :email, class: "form-control", placeholder: "Email", required: true, disabled: (!@user.is_super? && @user.company.setting.present? && @user.company.setting.edit_profile_not_allowed)
                   .col-md-6
                     .form-group
-                      = f.file_field :image, label: 'Profile Image', class: "form-control"
+                      = f.file_field :profile_image_upload, label: 'Profile Image', class: "form-control"
                   .w-100
                   .col-md-6
                     .form-group

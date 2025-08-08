@@ -1,4 +1,4 @@
-class AddPercentageToCostSheetOtherItems < ActiveRecord::Migration
+class AddPercentageToCostSheetOtherItems < ActiveRecord::Migration[7.1]
   def change
     add_column :cost_sheets, :total_cost, :integer
     add_column :cost_sheets_other_items, :percentage, :decimal

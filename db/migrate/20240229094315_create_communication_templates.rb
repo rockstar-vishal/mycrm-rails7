@@ -1,4 +1,4 @@
-class CreateCommunicationTemplates < ActiveRecord::Migration
+class CreateCommunicationTemplates < ActiveRecord::Migration[7.1]
   def change
     create_table :communication_templates do |t|
       t.string :template_name

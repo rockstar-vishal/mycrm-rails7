@@ -48,11 +48,11 @@
                         = fa_icon "upload"
                         Import
                     - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && @company.setting.present? && @company.enable_executive_export_leads)
-                      = link_to params.except(:action, :controller).merge!(format: :csv), class: "" do
+                      = link_to search_params.merge!(format: :csv), class: "" do
                         = fa_icon "download"
                         Export
                     - if current_user.is_super? && @company.enable_lead_export && current_user.company.daily_file_exports < 2
-                      = link_to params.except(:action, :controller), remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
+                      = link_to search_params, remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
                         = fa_icon "download"
                         Export All
                     = link_to calender_view_leads_path, class: "" do
@@ -98,20 +98,20 @@
                         -if company_index_fields.include?("status_id")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "status_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "status_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Status
                             - else
-                              = link_to params.merge(key: "status_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "status_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Status
                         -if company_index_fields.include?('presale_stage_id')
                           %th Stage
                         -if company_index_fields.include?("project_id")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "project_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "project_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Project
                             - else
-                              = link_to params.merge(key: "project_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "project_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Project
                         -if company_index_fields.include?("broker_id")
                           %th Broker
@@ -122,10 +122,10 @@
                         -if company_index_fields.include?("ncd")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "ncd", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "ncd", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Next Call Date
                             - else
-                              = link_to params.merge(key: "ncd", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "ncd", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Next Call Date
                         -if company_index_fields.include?("budget")
                           %th Budget
@@ -148,10 +148,10 @@
                         -if company_index_fields.include?("created_at")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "created_at", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "created_at", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Created at
                             - else
-                              = link_to params.merge(key: "created_at", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "created_at", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Created at
                         - magic_index_fields.each do |field|
                           %th

@@ -1,4 +1,4 @@
-class AddUuidToProject < ActiveRecord::Migration
+class AddUuidToProject < ActiveRecord::Migration[7.1]
   def change
   	add_column :projects, :uuid, :uuid, default: "uuid_generate_v4()"
   	add_column :call_ins, :uuid, :uuid, default: "uuid_generate_v4()"

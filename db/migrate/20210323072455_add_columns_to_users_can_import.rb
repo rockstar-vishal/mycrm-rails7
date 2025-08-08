@@ -1,4 +1,4 @@
-class AddColumnsToUsersCanImport < ActiveRecord::Migration
+class AddColumnsToUsersCanImport < ActiveRecord::Migration[7.1]
   def change
     add_column :users, :can_import, :boolean, default: false
   end

@@ -1,4 +1,4 @@
-class CreateStructureFields < ActiveRecord::Migration
+class CreateStructureFields < ActiveRecord::Migration[7.1]
   def change
     create_table :structure_fields do |t|
       t.integer "structure_id", index: true

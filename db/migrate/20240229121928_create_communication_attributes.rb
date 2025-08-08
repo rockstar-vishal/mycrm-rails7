@@ -1,4 +1,4 @@
-class CreateCommunicationAttributes < ActiveRecord::Migration
+class CreateCommunicationAttributes < ActiveRecord::Migration[7.1]
   def change
     create_table :communication_attributes do |t|
       t.string :text

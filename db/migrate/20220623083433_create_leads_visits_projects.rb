@@ -1,4 +1,4 @@
-class CreateLeadsVisitsProjects < ActiveRecord::Migration
+class CreateLeadsVisitsProjects < ActiveRecord::Migration[7.1]
   def change
     create_table :leads_visits_projects do |t|
       t.integer :visit_id, index: true

@@ -1,5 +1,6 @@
-class AddColumnsImagesToLeads < ActiveRecord::Migration
+class AddColumnsImagesToLeads < ActiveRecord::Migration[7.1]
   def change
-    add_attachment :leads, :image
+    # Active Storage handles image attachments automatically
+    # add_attachment :leads, :image
   end
 end

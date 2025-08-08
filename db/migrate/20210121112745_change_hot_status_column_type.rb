@@ -1,4 +1,4 @@
-class ChangeHotStatusColumnType < ActiveRecord::Migration
+class ChangeHotStatusColumnType < ActiveRecord::Migration[7.1]
   def up
     remove_column :companies, :hot_status_id, :integer
     add_column :companies, :hot_status_ids, :text, array: true, default: []

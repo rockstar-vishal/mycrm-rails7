@@ -1,4 +1,4 @@
-class CreateWebHookRequests < ActiveRecord::Migration
+class CreateWebHookRequests < ActiveRecord::Migration[7.1]
   def change
     create_table :web_hook_requests do |t|
       t.integer :company_id, index: true

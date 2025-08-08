@@ -1,4 +1,4 @@
-class AddBookingDonefieldsToLeads < ActiveRecord::Migration
+class AddBookingDonefieldsToLeads < ActiveRecord::Migration[7.1]
   def change
     add_column :leads, :booked_flat_no, :string
     add_column :leads, :bank_loan_name, :string

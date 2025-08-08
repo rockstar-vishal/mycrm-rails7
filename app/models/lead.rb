@@ -45,7 +45,7 @@ class Lead < ActiveRecord::Base
   has_many :secondary_sources, through: :leads_secondary_sources, source: :source
   has_many :call_logs, class_name: "Leads::CallLog", dependent: :destroy
   has_many :push_notification_logs, class_name: 'PushNotificationLog', dependent: :destroy
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, :allow_blank => true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, :allow_nil => true
 
   validate :mobile_validation, if: :mobile_number_present?
   validates :company, :status, :source, :project, presence: true
@@ -91,14 +91,14 @@ class Lead < ActiveRecord::Base
   before_validation :set_lead_no, :set_defaults, on: :create
   before_validation :strip_mobile_number
 
-  delegate :name, to: :project, prefix: true, allow_blank: true
+  delegate :name, to: :project, prefix: true, allow_nil: true
 
   accepts_nested_attributes_for :visits, reject_if: :all_blank, allow_destroy: true
 
   after_commit :delete_audit_logs, on: :destroy
   after_commit :client_integration_to_postsale, if: :client_integration_enable?
   before_create :set_executive
-  before_save :set_closing_excutive, on: :update
+  before_update :set_closing_excutive
   after_create :set_presale_user, if: :presale_user_site_visit_enabled?
   after_commit :notify_lead_create_event, :send_lead_create_brower_notification, on: :create
   before_save :set_site_visit_scheduled

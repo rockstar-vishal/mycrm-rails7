@@ -29,8 +29,10 @@ gem 'bootstrap_form', '~> 5.2'
 # Authentication
 gem 'devise', '~> 4.9'
 
-# File uploads (replacing Paperclip)
+# File uploads
+gem 'paperclip', '~> 6.1'
 gem 'image_processing', '~> 1.2'
+gem 'has_magic_fields', '~> 0.1'
 
 # Background jobs
 gem 'resque', '~> 2.7'

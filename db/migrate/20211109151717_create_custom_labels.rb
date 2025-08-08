@@ -1,4 +1,4 @@
-class CreateCustomLabels < ActiveRecord::Migration
+class CreateCustomLabels < ActiveRecord::Migration[7.1]
   def change
     create_table :custom_labels do |t|
       t.string :default_value

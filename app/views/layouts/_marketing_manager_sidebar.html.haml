@@ -11,8 +11,8 @@
       %a.nav-link.pt-0{"data-slide" => "true", "data-widget" => "control-sidebar", :href => "#"}
         .user-panel.d-flex
           .image
-            - if current_user.image.present?
-              = image_tag("#{current_user.img_url}", size: "160x160", alt: "User Image", class: 'img-circle')
+            - if current_user.profile_image_present?
+              = image_tag(user_profile_image_path(current_user), size: "160x160", alt: "User Image", class: 'img-circle')
             - else
               = image_tag  "user2-160x160.jpg", class: 'img-circle'
           .info

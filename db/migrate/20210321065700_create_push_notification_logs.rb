@@ -1,4 +1,4 @@
-class CreatePushNotificationLogs < ActiveRecord::Migration
+class CreatePushNotificationLogs < ActiveRecord::Migration[7.1]
   def change
     create_table :push_notification_logs do |t|
       t.integer :company_id, index: true

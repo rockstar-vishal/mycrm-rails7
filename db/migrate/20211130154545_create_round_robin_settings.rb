@@ -1,4 +1,4 @@
-class CreateRoundRobinSettings < ActiveRecord::Migration
+class CreateRoundRobinSettings < ActiveRecord::Migration[7.1]
   def change
     create_table :round_robin_settings do |t|
       t.integer :user_id

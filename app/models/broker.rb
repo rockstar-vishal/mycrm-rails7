@@ -15,11 +15,11 @@ class Broker < ActiveRecord::Base
   validates_attachment :rera_document, 
                         content_type: { :content_type => %w( application/pdf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document) }
 
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
   validates :mobile, length: {maximum: 15}, presence: true
   validates :name, presence: true
   validates_uniqueness_of :email, :rera_number, :cp_code, { scope: :company_id,
-    message: "Should be unique", allow_blank: true }
+    message: "Should be unique", allow_nil: true }
   validate :validate_broker_required_fields
   validate :mobile_uniqueness
   RERA_STATUS=["Yes", "No", "Work In Progress"]

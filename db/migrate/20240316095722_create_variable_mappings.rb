@@ -1,4 +1,4 @@
-class CreateVariableMappings < ActiveRecord::Migration
+class CreateVariableMappings < ActiveRecord::Migration[7.1]
   def change
     create_table :variable_mappings do |t|
       t.string :name

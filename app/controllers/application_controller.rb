@@ -4,6 +4,15 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :authenticate_user!
   before_action :check_authorization, :set_push_notification_attr, :set_pusher_attributes, if: :user_signed_in?
+  
+  # Enhanced error handling for development
+  if Rails.env.development?
+    rescue_from StandardError do |exception|
+      Rails.logger.error "Application Error: #{exception.class} - #{exception.message}"
+      Rails.logger.error exception.backtrace.join("\n")
+      raise exception
+    end
+  end
 
   def render_modal(partial, options = {backdrop: true, keyboard: true})
     respond_to do |format|

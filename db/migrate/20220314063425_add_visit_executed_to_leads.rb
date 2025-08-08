@@ -1,4 +1,4 @@
-class AddVisitExecutedToLeads < ActiveRecord::Migration
+class AddVisitExecutedToLeads < ActiveRecord::Migration[7.1]
   def change
     add_column :leads_visits, :is_visit_executed, :boolean, default: false
     add_column :leads_visits, :is_postponed, :boolean, default: false

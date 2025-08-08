@@ -1,5 +1,6 @@
-class AddReraCertToBrokers < ActiveRecord::Migration
+class AddReraCertToBrokers < ActiveRecord::Migration[7.1]
   def change
-    add_attachment :brokers, :rera_document
+    # Active Storage handles file attachments automatically
+    # add_attachment :brokers, :rera_document
   end
 end

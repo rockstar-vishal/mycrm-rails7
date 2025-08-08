@@ -1,4 +1,4 @@
-class CreateSystemSms < ActiveRecord::Migration
+class CreateSystemSms < ActiveRecord::Migration[7.1]
   def change
     create_table :system_sms do |t|
       t.integer :company_id

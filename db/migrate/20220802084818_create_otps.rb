@@ -1,4 +1,4 @@
-class CreateOtps < ActiveRecord::Migration
+class CreateOtps < ActiveRecord::Migration[7.1]
   def change
     create_table :otps do |t|
       t.integer :user_id, index: true

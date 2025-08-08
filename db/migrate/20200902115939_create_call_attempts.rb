@@ -1,4 +1,4 @@
-class CreateCallAttempts < ActiveRecord::Migration
+class CreateCallAttempts < ActiveRecord::Migration[7.1]
   def change
     create_table :call_attempts do |t|
       t.integer :lead_id, index: true

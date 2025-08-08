@@ -1,4 +1,4 @@
-class CreateRoleStatuses < ActiveRecord::Migration
+class CreateRoleStatuses < ActiveRecord::Migration[7.1]
   def change
     create_table :role_statuses do |t|
       t.integer :role_id

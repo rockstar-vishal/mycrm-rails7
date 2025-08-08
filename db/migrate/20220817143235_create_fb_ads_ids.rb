@@ -1,4 +1,4 @@
-class CreateFbAdsIds < ActiveRecord::Migration
+class CreateFbAdsIds < ActiveRecord::Migration[7.1]
   def change
     create_table :fb_ads_ids do |t|
       t.string :number

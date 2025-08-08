@@ -1,4 +1,4 @@
-class CreateCallIns < ActiveRecord::Migration
+class CreateCallIns < ActiveRecord::Migration[7.1]
   def change
     create_table :call_ins do |t|
       t.integer :company_id

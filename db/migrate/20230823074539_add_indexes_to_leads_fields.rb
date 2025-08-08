@@ -1,4 +1,4 @@
-class AddIndexesToLeadsFields < ActiveRecord::Migration
+class AddIndexesToLeadsFields < ActiveRecord::Migration[7.1]
   disable_ddl_transaction!
   def change
     add_index :leads, :company_id, algorithm: :concurrently

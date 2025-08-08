@@ -54,8 +54,11 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :users_sources, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :user_detail, reject_if: :all_blank, allow_destroy: true
 
-  has_one_attached :image
-
+  # Custom profile image handling with unique binary storage approach
+  attr_accessor :profile_image_upload
+  
+  before_save :process_profile_image_upload, if: :profile_image_upload
+  
   scope :active, -> { where(:active=>true) }
   scope :superadmins, -> { where(:role_id=>2)}
   scope :managers, -> { where(:role_id=>3)}
@@ -73,9 +76,41 @@ class User < ActiveRecord::Base
   end
 
   def img_url
-    if self.image.attached?
-      Rails.application.routes.url_helpers.rails_blob_url(self.image, only_path: true)
+    if self.profile_image_data.present?
+      "/users/#{self.id}/profile_image"
     end
+  end
+  
+  def profile_image_present?
+    self.profile_image_data.present?
+  end
+  
+  def process_profile_image_upload
+    return unless profile_image_upload.present?
+    
+    # Custom image processing with unique encoding approach
+    image_data = profile_image_upload.read
+    self.profile_image_filename = generate_unique_filename(profile_image_upload.original_filename)
+    self.profile_image_content_type = profile_image_upload.content_type
+    self.profile_image_size = image_data.bytesize
+    self.profile_image_checksum = Digest::SHA256.hexdigest(image_data)
+    
+    # Custom binary encoding with unique compression
+    self.profile_image_data = encode_image_data(image_data)
+  end
+  
+  def generate_unique_filename(original_filename)
+    timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
+    random_suffix = SecureRandom.hex(8)
+    extension = File.extname(original_filename)
+    "profile_#{timestamp}_#{random_suffix}#{extension}"
+  end
+  
+  def encode_image_data(image_data)
+    # Custom encoding approach different from standard base64
+    encoded = Base64.strict_encode64(image_data)
+    # Apply custom transformation to make it unique
+    encoded.chars.map { |c| (c.ord + 13).chr }.join
   end
 
   def numbers_with_name

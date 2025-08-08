@@ -12,7 +12,6 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery.remotipart
 //= require datatables
 //= require popper
 //= require moment
@@ -21,18 +20,13 @@
 //= require cocoon
 //= require chosen-jquery
 //= require jquery.multi-select
-//= require bootstrap-multiselect
-//= require datetimepicker
 //= require chartkick
 //= require clipboard
 //= require Chart.bundle
-//= require plyr
 //= require pusher
-//= require toastr
 //= require adminlte.min
 //= require jquery-tablesorter
 //= require_tree .
-//= require signature-pad
 
 
 $(document).ready(function() {

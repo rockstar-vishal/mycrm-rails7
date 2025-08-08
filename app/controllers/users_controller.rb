@@ -80,6 +80,28 @@ class UsersController < ApplicationController
     @users = current_user.manageables
     render_modal 'edit_user_config'
   end
+  
+  def profile_image
+    user = User.find(params[:id])
+    if user.profile_image_data.present?
+      # Custom decoding approach
+      decoded_data = decode_image_data(user.profile_image_data)
+      send_data decoded_data, 
+                type: user.profile_image_content_type, 
+                disposition: 'inline',
+                filename: user.profile_image_filename
+    else
+      head :not_found
+    end
+  end
+  
+  private
+  
+  def decode_image_data(encoded_data)
+    # Custom decoding approach matching the encoding method
+    decoded = encoded_data.chars.map { |c| (c.ord - 13).chr }.join
+    Base64.strict_decode64(decoded)
+  end
 
   def enable_round_robin
     current_user.manageables.each do |user|
@@ -213,7 +235,7 @@ class UsersController < ApplicationController
         :email,
         :password,
         :password_confirmation,
-        :image
+        :profile_image_upload
       )
     end
 end

@@ -1,4 +1,4 @@
-class CreateUsersSearchHistories < ActiveRecord::Migration
+class CreateUsersSearchHistories < ActiveRecord::Migration[7.1]
   def change
     create_table :users_search_histories do |t|
       t.integer :user_id

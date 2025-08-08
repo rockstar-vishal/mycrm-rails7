@@ -18,16 +18,16 @@
         %ul.nav.navbar-nav
           %li.dropdown.user.user-menu
             %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
-              - if current_user.image.present?
-                = image_tag "#{current_user.image.url}", class: "user-image", alt: "User Image"
+              - if current_user.profile_image_present?
+                = image_tag user_profile_image_path(current_user), class: "user-image", alt: "User Image"
               - else
                 = image_tag "blank_user.jpg", class: "user-image", alt: "User Image"
               %span.hidden-xs
                 = current_user.full_name
             %ul.dropdown-menu
               %li.user-header
-                - if current_user.image.present?
-                  = image_tag "#{current_user.image.url}", class: "user-image", alt: "User Image"
+                - if current_user.profile_image_present?
+                  = image_tag user_profile_image_path(current_user), class: "user-image", alt: "User Image"
                 - else
                   = image_tag "blank_user.jpg", class: "user-image", alt: "User Image"
                 %p

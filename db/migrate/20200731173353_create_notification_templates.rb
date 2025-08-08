@@ -1,4 +1,4 @@
-class CreateNotificationTemplates < ActiveRecord::Migration
+class CreateNotificationTemplates < ActiveRecord::Migration[7.1]
   def change
     create_table :notification_templates do |t|
       t.integer :company_id

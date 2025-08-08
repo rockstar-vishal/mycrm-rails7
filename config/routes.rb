@@ -118,6 +118,9 @@ Rails.application.routes.draw do
     resources :search_histories, only: [:index, :destroy]
   end
   resources :users, param: :uuid do
+    member do
+      get :profile_image
+    end
     collection do
       get :edit_profile
       patch :update_profile

@@ -1,4 +1,4 @@
-class CreateLocalities < ActiveRecord::Migration
+class CreateLocalities < ActiveRecord::Migration[7.1]
   def change
     create_table :localities do |t|
       t.string :name
