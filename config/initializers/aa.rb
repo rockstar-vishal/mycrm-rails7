@@ -7,6 +7,8 @@ unless defined?(CRMConfig)
   rescue LoadError, NameError => e
     # Fallback to ENV if Figaro is not available
     CRMConfig = OpenStruct.new(ENV)
-    Rails.logger.warn "CRMConfig initialization warning: #{e.message}" if defined?(Rails)
+    if defined?(Rails) && Rails.logger
+      Rails.logger.warn "CRMConfig initialization warning: #{e.message}"
+    end
   end
 end

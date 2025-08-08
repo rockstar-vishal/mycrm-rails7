@@ -98,7 +98,6 @@ end
 group :production do
   gem 'zip'
   gem 'sentry-ruby', '~> 5.0'
-  gem 'resque-sentry'
 end
 
 group :test, :development do

@@ -14,7 +14,7 @@ $redis_ns = Redis::Namespace.new("leadquest:#{Rails.env}", redis: $redis)
 
 # Configure Resque to use the Redis connection
 Resque.redis = $redis_ns
-  
+begin  
   puts "Redis connection established successfully"
 rescue => e
   puts "Warning: Could not connect to Redis: #{e.message}"
