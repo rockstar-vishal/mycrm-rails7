@@ -1,7 +1,7 @@
 class ExotelSid < ActiveRecord::Base
   belongs_to :company
   belongs_to :project
-  belongs_to :source
+  belongs_to :source, optional: true
 
   validates :number, presence: true, uniqueness: true
 

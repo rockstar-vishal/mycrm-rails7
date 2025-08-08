@@ -7,7 +7,7 @@ class Broker < ActiveRecord::Base
   belongs_to :company
   has_many :leads, dependent: :restrict_with_error
   default_scope { order(created_at: :asc) }
-  belongs_to :rm, class_name: "::User", foreign_key: :rm_id
+  belongs_to :rm, class_name: "::User", foreign_key: :rm_id, optional: true
 
   has_attached_file :rera_document,
                     path: ":rails_root/public/system/:attachment/:id/:style/:filename",
