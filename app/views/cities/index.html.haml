@@ -25,7 +25,7 @@
                             = fa_icon "search"
                   .float-right
                     .input-group
-                      = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
+                      = link_to cities_params.merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
                         = fa_icon "download"
                         Export
                       .input-group-btn

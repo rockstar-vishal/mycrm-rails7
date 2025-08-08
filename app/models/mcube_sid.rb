@@ -10,7 +10,7 @@ class McubeSid < ActiveRecord::Base
   def find_round_robin_user
     round_robin_ids = self.default_numbers
     user_ids = company.users.where(mobile: round_robin_ids).ids rescue []
-    leads = self.company.leads.joins{call_logs}.where("leads_call_logs.other_data->>'phone_number_sid' = ?", self.number)
+    leads = self.company.leads.joins(:call_logs).where("leads_call_logs.other_data->>'phone_number_sid' = ?", self.number)
     lead_user_id = leads.last&.user_id
     if user_ids.include? lead_user_id
       user_ids.each_with_index do |u, index|

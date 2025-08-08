@@ -8,7 +8,7 @@ class SiteVisitPlanned
 
   def self.perform
     begin
-      Company.joins{setting}.where("companies_settings.setting_data ->> 'mobicomm_sms_service_enabled' = ?", 'true').each do |company|
+      Company.joins(:setting).where("companies_settings.setting_data ->> 'mobicomm_sms_service_enabled' = ?", 'true').each do |company|
         if Time.current >= Time.zone.parse('5:30 PM')
           leads = company.leads.where(tentative_visit_planned: (Date.today + 1.day).beginning_of_day..(Date.today + 1.day).end_of_day)
         else

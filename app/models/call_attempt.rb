@@ -9,7 +9,7 @@ class CallAttempt < ActiveRecord::Base
     def advance_search(params)
       call_attempts = all
       if params[:project_ids].present?
-        call_attempts = call_attempts.joins{lead}.where(leads: {project_id: params[:project_ids]})
+        call_attempts = call_attempts.joins(:lead).where(leads: {project_id: params[:project_ids]})
       end
       call_attempts
     end

@@ -188,6 +188,11 @@ class UsersController < ApplicationController
       )
     end
 
+    def users_params
+      params.permit(:search_query, :page, :is_advanced_search, :name, :email, :mobile, :created_at_from, :created_at_upto, :updated_from, :updated_upto, role_ids: [])
+    end
+    helper_method :users_params
+
     def user_params
       permitted = params.require(:user).permit(
         :name,

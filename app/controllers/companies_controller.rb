@@ -543,4 +543,9 @@ class CompaniesController < ApplicationController
         :renewal_upto
       )
     end
+
+    def companies_params
+      params.permit(:search_query, :page, :is_advanced_search, :renewal_from, :renewal_upto)
+    end
+    helper_method :companies_params
 end

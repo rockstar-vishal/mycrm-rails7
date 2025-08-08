@@ -214,11 +214,11 @@ class Company < ActiveRecord::Base
       companies = all
       if search_params[:renewal_from].present?
         renewal_from = Date.parse(search_params[:renewal_from])
-        companies = companies.joins{renewals}.where("renewals.end_date >= ?", renewal_from)
+        companies = companies.joins(:renewals).where("renewals.end_date >= ?", renewal_from)
       end
       if search_params[:renewal_upto].present?
         renewal_upto = Date.parse(search_params[:renewal_upto])
-        companies = companies.joins{renewals}.where("renewals.end_date <=?",  renewal_upto)
+        companies = companies.joins(:renewals).where("renewals.end_date <=?",  renewal_upto)
       end
       companies
     end

@@ -22,7 +22,7 @@
                   %i.fa.fa-angle-down
               .col-md-9
                 .group-link
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
+                  = link_to campaigns_params.merge!(format: :csv), class: "btn btn-primary ml-auto" do
                     = fa_icon "download"
                     Export
             #adv-searchbox.box-body
@@ -72,7 +72,7 @@
                     - if campaign.project_ids.present? && current_user.check_project_enabled_presence
                       - leads = leads.where(project_id: campaign.project_ids)
                     - booking_data = leads.booked_for(current_user.company)
-                    - visted_data = leads.joins{visits}.distinct
+                    - visted_data = leads.joins(:visits).distinct
                     %tr
                       %td
                         = index

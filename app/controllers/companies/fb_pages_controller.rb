@@ -39,7 +39,7 @@ class Companies::FbPagesController < ApplicationController
   def fb_forms
     success, @fb_forms_api = @fb_page.leadgen_forms
     if success
-      @fb_forms_db = @fb_page.fb_forms.joins{project}.select("projects.name as project_name, companies_fb_forms.form_no, companies_fb_forms.bind_comment").as_json
+      @fb_forms_db = @fb_page.fb_forms.joins(:project).select("projects.name as project_name, companies_fb_forms.form_no, companies_fb_forms.bind_comment").as_json
     else
       flash[:notice] = @fb_forms_api
       redirect_to request.referer

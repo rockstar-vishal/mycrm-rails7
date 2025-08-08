@@ -146,17 +146,17 @@
                       %td To
                       %td.sorter-false
                         - if params["sort"].present? and params["sort"] == "desc"
-                          = link_to params.merge(key: "start_time", sort: "asc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "start_time", sort: "asc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Start Time
                         - else
-                          = link_to params.merge(key: "start_time", sort: "desc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "start_time", sort: "desc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Start Time
                       %td
                         - if params["sort"].present? and params["sort"] == "desc"
-                          = link_to params.merge(key: "end_time", sort: "asc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "end_time", sort: "asc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             End Time
                         - else
-                          = link_to params.merge(key: "end_time", sort: "desc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "end_time", sort: "desc", incoming: true), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             End Time
                       %td Direction
                       %td OverAll Call Duration
@@ -210,17 +210,17 @@
                       %td To
                       %td.sorter-false
                         - if params["sort"].present? and params["sort"] == "desc"
-                          = link_to params.merge(key: "start_time", sort: "asc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "start_time", sort: "asc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Start Time
                         - else
-                          = link_to params.merge(key: "start_time", sort: "desc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "start_time", sort: "desc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Start Time
                       %td
                         - if params["sort"].present? and params["sort"] == "desc"
-                          = link_to params.merge(key: "end_time", sort: "asc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "end_time", sort: "asc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             End Time
                         - else
-                          = link_to params.merge(key: "end_time", sort: "desc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to histories_params.merge(key: "end_time", sort: "desc", incoming: false), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             End Time
                       %td Direction
                       %td OverAll Call Duration

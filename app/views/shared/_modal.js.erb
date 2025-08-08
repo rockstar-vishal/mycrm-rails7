@@ -3,5 +3,6 @@
   $modal.find(".modal-content").html("<%= j (render partial) %>");
   $modal.removeClass('right');
   $modal.addClass("<%= options[:class] %>")
-  $modal.modal();
+  var modal = new bootstrap.Modal($modal[0]);
+  modal.show();
 })()

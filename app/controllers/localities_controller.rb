@@ -65,6 +65,11 @@ class LocalitiesController < ApplicationController
     )
   end
 
+  def localities_params
+    params.permit(:search_string, :page)
+  end
+  helper_method :localities_params
+
   def set_locality
     @locality = Locality.find(params[:id])
   end

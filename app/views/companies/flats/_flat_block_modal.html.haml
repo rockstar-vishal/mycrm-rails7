@@ -79,14 +79,13 @@
   $('.multi-select-list').each(function(){
     var text = $(this).closest('select').data('prompt-name')
     text = text ? 'Select '+ text : 'Please Select'
-    $(this).multiselect({
-      numberDisplayed: 1,
-      enableFiltering: true,
-      enableCaseInsensitiveFiltering: true,
-      nonSelectedText: text,
-      includeSelectAllOption: true,
-      buttonWidth: '100%',
-      maxHeight: 350,
+    $(this).multiSelect({
+      keySelect: [32],
+      selectableOptgroup: false,
+      disabledClass: 'disabled',
+      dblClick: false,
+      keepOrder: false,
+      cssClass: ''
     });
   });
 

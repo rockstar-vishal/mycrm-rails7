@@ -35,7 +35,7 @@
                         = fa_icon "upload"
                         Import
                   - if current_user.company.setting.present? && current_user.company.enable_export_brokers
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary" do
+                    = link_to brokers_params.merge!(format: :csv), class: "btn btn-primary" do
                       = fa_icon "download"
                       Export
                  

@@ -17,7 +17,7 @@ class Role < ActiveRecord::Base
     order = sanitize_sql_array(
       ["position((',' || id::text || ',') in ?)", ids.join(',') + ',']
     )
-    where(:id => ids).order(order)
+    where(:id => ids).order(Arel.sql(order))
   }
 
 end

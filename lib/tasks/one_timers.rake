@@ -148,7 +148,7 @@ namespace :one_timers do
       exportable_fields << 'Tentative Visit Time'
       csv << exportable_fields
 
-      company.leads.where(created_at: DateTime.now.beginning_of_day - 2.week..DateTime.now.end_of_day).includes{project.city}.each do |client|
+      company.leads.where(created_at: DateTime.now.beginning_of_day - 2.week..DateTime.now.end_of_day).includes(project: :city).each do |client|
         dead_reason = ""
         if company.dead_status_ids.include?(client.status_id)
           dead_reason = client.dead_reason.reason
@@ -178,7 +178,7 @@ namespace :one_timers do
 
   task :set_lead_revisit=> :environment do
     company = Company.find(36)
-    company.leads.joins{visits}.select{|x| x.visits.count > 1}.each do |lead|
+    company.leads.joins(:visits).select{|x| x.visits.count > 1}.each do |lead|
       lead.update_attributes(revisit: true)
     end
   end

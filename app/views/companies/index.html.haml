@@ -16,7 +16,7 @@
             .card-header
               .box-header.row
                 .pull-left.col-md-4.d-none.d-sm-block
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm" do
+                  = link_to companies_params.merge!(format: :csv), class: "btn btn-primary btn-sm" do
                     = fa_icon "download"
                     Export
                 .pull-left.col-md-5

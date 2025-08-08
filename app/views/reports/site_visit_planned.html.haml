@@ -12,8 +12,8 @@
           .lead-card.lead-visit
             %h5
               Visited
-              = link_to leads_path({visited: true, site_visit_from: @start_date.to_date, site_visit_upto: @end_date.to_date, is_advanced_search: true}.merge!(params)), target: "_blank" do
-                = @leads.joins{visits}.uniq.count
+              = link_to leads_path({visited: true, site_visit_from: @start_date.to_date, site_visit_upto: @end_date.to_date, is_advanced_search: true}.merge!(search_params)), target: "_blank" do
+                = @leads.joins(:visits).uniq.count
                 .visit_counter.align-fix
                   = image_tag 'fluent-color--building-people-16.svg'
   .content
@@ -29,10 +29,10 @@
                     %i.fa.fa-angle-down
                 .col-md-5
                   .group-link
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm ml-auto" do
+                    = link_to site_visit_planned_params.merge!(format: :csv), class: "btn btn-primary btn-sm ml-auto" do
                       = fa_icon "download"
                       Export
-                    = link_to params.except(:action, :controller).merge!(calender_view: true), class: "btn btn-primary btn-sm" do
+                    = link_to site_visit_planned_params.merge!(calender_view: true), class: "btn btn-primary btn-sm" do
                       = fa_icon "calendar"
                       Calender View
               #adv-searchbox.box-body
@@ -93,10 +93,10 @@
                       %th Name
                       %th.sorter-false
                         - if params["sort"].present? and params["sort"] == "desc"
-                          = link_to params.merge(key: "tentative_visit_planned", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to site_visit_planned_params.merge(key: "tentative_visit_planned", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Scheduled Date
                         - else
-                          = link_to params.merge(key: "tentative_visit_planned", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to site_visit_planned_params.merge(key: "tentative_visit_planned", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Scheduled Date
                       %th Day
                       %th Time

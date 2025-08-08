@@ -192,4 +192,9 @@ class BrokersController < ApplicationController
   def broker_params
     params.require(:broker).permit(:name, :email, :mobile, :firm_name, :locality, :rera_number, :company_id, :rm_id, :other_contacts, :address, :rera_status, :cp_code, :enable_partner_integration, :rera_document)
   end
+
+  def brokers_params
+    params.permit(:search_query, :page)
+  end
+  helper_method :brokers_params
 end

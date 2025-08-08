@@ -43,11 +43,11 @@
           
           Cancel
 :javascript
-  $('.multi-select-list').multiselect({
-    numberDisplayed: 1,
-    enableFiltering: true,
-    enableCaseInsensitiveFiltering: true,
-    nonSelectedText: 'Please Select',
-    includeSelectAllOption: true,
-    buttonWidth: '100%'
+  $('.multi-select-list').multiSelect({
+    keySelect: [32],
+    selectableOptgroup: false,
+    disabledClass: 'disabled',
+    dblClick: false,
+    keepOrder: false,
+    cssClass: ''
   });

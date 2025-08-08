@@ -378,36 +378,6 @@ module Api
         else
           Rails.logger.info("--------------------- Partner Projects not found for company - #{company.id}. Partner Lead not Created!! ---------------")
         end
-
-        # es = ExternalService.new(@company)
-        # details=es.fetch_partners_projects
-        # if details.present?
-        #   partners_projects = JSON.parse(details)
-        # end
-        # lead_proj_id=params["lead"]["project_id"]
-        # email=params["lead"]["email"]
-        # phone=params["lead"]["mobile"]
-        # proj_name=partners_projects.map{|x| x["text"] if  x["id"].to_i==lead_proj_id.to_i}.compact[0]
-        # if proj_name.present?
-        #   project_id=@company.projects.find_by(name: proj_name)&.id
-        #   projects_users = @company.users_projects.where(project_id: project_id)
-        #   gre_pu = projects_users.joins{user}.where("users.role_id = 10")
-        #   if gre_pu.present?
-        #     gre_user_mail = gre_pu.first.user.email
-        #   else
-        #     gre_user_mail = gre_users.first.email rescue nil
-        #   end
-        # end
-        # user_email = user.email rescue ""
-        # request = {email: user_email, lead_params: params["lead"]}
-        # begin
-        #   es = ExternalService.new(@company, request)
-        #   req = es.partner_params_formation
-        #   es = ExternalService.new(@company, req)
-        #   es.create_partners_lead
-        # rescue => e
-        #   puts e.message
-        # end
       end
 
       def get_cp_ids

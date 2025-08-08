@@ -93,7 +93,7 @@
                             - total_avg_tat_from_first_call += avg_tat_from_first_call
                             = format_duration(avg_tat_from_first_call)
                           %td
-                            - leads = Lead.joins{visits}.where.not(leads_visits: { date: nil }).where(id: lead_ids).where.not(status_id: @dead_status_ids, booking_date: nil)
+                            - leads = Lead.joins(:visits).where.not(leads_visits: { date: nil }).where(id: lead_ids).where.not(status_id: @dead_status_ids, booking_date: nil)
                             - difference_sum = leads.map { |lead| lead.day_difference }.sum
                             - avg_tat = leads.count > 0 ? difference_sum / leads.count : 0
                             - total_tats += avg_tat

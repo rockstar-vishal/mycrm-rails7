@@ -38,7 +38,7 @@
                     %th.all Active
                     %th.all Action
                 %tbody
-                  - @projects.includes{city}.each do |project|
+                  - @projects.includes(:city).each do |project|
                     %tr
                       / %td= project.name
                       %td= link_to project.name, project_path(project.uuid), remote: true
@@ -58,8 +58,8 @@
                           - project_form = current_user.company.project_configuration
                           - locations="%0D%0A%F0%9F%91%89+Location+%3A+#{project.location}" if project_form.present? && project_form.allowed_fields.include?("location") && project.location.present?
                           - broucher_link="%0D%0A%F0%9F%91%89+Brochure+%3A+#{project.brochure_link}" if project_form.present? && project_form.allowed_fields.include?("brochure_link") && project.brochure_link.present?
-                          - project_brochure = "%0D%0A%F0%9F%91%89+Project Brochure+%3A+#{project.project_brochure.url}" if project_form.present? && project_form.allowed_fields.include?("project_brochure_file_name") && project.project_brochure.present?
-                          - banner_image = "%0D%0A%F0%9F%91%89+Banner Image+%3A+#{project.banner_image.url}" if project_form.present? && project_form.allowed_fields.include?("banner_image_file_name") && project.banner_image.present?
+                          - project_brochure = "%0D%0A%F0%9F%91%89+Project Brochure+%3A+#{project.project_brochure&.url}" if project_form.present? && project_form.allowed_fields.include?("project_brochure_file_name") && project.project_brochure.present?
+                          - banner_image = "%0D%0A%F0%9F%91%89+Banner Image+%3A+#{project.banner_image&.url}" if project_form.present? && project_form.allowed_fields.include?("banner_image_file_name") && project.banner_image.present?
                           - property_code="%0D%0A%F0%9F%91%89+Project+Code+%3A+#{project.property_codes.join(',')}" if project.property_codes.present?
                           -contact="%0D%0A%F0%9F%91%89+Contact+%3A+#{project.contact}" if project_form.present? && project_form.allowed_fields.include?("contact") && project.contact.present?
                           - description = "%0D%0A%F0%9F%91%89+Description+%3A+#{project.description}" if project.description.present?

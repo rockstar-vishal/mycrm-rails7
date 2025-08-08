@@ -30,7 +30,7 @@
               .col-md-5
                 .group-link
                   - if current_user.is_super?
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
+                    = link_to users_params.merge!(format: :csv), class: "btn btn-primary ml-auto" do
                       = fa_icon "download"
                       Export
                 

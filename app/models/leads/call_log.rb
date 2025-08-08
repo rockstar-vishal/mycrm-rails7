@@ -208,7 +208,7 @@ class Leads::CallLog < ActiveRecord::Base
         call_logs = call_logs.where(to_number: search_params[:call_to])
       end
       if search_params[:lead_name].present?
-        call_logs = call_logs.joins{lead}.where("leads.name ILIKE ?", "%#{search_params["lead_name"]}%")
+        call_logs = call_logs.joins(:lead).where("leads.name ILIKE ?", "%#{search_params["lead_name"]}%")
       end
       if search_params[:call_status].present?
         call_status = Array.wrap(search_params[:call_status])
@@ -241,19 +241,19 @@ class Leads::CallLog < ActiveRecord::Base
         call_logs = call_logs.where("leads_call_logs.user_id IN (?)", search_params[:user_ids])
       end
       if search_params[:lead_statuses].present?
-        call_logs = call_logs.joins{lead}.where("leads.status_id IN (?)", search_params[:lead_statuses])
+        call_logs = call_logs.joins(:lead).where("leads.status_id IN (?)", search_params[:lead_statuses])
       end
       if search_params[:source_ids].present?
-        call_logs = call_logs.joins{lead}.where("leads.source_id IN (?)", search_params[:source_ids])
+        call_logs = call_logs.joins(:lead).where("leads.source_id IN (?)", search_params[:source_ids])
       end
       if search_params[:broker_ids].present?
-        call_logs = call_logs.joins{lead}.where("leads.broker_id IN (?)", search_params[:broker_ids])
+        call_logs = call_logs.joins(:lead).where("leads.broker_id IN (?)", search_params[:broker_ids])
       end
       if search_params[:project_ids].present?
-        call_logs = call_logs.joins{lead}.where("leads.project_id IN (?)", search_params[:project_ids])
+        call_logs = call_logs.joins(:lead).where("leads.project_id IN (?)", search_params[:project_ids])
       end
       if search_params[:first_call_attempt].present?
-        call_logs_ids = call_logs.joins{call_attempts}.where.not(call_attempts: {response_time: nil}).ids.uniq
+        call_logs_ids = call_logs.joins(:call_attempts).where.not(call_attempts: {response_time: nil}).ids.uniq
         call_logs = call_logs.where(id: call_logs_ids).select("DISTINCT ON (leads_call_logs.lead_id) leads_call_logs.*")
       end
       if search_params[:bs].present?

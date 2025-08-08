@@ -25,6 +25,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'jquery-rails'
 gem 'bootstrap', '~> 5.3'
 gem 'bootstrap_form', '~> 5.2'
+gem 'jquery-datetimepicker-rails', '~> 2.4.1'
 
 # Authentication
 gem 'devise', '~> 4.9'

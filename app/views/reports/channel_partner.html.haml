@@ -21,7 +21,7 @@
               .col-md-9
                 .group-link
                   = render 'reports_button', locals: {report_name: :channel_partner}
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm" do
+                  = link_to channel_partner_params.merge!(format: :csv), class: "btn btn-primary btn-sm" do
                     = fa_icon "download"
                     Export
             #adv-searchbox.box-body

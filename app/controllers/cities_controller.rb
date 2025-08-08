@@ -70,4 +70,9 @@ class CitiesController < ApplicationController
     def city_params
       params.require(:city).permit(:name)
     end
+
+    def cities_params
+      params.permit(:search_string, :page)
+    end
+    helper_method :cities_params
 end

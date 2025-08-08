@@ -64,7 +64,7 @@ class Broker < ActiveRecord::Base
       CSV.generate(options) do |csv|
         exportable_fields = ['CP Uuid','Name', 'Mobile', 'Email', 'Firm Name', 'Rera Number', 'RM','Locality', 'Address', 'Other Contacts','Rera Status', 'CP Code']
         csv << exportable_fields
-        all.includes{rm}.each do |broker|
+        all.includes(:rm).each do |broker|
           this_exportable_fields = [broker.uuid, broker.name, broker.mobile, broker.email, broker.firm_name, broker.rera_number, (broker.rm.name rescue '-'), broker.locality, broker.address, broker.other_contacts, broker.rera_status, broker.cp_code]
           csv << this_exportable_fields
         end

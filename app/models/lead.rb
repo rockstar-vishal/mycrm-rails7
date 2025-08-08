@@ -607,12 +607,12 @@ class Lead < ActiveRecord::Base
       end
       if params[:visited_date_from].present?
         visited_date_from = Date.parse(params[:visited_date_from]).beginning_of_day
-        lead_ids = leads.joins{visits}.where("leads_visits.date >= ?", visited_date_from).ids.uniq
+        lead_ids = leads.joins(:visits).where("leads_visits.date >= ?", visited_date_from).ids.uniq
         leads=leads.where(id: lead_ids)
       end
       if params[:visited_date_upto].present?
         visited_date_to = Date.parse(params[:visited_date_upto]).end_of_day
-        lead_ids = leads.joins{visits}.where("leads_visits.date <= ?", visited_date_to).ids.uniq
+        lead_ids = leads.joins(:visits).where("leads_visits.date <= ?", visited_date_to).ids.uniq
         leads=leads.where(id: lead_ids)
       end
       if params[:site_visit_from].present?
@@ -828,7 +828,7 @@ class Lead < ActiveRecord::Base
         end
       end
       if search_params[:sv_user].present?
-        leads = leads.joins{visits}.where(visits: {user_id: search_params[:sv_user]})
+        leads = leads.joins(:visits).where(visits: {user_id: search_params[:sv_user]})
       end
       if search_params["visit_expiring"].present?
         leads=leads.visit_expiration
@@ -837,7 +837,7 @@ class Lead < ActiveRecord::Base
         leads = leads.backlogs_for(user.company)
       end
       if search_params["merged"].present?
-        leads = leads.joins{leads_secondary_sources}
+        leads = leads.joins(:leads_secondary_sources)
       end
       if search_params["todays_call_only"].present?
         leads = leads.active_for(user.company).todays_calls
@@ -846,7 +846,7 @@ class Lead < ActiveRecord::Base
         leads = leads.where("leads.comment ILIKE ?", "%#{search_params["comment"]}%")
       end
       if search_params["visit_form"].present?
-        leads = leads.joins{visits}.thru_visit_form(user.company)
+        leads = leads.joins(:visits).thru_visit_form(user.company)
       end
       if search_params[:dead_reason_ids].present?
         leads = leads.where(:dead_reason_id=>search_params[:dead_reason_ids])
@@ -873,7 +873,7 @@ class Lead < ActiveRecord::Base
         leads = leads.where(:locality_id=>search_params["locality_ids"])
       end
       if search_params["country_ids"].present?
-        leads = leads.joins{project}.where("projects.country_id IN (?)", search_params["country_ids"])
+        leads = leads.joins(:project).where("projects.country_id IN (?)", search_params["country_ids"])
       end
       if search_params["lead_ids"].present?
         leads = leads.where(:id=>search_params["lead_ids"])
@@ -951,18 +951,17 @@ class Lead < ActiveRecord::Base
         end
       end
       if search_params["broker_ids"].present?
-        leads = leads.joins{broker}.where(source_id: user.company.sources.cp_sources&.ids, broker_id: search_params["broker_ids"])
+        leads = leads.joins(:broker).where(source_id: user.company.sources.cp_sources&.ids, broker_id: search_params["broker_ids"])
       end
       if search_params["postponed"].present?
-        leads = leads.joins{visits}.where("leads_visits.is_postponed='t'")
+        leads = leads.joins(:visits).where("leads_visits.is_postponed='t'")
       end
       if search_params["visit_cancel"].present?
-        leads = leads.joins{visits}.where("leads_visits.is_canceled='t'")
+        leads = leads.joins(:visits).where("leads_visits.is_canceled='t'")
       end
       if search_params["site_visit_done"].present?
-        leads = leads.joins{visits}.where(visits: {is_visit_executed: true})
+        leads = leads.joins(:visits).where(visits: {is_visit_executed: true})
       end
-      # leads = leads.includes(:magic_attributes).references(:magic_attributes)
       conditions = []
       values = []
       user.company.magic_fields.each do |field|
@@ -1078,7 +1077,7 @@ class Lead < ActiveRecord::Base
         csv << exportable_fields
 
         magic_attributes = MagicAttribute.where(lead_id: all.ids).group("lead_id").select("lead_id, ARRAY_AGG(magic_field_id ORDER BY magic_field_id) AS magic_field_ids, ARRAY_AGG(value ORDER BY magic_field_id) AS values").as_json(except: [:id])
-        all.includes{project.city}.find_each do |client|
+        all.includes(project: :city).find_each do |client|
           dead_reason = ""
           dead_sub_reason = ""
           if exporting_user.company.dead_status_ids.include?(client.status_id.to_s)
@@ -1539,7 +1538,7 @@ class Lead < ActiveRecord::Base
   def selectable_company_stages
     if self.persisted?
       if self.company.company_stage_statuses.present?
-        self.company.company_stages.joins{:company_stage_statuses}.where(company_stage_statuses: {status_id: self.status_id})
+        self.company.company_stages.joins(:company_stage_statuses).where(company_stage_statuses: {status_id: self.status_id})
       else
         self.company.company_stages
       end

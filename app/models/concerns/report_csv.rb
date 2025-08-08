@@ -42,15 +42,15 @@ module ReportCsv
             if this_user_data.present?
               user_total = this_user_data.count
               this_exportable_fields = [user.name, user_total]
-              visit_done = this_user_data.joins{visits}.where(visits: {is_visit_executed: true}).uniq.size
+              visit_done = this_user_data.joins(:visits).where(visits: {is_visit_executed: true}).uniq.size
               this_exportable_fields << "#{visit_done} - (#{((visit_done / this_user_data.size.to_f) * 100).round(2)}%)"
-              this_exportable_fields<<this_user_data.joins{visits}.where("leads_visits.is_postponed = 't'").uniq.size
-              this_exportable_fields << this_user_data.joins{visits}.where("leads_visits.is_canceled = 't'").uniq.size
+              this_exportable_fields<<this_user_data.joins(:visits).where("leads_visits.is_postponed = 't'").uniq.size
+              this_exportable_fields << this_user_data.joins(:visits).where("leads_visits.is_canceled = 't'").uniq.size
               this_exportable_fields << this_user_data.where(revisit: true).size
-              visit_done = this_user_data.joins{visits}.uniq.size
+              visit_done = this_user_data.joins(:visits).uniq.size
               booked = this_user_data.booked_for(user.company).count
               this_exportable_fields << "#{booked} - (#{((booked.to_f / visit_done.to_f) * 100).round(2)}%)"
-              visit_done = this_user_data.joins{visits}.uniq.size
+              visit_done = this_user_data.joins(:visits).uniq.size
               tokened = this_user_data.where(status_id: user.company.token_status_ids).count
               this_exportable_fields<<"#{tokened} - (#{((tokened.to_f / visit_done.to_f) * 100).round(2)}%)"
             end
@@ -72,7 +72,7 @@ module ReportCsv
               leads = leads.where(project_id: campaign.project_ids)
             end
             booking_data = leads.booked_for(user.company)
-            visted_data = leads.joins{visits}.uniq
+            visted_data = leads.joins(:visits).uniq
             this_exportable_fields = [campaign.title, campaign.start_date&.strftime("%Y-%m-%d"), campaign.end_date&.strftime("%Y-%m-%d"), Utility.to_words(campaign.budget), campaign.source_name, (campaign.projects.pluck(:name).join(', ') rescue "")]
             leads_count = leads.where(source_id: campaign.source_id, created_at: campaign.start_date.beginning_of_day..campaign.end_date.end_of_day).count
             this_exportable_fields << leads_count
@@ -390,7 +390,7 @@ module ReportCsv
       end
 
       def gre_source_report_to_csv(options={}, user)
-        data = all.joins{visits}.group("source_id, leads.status_id").select("COUNT(*), source_id, leads.status_id, json_agg(leads.id) as lead_ids")
+        data = all.joins(:visits).group("source_id, leads.status_id").select("COUNT(*), source_id, leads.status_id, json_agg(leads.id) as lead_ids")
         @data = data.as_json(except: [:id])
         sources = user.company.sources.where(:id=>data.map(&:source_id).uniq)
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)

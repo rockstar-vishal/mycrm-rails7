@@ -39,9 +39,9 @@ class LeadsController < ApplicationController
     end
     if params["key"].present? && params["sort"].present?
       if params["key"] == 'project_id'
-        @leads = @leads.includes{project}.order("projects.name #{params['sort']} NULLS FIRST")
+        @leads = @leads.includes(:project).order("projects.name #{params['sort']} NULLS FIRST")
       elsif params["key"] == 'status_id'
-        @leads = @leads.includes{status}.order("statuses.name #{params['sort']} NULLS FIRST")
+        @leads = @leads.includes(:status).order("statuses.name #{params['sort']} NULLS FIRST")
       else
         if @company.setting.present? && @company.enable_ncd_sort_nulls_last && params['sort'] == "desc"
           @leads = @leads.order("leads.#{params['key']} #{params['sort']} NULLS LAST")
@@ -52,7 +52,6 @@ class LeadsController < ApplicationController
     else
       @leads = @leads.order("leads.ncd asc NULLS FIRST, leads.created_at DESC")
     end
-    # @leads = @leads.includes{status}.includes{property_type}.includes{transaction_type}.includes{user}.includes{project}.includes{enquiry_source}.includes{outlet_location}
     @leads_count = @leads.size
     respond_to do |format|
       format.html do
@@ -453,7 +452,7 @@ class LeadsController < ApplicationController
   end
 
   def call_logs
-    @call_logs = @company.call_logs.joins{lead}.where(leads: {user_id: current_user.manageables.ids})
+    @call_logs = @company.call_logs.joins(:lead).where(leads: {user_id: current_user.manageables.ids})
     if params[:is_external].present?
       @call_logs = @call_logs.advance_search(call_logs_search_params)
     elsif params[:is_advanced_search].present?
@@ -506,7 +505,7 @@ class LeadsController < ApplicationController
   end
 
   def dead_or_recycle
-    @leads = @leads.joins{audits}.where("((audits.audited_changes -> 'status_id')::jsonb->>1)::INT IN (?)", @company.dead_status_ids.map(&:to_i)).select("DISTINCT ON (audits.associated_id) leads.*")
+    @leads = @leads.joins(:audits).where("((audits.audited_changes -> 'status_id')::jsonb->>1)::INT IN (?)", @company.dead_status_ids.map(&:to_i)).select("DISTINCT ON (audits.associated_id) leads.*")
     if params[:is_advanced_search].present?
       @leads = @leads.advance_search(search_params, current_user)
     end
@@ -521,9 +520,9 @@ class LeadsController < ApplicationController
     new_status_count = @leads.where(status_id: @company.new_status_id).count
     booking_done_count = @leads.where(status_id: @company.booking_done_id).count
     dead_lead_count = @leads.where(status_id: @company.dead_status_ids).count
-    visit_counter = @leads.joins{visits}.thru_visit_form(current_user.company).uniq.count
+    visit_counter = @leads.joins(:visits).thru_visit_form(current_user.company).uniq.count
     deactivate_leads_count=@leads.unscoped.where(is_deactivated: true).count
-    merge_lead_count=@leads.joins{leads_secondary_sources}.pluck(:id).uniq.count
+    merge_lead_count=@leads.joins(:leads_secondary_sources).pluck(:id).uniq.count
     visit_expiration_count=@leads.visit_expiration.size
     respond_to do |format|
       format.json do
@@ -654,6 +653,7 @@ class LeadsController < ApplicationController
         abandoned_calls_status: []
       )
     end
+    helper_method :call_logs_search_params
 
     def outbound_search_params
       params.permit(
@@ -675,4 +675,10 @@ class LeadsController < ApplicationController
         call_status: [] # convert string to array
       )
     end
+    helper_method :outbound_search_params
+
+    def histories_params
+      params.permit(:sort, :key, :incoming)
+    end
+    helper_method :histories_params
 end

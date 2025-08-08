@@ -26,6 +26,7 @@
 //= require pusher
 //= require adminlte.min
 //= require jquery-tablesorter
+//= require jquery.datetimepicker
 //= require_tree .
 
 
@@ -46,22 +47,25 @@ $(document).ready(function() {
     bPaginate: false,
     bFilter: false
   });
-  $('.multi-select-list').multiselect({
-    numberDisplayed: 1,
-    enableFiltering: true,
-    enableCaseInsensitiveFiltering: true,
-    nonSelectedText: 'Please Select',
-    includeSelectAllOption: true,
-    buttonWidth: '100%',
-    maxHeight: 350,
+  $('.multi-select-list').multiSelect({
+    keySelect: [32],
+    selectableOptgroup: false,
+    disabledClass: 'disabled',
+    dblClick: false,
+    keepOrder: false,
+    cssClass: ''
   });
 
   // clipboard js
 
-  $('.clipboard-btn').tooltip({
-    trigger: 'click',
-    placement: 'top'
+  // Initialize tooltips for Bootstrap 5
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
   });
+
+  // For clipboard buttons, use data attributes for tooltips
+  $('.clipboard-btn').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'top');
 
   $('.chosen-select').chosen({
     allow_single_deselect: true,
@@ -72,14 +76,22 @@ $(document).ready(function() {
   $('#company_cost_sheet_letter_types_chosen').attr('style', 'width: 250px !important;');
 
   function setTooltip(btn, message) {
-    $(btn).tooltip('show')
-      .attr('data-original-title', message)
-      .tooltip('show');
+    // For Bootstrap 5, we need to use the new API
+    var tooltip = bootstrap.Tooltip.getInstance(btn);
+    if (tooltip) {
+      tooltip.hide();
+    }
+    $(btn).attr('data-bs-original-title', message);
+    tooltip = new bootstrap.Tooltip(btn);
+    tooltip.show();
   }
 
   function hideTooltip(btn) {
     setTimeout(function() {
-      $(btn).tooltip('hide');
+      var tooltip = bootstrap.Tooltip.getInstance(btn);
+      if (tooltip) {
+        tooltip.hide();
+      }
     }, 1000);
   }
 
@@ -101,14 +113,16 @@ $(document).ready(function() {
   $('.datetimepickerncd').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
   $('.datetimepickerleaseexpired').datetimepicker({timepicker: false,format:'d/m/Y', maxDate: today});
   // For Modal
-  $(document).on('show.bs.modal', '#modal-window', function() {
-    $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
-    $('.datetimepickerncd_modal').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
-    $('.dateFormat').datetimepicker({
-      timepicker: false,
-      format:'d/m/Y'
-    });
-  })
+  document.addEventListener('show.bs.modal', function(event) {
+    if (event.target.id === 'modal-window') {
+      $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
+      $('.datetimepickerncd_modal').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
+      $('.dateFormat').datetimepicker({
+        timepicker: false,
+        format:'d/m/Y'
+      });
+    }
+  });
   $('.dateFormat').datetimepicker({
     timepicker: false,
     format:'d/m/Y'
