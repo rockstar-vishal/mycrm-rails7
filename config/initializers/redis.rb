@@ -1,17 +1,19 @@
+require 'redis'
 require 'redis-namespace'
 
-begin
-  # Redis configuration for Rails 7.1
-  redis_connection = Redis.new(
-    host: CRMConfig.redis_host, 
-    port: CRMConfig.redis_port
-  )
+redis_config = {
+  host: defined?(CRMConfig) ? CRMConfig.redis_host : ENV['REDIS_HOST'] || 'localhost',
+  port: defined?(CRMConfig) ? CRMConfig.redis_port : ENV['REDIS_PORT'] || 6379,
+  db: defined?(CRMConfig) ? CRMConfig.redis_db : ENV['REDIS_DB'] || 0
+}
 
-  # Create a namespaced Redis connection for the application
-  $redis = Redis::Namespace.new(:leadquest_corelto, redis: redis_connection)
+redis_config[:password] = defined?(CRMConfig) ? CRMConfig.redis_password : ENV['REDIS_PASSWORD'] if defined?(CRMConfig) ? CRMConfig.redis_password.present? : ENV['REDIS_PASSWORD'].present?
 
-  # Configure Resque to use the Redis connection
-  Resque.redis = $redis
+$redis = Redis.new(redis_config)
+$redis_ns = Redis::Namespace.new("leadquest:#{Rails.env}", redis: $redis)
+
+# Configure Resque to use the Redis connection
+Resque.redis = $redis_ns
   
   puts "Redis connection established successfully"
 rescue => e

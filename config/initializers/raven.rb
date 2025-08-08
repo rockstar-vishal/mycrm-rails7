@@ -11,7 +11,7 @@ if Rails.env.production?
   Resque::Failure.backend = Resque::Failure::Multiple
 
   Sentry.init do |config|
-    config.dsn = CRMConfig.SENTRY_DSN
+    config.dsn = defined?(CRMConfig) ? CRMConfig.SENTRY_DSN : ENV['SENTRY_DSN']
     config.breadcrumbs_logger = [:active_support_logger, :http_logger]
     config.traces_sample_rate = 0.5
   end
