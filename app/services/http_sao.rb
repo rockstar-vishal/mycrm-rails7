@@ -1,4 +1,4 @@
-module HTTPSao
+module HttpSao
   class << self
 
     def secure_get url, params={}

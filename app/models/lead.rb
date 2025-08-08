@@ -1256,7 +1256,7 @@ class Lead < ActiveRecord::Base
           custnumber: self.mobile&.last(10),
           refurl: current_user.company.mcube_integration_callback_url
         }.to_json
-        success, response = HTTPSao.secure_post(url, request_body)
+        success, response = HttpSao.secure_post(url, request_body)
         success = response["status"]
         if !success
           return false, response["msg"]
@@ -1329,7 +1329,7 @@ class Lead < ActiveRecord::Base
     begin
       radom_reference_no = SecureRandom.uuid
       url = "https://way2voice.in:444/FileApi/OBDCall?key=3646&userid=mukandan&password=mukandan@123&CallerNo=#{self.mobile.last(10)}&AgentNo=#{self.user.mobile}&refid=#{radom_reference_no}"
-      status, code, response = HTTPSao.secure_get(url)
+      status, code, response = HttpSao.secure_get(url)
       if response["status"] == "success"
         radom_reference_no = response["cdtrno"]
       end
@@ -1476,7 +1476,7 @@ class Lead < ActiveRecord::Base
     begin
       api_key = current_user.company.callerdesk_integration.integration_key
       url = "https://app.callerdesk.io/api/click_to_call_v2?calling_party_a=#{current_user.mobile}&calling_party_b=#{self.mobile}&deskphone=#{current_user.cloud_telephony_sid&.number}&authcode=#{api_key}&call_from_did=1"
-      status, code, response = HTTPSao.secure_get(url)
+      status, code, response = HttpSao.secure_get(url)
       if status && code == "200"
         call_log = self.call_logs.build(
           caller: 'User',
