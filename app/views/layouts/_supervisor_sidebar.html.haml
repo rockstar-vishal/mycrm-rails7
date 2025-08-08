@@ -19,13 +19,13 @@
   = link_to root_path, class: "brand-link logo-switch" do
     - company = current_user.company
     - if company.icon.present?
-      = image_tag  "#{company.icon.url}", class: 'brand-image-xl logo-xs'
+      %img.brand-image-xl.logo-xs{src: company.icon.url, alt: "Company Icon"}
     - else
-      = image_tag  "small-logo.jpg", class: 'brand-image-xl logo-xs'
+      = image_tag "small-logo.jpg", class: 'brand-image-xl logo-xs'
     - if company.logo.present?
-      = image_tag  "#{company.logo.url}", class: 'brand-image-xs logo-xl'
+      %img.brand-image-xs.logo-xl{src: company.logo.url, alt: "Company Logo"}
     - else
-      = image_tag  "logo.jpg", class: 'brand-image-xs logo-xl'
+      = image_tag "logo.jpg", class: 'brand-image-xs logo-xl'
   .sidebar
     %nav.mt-2
       %ul.nav.nav-pills.nav-sidebar.flex-column{"data-accordion" => "false", "data-widget" => "treeview", :role => "menu"}

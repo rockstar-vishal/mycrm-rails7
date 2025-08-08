@@ -44,5 +44,9 @@ module CoreltoLeadQuest
     # Prevent circular dependencies during initialization
     config.autoload_paths += %W(#{config.root}/app/models/concerns)
     config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
+
+    # Disable ActiveStorage since we're using Paperclip
+    config.active_storage.service = :local
+    config.active_storage.resolve_model_to_route = :rails_storage_redirect
   end
 end

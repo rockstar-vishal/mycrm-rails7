@@ -69,7 +69,7 @@
                       %td= broker.locality
                       %td= broker.cp_code
                       %td= broker.rm.name rescue nil
-                      %td= link_to (fa_icon("external-link", class: 'text-light')), broker.rera_document.url(:original, false), target: '_blank', class: "btn btn-action" if broker.rera_document.present?
+                      %td= link_to (fa_icon("external-link", class: 'text-light')), broker.rera_document.url, target: '_blank', class: "btn btn-action" if broker.rera_document.present?
                       %td
                         = link_to edit_broker_path(broker.uuid), remote: true, class: "btn btn-action btn-edit" do
                           = render partial: 'icons/edit'

@@ -8,7 +8,7 @@ class DashboardsController < ApplicationController
     if current_user.is_sysad?
       redirect_to companies_path
     else
-      redirect_to statistics_dashboards_path
+      redirect_to leads_path
     end
   end
 

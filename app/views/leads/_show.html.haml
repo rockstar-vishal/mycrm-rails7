@@ -63,7 +63,7 @@
           .form-group.col-md-4
             %span.lead-title Image
             %span.lead-info
-              = link_to (fa_icon("external-link", class: 'text-light')), @lead.image.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+              = link_to (fa_icon("external-link", class: 'text-light')), @lead.image.url, target: '_blank', class: "btn btn-primary btn-sm"
         - if @company.is_allowed_field?("email")
           .form-group.col-md-4
             %span.lead-title Email
@@ -199,7 +199,7 @@
             .form-group.col-md-4
               %span.lead-title Booking Form
               %span.lead-info
-                = link_to (fa_icon("external-link", class: 'text-light')), @lead.booking_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+                = link_to (fa_icon("external-link", class: 'text-light')), @lead.booking_form.url, target: '_blank', class: "btn btn-primary btn-sm"
         - if @lead.status_id == @lead.company.booking_done_id && @lead.company.setting.present? && @lead.company.enable_booking_loan_fields
           - if @lead.booked_flat_no.present?
             .form-group.col-md-4
@@ -392,7 +392,7 @@
                         %td.showmore= visit.comment
                       %td
                         - if visit.site_visit_form.exists?
-                          = link_to (fa_icon("external-link", class: 'text-light')), visit.site_visit_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+                          = link_to (fa_icon("external-link", class: 'text-light')), visit.site_visit_form.url, target: '_blank', class: "btn btn-primary btn-sm"
                       - if @lead.company.setting.present? && @lead.company.enable_sv_form_print
                         %td
                           = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do

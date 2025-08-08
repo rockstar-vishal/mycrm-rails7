@@ -6,6 +6,14 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Amazon S3 configuration (only used if explicitly configured)
+amazon:
+  service: S3
+  access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) || ENV['AWS_ACCESS_KEY_ID'] %>
+  secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) || ENV['AWS_SECRET_ACCESS_KEY'] %>
+  region: <%= Rails.application.credentials.dig(:aws, :region) || ENV['AWS_REGION'] || 'ap-south-1' %>
+  bucket: <%= Rails.application.credentials.dig(:aws, :bucket_name) || ENV['AWS_BUCKET_NAME'] %>
+
 # Use Amazon S3 to store uploaded files.
 #
 # Add the `aws-sdk-s3` gem to your Gemfile:
