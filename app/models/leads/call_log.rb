@@ -28,9 +28,7 @@ class Leads::CallLog < ActiveRecord::Base
 
   validates :start_time,  presence: true
 
-  has_attached_file :recorded_audio,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :recorded_audio
   validates_attachment_content_type :recorded_audio, content_type: ['audio/mpeg', 'audio/mp3']
 
   after_commit :send_push_notification,:web_push_notification

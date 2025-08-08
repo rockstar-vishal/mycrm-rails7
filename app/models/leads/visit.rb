@@ -15,9 +15,7 @@ class Leads::Visit < ActiveRecord::Base
     "Online Meeting": 6
   }
 
-  has_attached_file :site_visit_form,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :site_visit_form
 
   validates_attachment_content_type  :site_visit_form,
                         content_type: ['application/pdf', 'application/msword', 'image/jpeg', 'image/png', 'application/vnd.ms-excel',

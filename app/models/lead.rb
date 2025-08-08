@@ -54,9 +54,7 @@ class Lead < ActiveRecord::Base
   validates :dead_reason, presence: true, if: Proc.new { |a| a.company.dead_status_ids.map(&:to_i).include?(a.status_id) }
   validates :lead_no, presence: true, uniqueness: true
 
-  has_attached_file :image,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :image
   validates_attachment_content_type  :image,
                     content_type: ['image/jpeg', 'image/png'],
                     size: { in: 0..5.megabytes }
@@ -375,7 +373,7 @@ class Lead < ActiveRecord::Base
           messageable_id: self.id,
           messageable_type: "Lead",
           mobile: self.mobile,
-          text: "Dear #{self.name}, Thank you for showing interest in our project #{self.project_name}. Our Sales Representative #{self.user&.name}(#{self&.user&.mobile}) shall be in touch with you. In the meantime, please visit #{self.project_name} to know more details about the project. \nRegards, \nTeam #{self.project_name}",
+          text: "Dear #{self.name}, Thank you for showing interest in our project #{self.project_name}. Our Sales Representative #{self&.user&.name}(#{self&.user&.mobile}) shall be in touch with you. In the meantime, please visit #{self.project_name} to know more details about the project. \nRegards, \nTeam #{self.project_name}",
           user_id: self.user.id
         )
         ss.save

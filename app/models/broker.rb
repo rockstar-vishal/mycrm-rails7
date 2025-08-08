@@ -9,9 +9,7 @@ class Broker < ActiveRecord::Base
   default_scope { order(created_at: :asc) }
   belongs_to :rm, class_name: "::User", foreign_key: :rm_id, optional: true
 
-  has_attached_file :rera_document,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :rera_document
   validates_attachment :rera_document, 
                         content_type: { :content_type => %w( application/pdf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document) }
 

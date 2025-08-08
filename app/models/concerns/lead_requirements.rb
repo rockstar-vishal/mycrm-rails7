@@ -3,9 +3,7 @@ module LeadRequirements
   extend ActiveSupport::Concern
 
   included do
-    has_attached_file :booking_form,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+    has_attached_file :booking_form
 
     validates_attachment_content_type  :booking_form,
                         content_type: ['application/pdf', 'application/msword', 'image/jpeg', 'image/png', 'application/vnd.ms-excel',

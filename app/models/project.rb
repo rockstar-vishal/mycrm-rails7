@@ -20,14 +20,10 @@ class Project < ActiveRecord::Base
   has_many :round_robin_settings, class_name: 'RoundRobinSetting'
   validates :name, :company, presence: true
 
-  has_attached_file :project_brochure,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :project_brochure
   validates_attachment :project_brochure, 
                         content_type: { :content_type => %w(image/jpeg image/jpg image/gif image/png application/pdf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document) }
-  has_attached_file :banner_image,
-                        path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                        url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :banner_image
   validates_attachment :banner_image, 
                         content_type: { :content_type => %w(image/jpeg image/jpg image/png) }
 
