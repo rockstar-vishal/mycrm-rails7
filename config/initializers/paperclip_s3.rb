@@ -13,10 +13,11 @@ if Rails.application.credentials.dig(:aws, :access_key_id).present? || ENV['AWS_
     s3_region: Rails.application.credentials.dig(:aws, :region) || ENV['AWS_REGION'] || 'ap-south-1',
     bucket: Rails.application.credentials.dig(:aws, :bucket_name) || ENV['AWS_BUCKET_NAME'],
     s3_host_alias: nil,
-    url: ':s3_domain_url',
+    url: ':s3_path_url',
     path: ':class/:attachment/:id/:style/:filename',
     s3_protocol: 'https',
-    escape_url: false
+    escape_url: false,
+    s3_host_name: 's3.ap-south-1.amazonaws.com'
   })
   
   # Override the default options to ensure S3 is used
@@ -28,10 +29,11 @@ if Rails.application.credentials.dig(:aws, :access_key_id).present? || ENV['AWS_
   }
   Paperclip::Attachment.default_options[:s3_region] = Rails.application.credentials.dig(:aws, :region) || ENV['AWS_REGION'] || 'ap-south-1'
   Paperclip::Attachment.default_options[:bucket] = Rails.application.credentials.dig(:aws, :bucket_name) || ENV['AWS_BUCKET_NAME']
-  Paperclip::Attachment.default_options[:url] = ':s3_domain_url'
+  Paperclip::Attachment.default_options[:url] = ':s3_path_url'
   Paperclip::Attachment.default_options[:path] = ':class/:attachment/:id/:style/:filename'
   Paperclip::Attachment.default_options[:s3_protocol] = 'https'
   Paperclip::Attachment.default_options[:escape_url] = false
+  Paperclip::Attachment.default_options[:s3_host_name] = 's3.ap-south-1.amazonaws.com'
   
   puts "Paperclip configured to use S3 storage"
 else
