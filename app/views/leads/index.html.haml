@@ -1,7 +1,7 @@
 .content-wrapper
   .content-header
     .container-fluid
-      .row.mb-2
+      .row
         .col-md-12
           %ol.breadcrumb
             %li.breadcrumb-item
@@ -38,25 +38,25 @@
                               = fa_icon "search"
                             = link_to leads_path, class: "btn btn-default search-btn refresh" do
                               = fa_icon "refresh"
-                    %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary btn-sm"}
-                      Advanced Search
-                      %i.fa.fa-angle-down
+                    %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                      = render 'icons/filters'
+                      Filters
                 .col-md-5
                   .group-link
                     - if current_user.is_super? || current_user.can_import
                       = link_to import_leads_path, :class=>"ml-auto", target: "_blank" do
-                        = fa_icon "upload"
+                        = render 'icons/import'
                         Import
                     - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && @company.setting.present? && @company.enable_executive_export_leads)
                       = link_to params.except(:action, :controller).merge!(format: :csv), class: "" do
-                        = fa_icon "download"
+                        = render 'icons/export'
                         Export
                     - if current_user.is_super? && @company.enable_lead_export && current_user.company.daily_file_exports < 2
                       = link_to params.except(:action, :controller), remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
-                        = fa_icon "download"
+                        = render 'icons/export'
                         Export All
                     = link_to calender_view_leads_path, class: "" do
-                      = fa_icon "calendar"
+                      = render 'icons/calendar'
                       Calender
                   
                   
@@ -74,11 +74,11 @@
                 - if current_user.is_super? || current_user.can_import?
                   = render 'bulk_action'
                 .table-responsive
-                  %table.table.table-bordered.table-condensed.table-striped.tablesorter
+                  %table.table.tablesorter
                     %thead
                       %tr
                         - unless params[:deactivated].present?
-                          %th{"data-sorter"=> "false", style: "width:3%;"}
+                          %th{"data-sorter"=> "false"}
                             = check_box_tag 'checkbox', nil, false, class: 'select-all bulk-select'
                         -if company_index_fields.include?("name")
                           %th Name
