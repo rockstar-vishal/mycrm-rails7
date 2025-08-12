@@ -15,7 +15,7 @@
           .table-card
             .table-body
               .table-responsive
-                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap
+                %table.table.table-hover.dataTables.responsive.nowrap
                   %thead
                     %tr
                       %th.all File Name
@@ -32,5 +32,5 @@
                         %td= status
                         %td
                           = link_to file_export_download_path(export), class: "btn btn-action#{export.is_ready? ? '' : ' disabled'}" do
-                            = fa_icon "download"
+                            
                             Download

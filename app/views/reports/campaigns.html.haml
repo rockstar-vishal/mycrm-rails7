@@ -6,25 +6,27 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Marketing ROI Report
-          %h1.m-0 Campaigns
+            %li.breadcrumb-item.active Marketing Analysis
+          %h1.m-0 Marketing Analysis
   .content
     .container-fluid
       .row
         .col-lg-12
           .search-card
             .row
-              .col-md-3
+              .col-md-6
               - if current_user.company.setting.present? && current_user.company.enable_marketing_report_subsource_filter
                 
-                %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
-                  Advanced Search
-                  %i.fa.fa-angle-down
-              .col-md-9
                 .group-link
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
-                    = fa_icon "download"
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
+              .col-md-6
+                .group-link
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action ml-auto" do
+                    = render 'icons/export'
                     Export
+
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
                 .p-2
@@ -39,7 +41,7 @@
           .table-body
             - plottable = {}
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all #

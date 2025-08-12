@@ -22,7 +22,7 @@
               
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all Name
@@ -41,7 +41,7 @@
                       %td
                         = link_to edit_notification_template_path(nt.uuid), remote: true, class: "btn btn-action btn-edit" do
                           = render partial: 'icons/edit'
-        - if @templates.present?
-          .pagination-custom-holder
-            %strong{style: "margin-left: 0;"} Templates Count - #{@templates.count}
-            = will_paginate @templates, :class  =>  "ct-pag"
+          - if @templates.present?
+            .pagination-custom-holder
+              %label{style: "margin-left: 0;"} Templates Count - #{@templates.count}
+              = will_paginate @templates, :class  =>  "ct-pag"

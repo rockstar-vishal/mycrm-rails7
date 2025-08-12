@@ -1,11 +1,28 @@
 .modal-header
-  %h5.modal-title Preview Lead
-  - unless params[:controller] == 'reports'
-    = link_to edit_lead_path(@lead), class: "btn btn-black #{current_user.disable_lead_edit ? ' disabled' : ''}" do
-      Edit
+  %h5.modal-title Preview Profile
   %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
     %span{"aria-hidden" => "true"} ×
 .modal-body.show-body
+  .intro-lead-data
+    .lead-header
+      - if @company.is_allowed_field?("name")
+        %span.lead-summary-name= @lead.name.presence || '—'
+        - if @lead.source_with_call_in.present?
+          %span.badge-source= @lead.source_with_call_in
+        - if @lead.project&.name.present?
+          %span.badge-status-project= @lead.project.name
+        - if @lead.status&.name.present?
+          %span.badge-status= @lead.status.name
+      .lead-created
+        Created on
+        = @lead.created_at.in_time_zone.strftime("%d %B %Y %H:%M %p")
+    .lead-actions
+      = link_to edit_lead_path(@lead),
+        class: "btn btn-edit #{'disabled' if current_user.disable_lead_edit}",
+        data: { disable_with: 'Saving...' } do
+        = render partial: 'icons/edit'
+        Edit
+      
   %ul.nav.nav-tabs.nav-justified
     %li{:class => ("active" if @default_tab == 'leads-detail')}
       = link_to '#tab1', class: "nav-link #{('active' if @default_tab == 'leads-detail')}", "data-toggle"=>"tab" do
@@ -15,150 +32,123 @@
         Visits
   .tab-content.show-content-modal
     #tab1.tab-pane.fade{:class => ("show active" if @default_tab == 'leads-detail')}
-      .row
-        .form-group.col-md-12
-          %h4.lead-heading Lead Basic Detail
-          .form-group
-            %span.lead-title Lead Number
+      %h4.lead-heading Lead Profile
+      .lead-body
+        .row
+          .form-group.col-md-4
+            %span.lead-title Lead ID
             %span.lead-info
               = @lead.lead_no
-        - if @company.is_allowed_field?("customer_type")
-          .form-group.col-md-4
-            %span.lead-title Customer Type
-            %span.lead-info
-              = @lead.customer_type
-        - if @company.is_allowed_field?("name")
-          .form-group.col-md-4
-            %span.lead-title Name
-            %span.lead-info
-              = @lead.name
-        - unless current_user.is_telecaller? || (current_user.is_executive? && @company.setting&.hide_lead_mobile_for_executive)
-          - if (current_user.is_super? || !@company.enable_restricted_fields)
-            - if @company.is_allowed_field?("mobile") && !current_user.hide_number
-              .form-group.col-md-4
-                %span.lead-title Mobile Number
-                %span.lead-info
-                  = @lead.mobile
-          - if @company.is_allowed_field?("other_contacts")
+          - if @company.is_allowed_field?("customer_type")
             .form-group.col-md-4
-              %span.lead-title Other Contact
+              %span.lead-title Customer Type
               %span.lead-info
-                = @lead.other_contacts
-        - if @company.is_allowed_field?("address")
+                = @lead.customer_type
+          - if @company.is_allowed_field?("name")
+            .form-group.col-md-4
+              %span.lead-title Name
+              %span.lead-info
+                = @lead.name
+          - unless current_user.is_telecaller? || (current_user.is_executive? && @company.setting&.hide_lead_mobile_for_executive)
+            - if (current_user.is_super? || !@company.enable_restricted_fields)
+              - if @company.is_allowed_field?("mobile") && !current_user.hide_number
+                .form-group.col-md-4
+                  %span.lead-title Contact
+                  %span.lead-info
+                    = @lead.mobile
+            - if @company.is_allowed_field?("other_contacts")
+              .form-group.col-md-4
+                %span.lead-title Other Contact
+                %span.lead-info
+                  = @lead.other_contacts
+          - if @company.is_allowed_field?("address")
+            .form-group.col-md-4
+              %span.lead-title Address
+              %span.lead-info
+                = @lead.address
+          - if @company.is_allowed_field?("city_id")
+            .form-group.col-md-4
+              %span.lead-title City
+              %span.lead-info
+                = @lead.city&.name
+          - if @company.is_allowed_field?("locality_id")
+            .form-group.col-md-4
+              %span.lead-title Area
+              %span.lead-info
+                = @lead.locality&.name
+          - if @lead.image.present?
+            .form-group.col-md-4
+              %span.lead-title Image
+              %span.lead-info
+                = link_to (fa_icon("external-link", class: 'text-light')), @lead.image.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+          - if @company.is_allowed_field?("email")
+            .form-group.col-md-4
+              %span.lead-title Email
+              %span.lead-info
+                = mail_to @lead.email
+          - if current_user.check_source_presence
+            .form-group.col-md-4
+              %span.lead-title Origin
+              %span.lead-info
+                = @lead.source_with_call_in
+          - if @lead.secondary_sources.present?
+            .form-group.col-md-4
+              %span.lead-title Secondary Sources
+              %span.lead-info
+                = @lead.secondary_sources.collect(&:name).join(',')
+          - if @company.is_allowed_field?("sub_source")
+            .form-group.col-md-4
+              %span.lead-title Sub source
+              %span.lead-info
+                = @lead.sub_source
+          - if @company.is_allowed_field?("enquiry_sub_source_id")
+            .form-group.col-md-4
+              %span.lead-title Sub source
+              %span.lead-info
+                = @lead.enq_subsource&.name
           .form-group.col-md-4
-            %span.lead-title Address
+            %span.lead-title Date Created
             %span.lead-info
-              = @lead.address
-        - if @company.is_allowed_field?("city_id")
-          .form-group.col-md-4
-            %span.lead-title City
-            %span.lead-info
-              = @lead.city&.name
-        - if @company.is_allowed_field?("locality_id")
-          .form-group.col-md-4
-            %span.lead-title Locality
-            %span.lead-info
-              = @lead.locality&.name
-        - if @lead.image.present?
-          .form-group.col-md-4
-            %span.lead-title Image
-            %span.lead-info
-              = link_to (fa_icon("external-link", class: 'text-light')), @lead.image.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
-        - if @company.is_allowed_field?("email")
-          .form-group.col-md-4
-            %span.lead-title Email
-            %span.lead-info
-              = mail_to @lead.email
-        - if current_user.check_source_presence
-          .form-group.col-md-4
-            %span.lead-title Enquiry Source
-            %span.lead-info
-              = @lead.source_with_call_in
-        - if @lead.secondary_sources.present?
-          .form-group.col-md-4
-            %span.lead-title Secondary Sources
-            %span.lead-info
-              = @lead.secondary_sources.collect(&:name).join(',')
-        - if @company.is_allowed_field?("sub_source")
-          .form-group.col-md-4
-            %span.lead-title Sub source
-            %span.lead-info
-              = @lead.sub_source
-        - if @company.is_allowed_field?("enquiry_sub_source_id")
-          .form-group.col-md-4
-            %span.lead-title Sub source
-            %span.lead-info
-              = @lead.enq_subsource&.name
-        .form-group.col-md-4
-          %span.lead-title Created At
-          %span.lead-info
-            = @lead.created_at.in_time_zone.strftime("%d %B %Y %H:%M %p")
-        - if @lead.conversion_date.present?
-          .form-group.col-md-4
-            %span.lead-title Conversion Date
-            %span.lead-info
-              = @lead.conversion_date.strftime("%d %B %Y")
-        - if @company.is_allowed_field?("project_id")
-          .form-group.col-md-4
-            %span.lead-title Enquired / Interested For
-            %span.lead-info
-              = @lead.project.name
-        - if @company.is_allowed_field?("budget")
-          .form-group.col-md-4
-            %span.lead-title Budget
-            %span.lead-info
-              - if @lead.budget.present?
-                = fa_icon "rupee"
-                = Utility.to_words(@lead.budget)
-              - else
-                = "-"
-        - if @lead.other_emails.present?
-          .form-group.col-md-4
-            %span.lead-title Other Emails
-            %span.lead-info
-              = @lead.other_emails
-        - if @lead.other_phones.present?
-          .form-group.col-md-4
-            %span.lead-title Other Contacts
-            %span.lead-info
-              = @lead.other_phones
-        .form-group.col-md-12
-          %h4.lead-heading.mt-2.mb-2 Other Details
+              = @lead.created_at.in_time_zone.strftime("%d %B %Y %H:%M %p")
+          - if @lead.conversion_date.present?
+            .form-group.col-md-4
+              %span.lead-title Conversion Date
+              %span.lead-info
+                = @lead.conversion_date.strftime("%d %B %Y")
+          - if @company.is_allowed_field?("project_id")
+            .form-group.col-md-4
+              %span.lead-title Interested In
+              %span.lead-info
+                = @lead.project.name
+          - if @company.is_allowed_field?("budget")
+            .form-group.col-md-4
+              %span.lead-title Budget
+              %span.lead-info
+                - if @lead.budget.present?
+                  = fa_icon "rupee"
+                  = Utility.to_words(@lead.budget)
+                - else
+                  = "-"
+          - if @lead.other_emails.present?
+            .form-group.col-md-4
+              %span.lead-title Other Emails
+              %span.lead-info
+                = @lead.other_emails
+          - if @lead.other_phones.present?
+            .form-group.col-md-4
+              %span.lead-title Other Contacts
+              %span.lead-info
+                = @lead.other_phones
+      %h4.lead-heading Further Information
+      .lead-body
+        .row
           - if @lead.fb_ads_id.present?
             .form-group.col-md-4
               %span.lead-title Facebook Ads Id
               %span.lead-info
                 = @lead.fb_ads_id
-        - if @lead.property_type.present?
-          - if @lead.property_type == "Residential" && @lead.residential_type.present?
-            .form-group.col-md-4
-              %span.lead-title Property Type
-              %span.lead-info
-                = @lead.property_type
-            .form-group.col-md-4
-              %span.lead-title Property Type
-              %span.lead-info
-                = @lead.residential_type.property_type rescue "-"
-            - if @lead.residential_type.property_type == "Plot"
-              .form-group.col-md-4
-                %span.lead-title Plot Area
-                %span.lead-info
-                  = @lead.residential_type.plot_area_from
-                  %b -
-                  = @lead.residential_type.plot_area_to
-                  = @lead.residential_type.area_unit
-            - else
-              .form-group.col-md-4
-                %span.lead-title Config
-                %span.lead-info
-                  = @lead.residential_type.area_config
-            - if @lead.residential_type.purpose.present?
-              .form-group.col-md-4
-                %span.lead-title Purpose
-                %span.lead-info
-                  = @lead.residential_type.purpose
-          - else
-            - if @lead.commercial_type.present?
+          - if @lead.property_type.present?
+            - if @lead.property_type == "Residential" && @lead.residential_type.present?
               .form-group.col-md-4
                 %span.lead-title Property Type
                 %span.lead-info
@@ -166,242 +156,273 @@
               .form-group.col-md-4
                 %span.lead-title Property Type
                 %span.lead-info
-                  = @lead.commercial_type.property_type
-              - if @lead.commercial_type.plot_area_from.present?
+                  = @lead.residential_type.property_type rescue "-"
+              - if @lead.residential_type.property_type == "Plot"
                 .form-group.col-md-4
                   %span.lead-title Plot Area
                   %span.lead-info
-                    = @lead.commercial_type.plot_area_from
+                    = @lead.residential_type.plot_area_from
                     %b -
-                    = @lead.commercial_type.plot_area_to
-                    = @lead.commercial_type.area_unit
-              - if @lead.commercial_type.purpose.present?
+                    = @lead.residential_type.plot_area_to
+                    = @lead.residential_type.area_unit
+              - else
+                .form-group.col-md-4
+                  %span.lead-title Config
+                  %span.lead-info
+                    = @lead.residential_type.area_config
+              - if @lead.residential_type.purpose.present?
                 .form-group.col-md-4
                   %span.lead-title Purpose
                   %span.lead-info
-                    = @lead.commercial_type.purpose
-              - if @lead.commercial_type.purpose_comment.present?
+                    = @lead.residential_type.purpose
+            - else
+              - if @lead.commercial_type.present?
                 .form-group.col-md-4
-                  %span.lead-title Comment
+                  %span.lead-title Property Type
                   %span.lead-info
-                    = @lead.commercial_type.purpose_comment
+                    = @lead.property_type
+                .form-group.col-md-4
+                  %span.lead-title Property Type
+                  %span.lead-info
+                    = @lead.commercial_type.property_type
+                - if @lead.commercial_type.plot_area_from.present?
+                  .form-group.col-md-4
+                    %span.lead-title Plot Area
+                    %span.lead-info
+                      = @lead.commercial_type.plot_area_from
+                      %b -
+                      = @lead.commercial_type.plot_area_to
+                      = @lead.commercial_type.area_unit
+                - if @lead.commercial_type.purpose.present?
+                  .form-group.col-md-4
+                    %span.lead-title Purpose
+                    %span.lead-info
+                      = @lead.commercial_type.purpose
+                - if @lead.commercial_type.purpose_comment.present?
+                  .form-group.col-md-4
+                    %span.lead-title Comment
+                    %span.lead-info
+                      = @lead.commercial_type.purpose_comment
+                .form-group.col-md-4
+                  %span.lead-title Attached Toilet
+                  %span.lead-info
+                    = @lead.commercial_type.is_attached_toilet
+          - if @lead.status_id == @lead.company.booking_done_id && @lead.company.setting.present? && @lead.company.enable_booking_done_fields
+            - if @lead.booking_form.present?
               .form-group.col-md-4
-                %span.lead-title Attached Toilet
+                %span.lead-title Booking Date
                 %span.lead-info
-                  = @lead.commercial_type.is_attached_toilet
-        - if @lead.status_id == @lead.company.booking_done_id && @lead.company.setting.present? && @lead.company.enable_booking_done_fields
-          - if @lead.booking_form.present?
-            .form-group.col-md-4
-              %span.lead-title Booking Date
-              %span.lead-info
-                =@lead.booking_date
-          - if @lead.booking_form.exists?
-            .form-group.col-md-4
-              %span.lead-title Booking Form
-              %span.lead-info
-                = link_to (fa_icon("external-link", class: 'text-light')), @lead.booking_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
-        - if @lead.status_id == @lead.company.booking_done_id && @lead.company.setting.present? && @lead.company.enable_booking_loan_fields
-          - if @lead.booked_flat_no.present?
-            .form-group.col-md-4
-              %span.lead-title Flat No.
-              %span.lead-info
-                =@lead.booked_flat_no
-          - if @lead.bank_loan_name.present?
-            .form-group.col-md-4
-              %span.lead-title Bank Loan Name
-              %span.lead-info
-                =@lead.bank_loan_name
-          - if @lead.bank_person_name.present?
-            .form-group.col-md-4
-              %span.lead-title Bank Person Name
-              %span.lead-info
-                =@lead.bank_person_name
-          - if @lead.bank_person_contact.present?
-            .form-group.col-md-4
-              %span.lead-title Bank Person Contact
-              %span.lead-info
-                =@lead.bank_person_contact
-          - if @lead.bank_sales_person.present?
-            .form-group.col-md-4
-              %span.lead-title Bank Sales Person
-              %span.lead-info
-                =@lead.bank_sales_person
-        - if @lead.magic_fields.present?
-          - @lead.magic_fields.order(created_at: :asc).each do |field|
-            .form-group.col-md-4
-              %span.lead-title #{field.pretty_name}
-              %span.lead-info
-                - if field.datatype == "check_box_boolean"
-                  = (@lead.send(field.name)) =="1" ? "Yes" : "No"
-                - else
-                  = @lead.send(field.name)
-        .form-group.col-md-12
-          %h4.lead-heading.mt-2.mb-2 Enquiry Assignment
-        .form-group.col-md-4
-          %span.lead-title Enquiry Status
-          %span.lead-info
-            = @lead.status.name
-        - if @company.dead_status_ids.include?(@lead.status_id.to_s) && @lead.dead_reason_id.present?
-          .form-group.col-md-4
-            %span.lead-title Dead Reason
-            %span.lead-info
-              = @lead.dead_reason.reason
-        - if @company.dead_status_ids.include?(@lead.status_id.to_s) && @lead.dead_sub_reason.present?
-          .form-group.col-md-4
-            %span.lead-title Dead Reason Comment
-            %span.lead-info
-              = @lead.dead_sub_reason
-        - if @company.token_status_ids.include?(@lead.status_id.to_s) && @company.is_allowed_field?("token_date")
-          .form-group.col-md-4
-            %span.lead-title Token Date
-            %span.lead-info
-              = @lead.token_date&.strftime("%d-%m-%Y")
-        - if @company.is_allowed_field?("presale_stage_id")
+                  =@lead.booking_date
+            - if @lead.booking_form.exists?
+              .form-group.col-md-4
+                %span.lead-title Booking Form
+                %span.lead-info
+                  = link_to (fa_icon("external-link", class: 'text-light')), @lead.booking_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+          - if @lead.status_id == @lead.company.booking_done_id && @lead.company.setting.present? && @lead.company.enable_booking_loan_fields
+            - if @lead.booked_flat_no.present?
+              .form-group.col-md-4
+                %span.lead-title Flat No.
+                %span.lead-info
+                  =@lead.booked_flat_no
+            - if @lead.bank_loan_name.present?
+              .form-group.col-md-4
+                %span.lead-title Bank Loan Name
+                %span.lead-info
+                  =@lead.bank_loan_name
+            - if @lead.bank_person_name.present?
+              .form-group.col-md-4
+                %span.lead-title Bank Person Name
+                %span.lead-info
+                  =@lead.bank_person_name
+            - if @lead.bank_person_contact.present?
+              .form-group.col-md-4
+                %span.lead-title Bank Person Contact
+                %span.lead-info
+                  =@lead.bank_person_contact
+            - if @lead.bank_sales_person.present?
+              .form-group.col-md-4
+                %span.lead-title Bank Sales Person
+                %span.lead-info
+                  =@lead.bank_sales_person
+          - if @lead.magic_fields.present?
+            - @lead.magic_fields.order(created_at: :asc).each do |field|
+              .form-group.col-md-4
+                %span.lead-title #{field.pretty_name}
+                %span.lead-info
+                  - if field.datatype == "check_box_boolean"
+                    = (@lead.send(field.name)) =="1" ? "Yes" : "No"
+                  - else
+                    = @lead.send(field.name)
+      %h4.lead-heading  Lead Allocation
+      .lead-body
+        .row
           .form-group.col-md-4
             %span.lead-title Stage
             %span.lead-info
-              = @lead.presales_stage&.name
-        - if @lead.tentative_visit_planned.present?
-          .form-group.col-md-4
-            %span.lead-title Tentative Visit Planned
-            %span.lead-info
-              = @lead.tentative_visit_planned.strftime("%d-%m-%Y %I:%M %p")
-        .form-group.col-md-4
-          %span.lead-title Next Action Date
-          %span.lead-info
-            = @lead.ncd.strftime("%d %B %Y") rescue nil
-        - if @company.is_allowed_field?("user_id")
-          .form-group.col-md-4
-            %span.lead-title Assigned To
-            %span.lead-info
-              = @lead.user.name rescue nil
-        - if @company.setting.present? && @company.enable_meeting_executives && @company.is_allowed_field?("closing_executive")
-          .form-group.col-md-4
-            %span.lead-title
-              = @company.find_label("closing_executive").present? ? (@company.find_label("closing_executive").custom_value.present? ? @company.find_label("closing_executive").custom_value : @company.find_label("closing_executive").default_value) : 'Closing Executive'
-            %span.lead-info
-              = @lead.postsale_user&.name rescue nil
-        .form-group.col-md-4
-          %span.lead-title Updated At
-          %span.lead-info
-            = @lead.updated_at.strftime("%d %B %Y")
-        - if @lead.company.setting.present? && @company.enable_visit_expiring_card
-          .form-group.col-md-4
-            %span.lead-title Since First Visit
-            %span.lead-info
-              = @lead.days_since_first_visit
-        - if @lead.signature.present?
-          .form-group.col-md-12
-            %h4.lead-heading.mt-2.mb-2 Enquiry Consent
-            .form-group.col-md-12
-              %span.lead-title Signature
+              = @lead.status.name
+          - if @company.dead_status_ids.include?(@lead.status_id.to_s) && @lead.dead_reason_id.present?
+            .form-group.col-md-4
+              %span.lead-title Dead Reason
               %span.lead-info
-                = image_tag @lead.signature, class: "border signature_pad_body"
-        .form-group.col-md-12
-          %h4.lead-heading.mt-2.mb-2 Enquiry Comment
-          .form-group.col-md-12
+                = @lead.dead_reason.reason
+          - if @company.dead_status_ids.include?(@lead.status_id.to_s) && @lead.dead_sub_reason.present?
+            .form-group.col-md-4
+              %span.lead-title Dead Reason Comment
+              %span.lead-info
+                = @lead.dead_sub_reason
+          - if @company.token_status_ids.include?(@lead.status_id.to_s) && @company.is_allowed_field?("token_date")
+            .form-group.col-md-4
+              %span.lead-title Token Date
+              %span.lead-info
+                = @lead.token_date&.strftime("%d-%m-%Y")
+          - if @company.is_allowed_field?("presale_stage_id")
+            .form-group.col-md-4
+              %span.lead-title Stage
+              %span.lead-info
+                = @lead.presales_stage&.name
+          - if @lead.tentative_visit_planned.present?
+            .form-group.col-md-4
+              %span.lead-title Proposed Visit Date
+              %span.lead-info
+                = @lead.tentative_visit_planned.strftime("%d-%m-%Y %I:%M %p")
+          .form-group.col-md-4
+            %span.lead-title Follow up 
+            %span.lead-info
+              = @lead.ncd.strftime("%d %B %Y") rescue nil
+          - if @company.is_allowed_field?("user_id")
+            .form-group.col-md-4
+              %span.lead-title Lead Owner
+              %span.lead-info
+                = @lead.user.name rescue nil
+          - if @company.setting.present? && @company.enable_meeting_executives && @company.is_allowed_field?("closing_executive")
+            .form-group.col-md-4
+              %span.lead-title
+                = @company.find_label("closing_executive").present? ? (@company.find_label("closing_executive").custom_value.present? ? @company.find_label("closing_executive").custom_value : @company.find_label("closing_executive").default_value) : 'Sales Person'
+              %span.lead-info
+                = @lead.postsale_user&.name rescue nil
+          .form-group.col-md-4
+            %span.lead-title Last Updated
+            %span.lead-info
+              = @lead.updated_at.strftime("%d %B %Y")
+          - if @lead.company.setting.present? && @company.enable_visit_expiring_card
+            .form-group.col-md-4
+              %span.lead-title Visit Age (in Days)
+              %span.lead-info
+                = @lead.days_since_first_visit
+          - if @lead.signature.present?
+            .form-group.col-md-12
+              %h4.lead-heading.mt-2.mb-2 Enquiry Consent
+              .form-group.col-md-12
+                %span.lead-title Signature
+                %span.lead-info
+                  = image_tag @lead.signature, class: "border signature_pad_body"
+      %h4.lead-heading Notes
+      .lead-body
+        .row
+          .col-md-12
             %span.lead-title Comments
             %span.lead-info
               -#= @lead.comment&.gsub(/\n/, '<br/>')&.html_safe
               = @lead.comment.to_s.strip.gsub(/\r\n?/, "\n").gsub(/\n+/, '<br/>').gsub(/(<br\/>){3,}/, '<br/><br/>').html_safe
     #tab2.tab-pane.fade{:class => ("show active" if @default_tab == 'site-visit-detail')}
-      .row
-        .form-group.col-md-12
-          %h4.lead-heading.mb-3 Visits
-          = link_to 'Add Visit',new_visit_lead_path(@lead), remote: true, class: 'btn btn-new btn-sm'
-          .w-100.mb-4
-          - if @lead.visits.present?
-            .table-responsive
-              %table.table.table-bordered.table-hover
-                %thead
-                  %tr
-                    %th #
-                    %th Date
-                    - if @company.is_sv_project_enabled
-                      %th Project
-                    - if @company.is_allowed_for_visits?('status_id')
-                      %th Status
-                    - if @company.is_allowed_for_visits?('source_id')
-                      %th Source
-                    - if @company.setting.present? && @company.enable_advance_visits
-                      %th Visit Executed
-                    - if @company.is_allowed_for_visits?('location')
-                      %th Location
-                    - if @company.is_allowed_for_visits?('surronding')
-                      %th Surronding
-                    - if @company.is_allowed_for_visits?('finalization_period')
-                      %th Finalization Period
-                    - if @company.is_allowed_for_visits?('loan_sanctioned')
-                      %th Loan Sanctioned
-                    - if @company.is_allowed_for_visits?('bank_name')
-                      %th Bank Name
-                    - if @company.is_allowed_for_visits?('loan_amount')
-                      %th Loan Amount
-                    - if @company.is_allowed_for_visits?('eligibility')
-                      %th Eligibility
-                    - if @company.is_allowed_for_visits?('loan_requirements')
-                      %th Loan Requirement
-                    - if @company.is_allowed_for_visits?('own_contribution_minimum')
-                      %th Min Own Contribution
-                    - if @company.is_allowed_for_visits?('own_contribution_maximum')
-                      %th Max Own Contribution
-                    - if @company.is_allowed_for_visits?('user_id')
-                      %th Presale User
-                    - if @company.is_allowed_for_visits?('comment')
-                      %th Comments
-                    %th Form
-                    - if @lead.company.setting.present? && @lead.company.enable_sv_form_print
-                      %th Print
-                    %th Action
-                %tbody
-                  - @lead.visits.includes(:user).order(created_at: :desc).each.with_index(1) do |visit, i|
+      %h4.lead-heading Site Visit
+      .lead-body
+        .row
+          .form-group.col-md-12
+            = link_to 'New Visit Entry',new_visit_lead_path(@lead), remote: true, class: 'btn btn-new btn-sm'
+            .table-body
+            - if @lead.visits.present?
+              .table-responsive
+                %table.table.table-hover
+                  %thead
                     %tr
-                      %td= i
-                      %td= visit.date.strftime("%d-%B-%Y, %H:%M %p")
+                      %th #
+                      %th Date
                       - if @company.is_sv_project_enabled
-                        %td= visit.projects.pluck(:name).join(', ') rescue nil
+                        %th Project
                       - if @company.is_allowed_for_visits?('status_id')
-                        %td=visit.status_id&.humanize
+                        %th Status
                       - if @company.is_allowed_for_visits?('source_id')
-                        %td=visit.source&.name
+                        %th Source
                       - if @company.setting.present? && @company.enable_advance_visits
-                        %td= visit.is_visit_executed ? "Yes" : "No"
+                        %th Visit Conducted
                       - if @company.is_allowed_for_visits?('location')
-                        %td= visit.location
+                        %th Location
                       - if @company.is_allowed_for_visits?('surronding')
-                        %td= visit.surronding
+                        %th Surronding
                       - if @company.is_allowed_for_visits?('finalization_period')
-                        %td= visit.finalization_period
+                        %th Finalization Period
                       - if @company.is_allowed_for_visits?('loan_sanctioned')
-                        %td= visit.loan_sanctioned
+                        %th Loan Sanctioned
                       - if @company.is_allowed_for_visits?('bank_name')
-                        %td= visit.bank_name
+                        %th Bank Name
                       - if @company.is_allowed_for_visits?('loan_amount')
-                        %td= visit.loan_amount
+                        %th Loan Amount
                       - if @company.is_allowed_for_visits?('eligibility')
-                        %td= visit.eligibility
+                        %th Eligibility
                       - if @company.is_allowed_for_visits?('loan_requirements')
-                        %td= visit.loan_requirements
+                        %th Loan Requirement
                       - if @company.is_allowed_for_visits?('own_contribution_minimum')
-                        %td= visit.own_contribution_minimum
+                        %th Min Own Contribution
                       - if @company.is_allowed_for_visits?('own_contribution_maximum')
-                        %td= visit.own_contribution_maximum
+                        %th Max Own Contribution
                       - if @company.is_allowed_for_visits?('user_id')
-                        %td= visit.user_name
+                        %th Presale User
                       - if @company.is_allowed_for_visits?('comment')
-                        %td.showmore= visit.comment
-                      %td
-                        - if visit.site_visit_form.exists?
-                          = link_to (fa_icon("external-link", class: 'text-light')), visit.site_visit_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+                        %th Notes
+                      %th Form
                       - if @lead.company.setting.present? && @lead.company.enable_sv_form_print
+                        %th Print
+                      %th Task
+                  %tbody
+                    - @lead.visits.includes(:user).order(created_at: :desc).each.with_index(1) do |visit, i|
+                      %tr
+                        %td= i
+                        %td= visit.date.strftime("%d-%B-%Y, %H:%M %p")
+                        - if @company.is_sv_project_enabled
+                          %td= visit.projects.pluck(:name).join(', ') rescue nil
+                        - if @company.is_allowed_for_visits?('status_id')
+                          %td=visit.status_id&.humanize
+                        - if @company.is_allowed_for_visits?('source_id')
+                          %td=visit.source&.name
+                        - if @company.setting.present? && @company.enable_advance_visits
+                          %td= visit.is_visit_executed ? "Yes" : "No"
+                        - if @company.is_allowed_for_visits?('location')
+                          %td= visit.location
+                        - if @company.is_allowed_for_visits?('surronding')
+                          %td= visit.surronding
+                        - if @company.is_allowed_for_visits?('finalization_period')
+                          %td= visit.finalization_period
+                        - if @company.is_allowed_for_visits?('loan_sanctioned')
+                          %td= visit.loan_sanctioned
+                        - if @company.is_allowed_for_visits?('bank_name')
+                          %td= visit.bank_name
+                        - if @company.is_allowed_for_visits?('loan_amount')
+                          %td= visit.loan_amount
+                        - if @company.is_allowed_for_visits?('eligibility')
+                          %td= visit.eligibility
+                        - if @company.is_allowed_for_visits?('loan_requirements')
+                          %td= visit.loan_requirements
+                        - if @company.is_allowed_for_visits?('own_contribution_minimum')
+                          %td= visit.own_contribution_minimum
+                        - if @company.is_allowed_for_visits?('own_contribution_maximum')
+                          %td= visit.own_contribution_maximum
+                        - if @company.is_allowed_for_visits?('user_id')
+                          %td= visit.user_name
+                        - if @company.is_allowed_for_visits?('comment')
+                          %td.showmore= visit.comment
                         %td
-                          = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
-                            %i.fa.fa-print{"aria-hidden" => "true"}
-                      %td
-                        = link_to edit_visit_lead_path(@lead, visit), remote: true, class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
-                          = fa_icon "pencil"
-                        - if current_user.is_super?
-                          = link_to fa_icon('trash', class: 'text-light'), delete_visit_lead_path(@lead, visit), remote: true, method: :delete, class: 'btn btn-danger btn-sm', data: {confirm: "Are you sure?"}
-          - else
-            %h3
-              = "No Visits Avaliable"
+                          - if visit.site_visit_form.exists?
+                            = link_to (fa_icon("external-link", class: 'text-light')), visit.site_visit_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
+                        - if @lead.company.setting.present? && @lead.company.enable_sv_form_print
+                          %td
+                            = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                              %i.fa.fa-print{"aria-hidden" => "true"}
+                        %td
+                          = link_to edit_visit_lead_path(@lead, visit), remote: true, class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                            = fa_icon "pencil"
+                          - if current_user.is_super?
+                            = link_to fa_icon('trash', class: 'text-light'), delete_visit_lead_path(@lead, visit), remote: true, method: :delete, class: 'btn btn-danger btn-sm', data: {confirm: "Are you sure?"}
+            - else
+              %h3
+                = "No Visits Avaliable"

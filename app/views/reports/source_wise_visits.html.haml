@@ -6,24 +6,26 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active SVC SourceReport
-          %h1.m-0 SVC Source Report
+            %li.breadcrumb-item.active Origin Visit Tracker
+          %h1.m-0 Origin Visit Tracker
   .content
     .container-fluid
       .row
         .col-lg-12
           .search-card
             .row
-              .col-md-3
-                %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:-2px;", :class=>"btn btn-primary"}
-                  Advanced Search
-                  %i.fa.fa-angle-down
-              .col-md-9
+              .col-md-5
+                .group-link
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                    = render 'icons/export'
+                    Export
+              .col-md-7
                 .group-link
                   = render 'reports_button', locals: {report_name: :source_wise_visits}
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary" do
-                    = fa_icon "download"
-                    Export
+                 
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
                 .p-2
@@ -58,7 +60,7 @@
             - plottable = {}
             - visit_data = @data.group_by{ |t| t["source_id"] }
             .table-responsive
-              %table.table-bordered.table-condensed.table-hover.table-striped.custom-sorter#basic-data-table{style: 'width:100%!important'}
+              %table.table.table-condensed.table-hover.custom-sorter#basic-data-table{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all Source

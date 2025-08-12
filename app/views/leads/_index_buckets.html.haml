@@ -2,15 +2,15 @@
   = link_to leads_path(todays_call_only: true, is_advanced_search: true), class: "lead-card-link" do
     .lead-card-icon.today_calls_leads_counts
     .lead-card-body
-      %span.title Today's Follow-ups
+      %span.title Active Tasks
       %span.subtitle Calls Today
 / Backlogs
 .lead-card.lead-backlog
   = link_to leads_path(backlogs_only: true, is_advanced_search: true), class: "lead-card-link" do
     .lead-card-icon.backlog_lead_counts
     .lead-card-body
-      %span.title Backlogs
-      %span.subtitle Pending
+      %span.title MFA
+      %span.subtitle Missed Future Activity
 
 - if @company.setting.present? && @company.enable_user_incentive && current_user.user_detail.present?
   .lead-card.lead-incentive-earned
@@ -37,7 +37,7 @@
     = link_to leads_path(visit_expiring: true, is_advanced_search: true), class: "lead-card-link" do
       .lead-card-icon.visit_expiration_count
       .lead-card-body
-        %span.title Visit Expirations
+        %span.title Visit Expiry
         %span.subtitle Soon
 
 - if @company.secondary_source_enabled
@@ -45,7 +45,7 @@
     = link_to leads_path(is_advanced_search: true, merged: true), class: "lead-card-link" do
       .lead-card-icon.merge_lead_counts
       .lead-card-body
-        %span.title Merge Leads
+        %span.title Lead Merge
         %span.subtitle Duplicates
 
 - if @company.hot_status_ids.reject(&:blank?).present?
@@ -77,7 +77,7 @@
     = link_to leads_path(lead_statuses: @company.dead_status_ids, is_advanced_search: true), class: "lead-card-link" do
       .lead-card-icon#dead_lead_counts
       .lead-card-body
-        %span.title Inactive Leads
+        %span.title Drop off Leads
         %span.subtitle Closed
 
 - if @company.setting.present? && @company.enable_visit_counter_card

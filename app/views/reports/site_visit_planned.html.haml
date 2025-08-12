@@ -8,14 +8,14 @@
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Scheduled Visit Planned Report
           %h1.m-0 Scheduled Visit Planned Report
-        .col-md-4.text-right
-          .lead-card.lead-visit
-            %h5
-              Visited
-              = link_to leads_path({visited: true, site_visit_from: @start_date.to_date, site_visit_upto: @end_date.to_date, is_advanced_search: true}.merge!(params)), target: "_blank" do
-                = @leads.joins{visits}.uniq.count
-                .visit_counter.align-fix
-                  = image_tag 'fluent-color--building-people-16.svg'
+        .w-100
+        .lead-card.lead-visit
+          = link_to leads_path({visited: true, site_visit_from: @start_date.to_date, site_visit_upto: @end_date.to_date, is_advanced_search: true}.merge!(params)), target: "_blank", class: "lead-card-link" do
+            .lead-card-icon= @leads.joins{visits}.uniq.count
+            .lead-card-body
+              %span.title Lead Visited
+              %span.subtitle Visited
+          
   .content
     .container-fluid
       .row
@@ -24,17 +24,18 @@
             .search-card
               .row
                 .col-md-7
-                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
-                    Advanced Search
-                    %i.fa.fa-angle-down
+                  .group-link
+                    %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                      = render 'icons/filters'
+                      Smart Search
                 .col-md-5
                   .group-link
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm ml-auto" do
-                      = fa_icon "download"
+                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action ml-auto" do
+                      = render 'icons/export'
                       Export
-                    = link_to params.except(:action, :controller).merge!(calender_view: true), class: "btn btn-primary btn-sm" do
-                      = fa_icon "calendar"
-                      Calender View
+                    = link_to params.except(:action, :controller).merge!(calender_view: true), class: "btn btn-action btn-sm" do
+                      = render 'icons/calendar'
+                      Calender
               #adv-searchbox.box-body
                 = form_tag nil, method: :get, class: "filter-search-menu" do
                   .table-header
@@ -87,7 +88,7 @@
                            
             .table-body
               .table-responsive
-                %table.table.table-bordered.table-hover.table-sm.responsive.nowrap.tablesorter{style: 'width:100%!important'}
+                %table.table.table-hover.responsive.nowrap.tablesorter{style: 'width:100%!important'}
                   %thead
                     %tr
                       %th Name
@@ -120,7 +121,3 @@
               - if @leads.present?
                 = will_paginate @leads, class: "ct-pag"
 
-:css
-  th a {
-    color:#fff;
-  }
