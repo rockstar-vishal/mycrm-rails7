@@ -272,7 +272,7 @@
           - if current_user.company.setting.present? && current_user.company.enable_accounts
             %li.nav-item.has-treeview{class: "#{['payment_plans', 'cost_sheets'].include?(params[:controller]) ? 'menu-open' : ''}"}
               = link_to '#', class: "nav-link #{'active' if ['payment_plans', 'cost_sheets'].include?(params[:controller])}" do
-                = render partial: 'icons/setings'
+                = render partial: 'icons/settings'
                 %p
                   Finance
                 
