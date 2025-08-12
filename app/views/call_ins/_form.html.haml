@@ -9,15 +9,15 @@
           %li= message
   - if current_user.is_sysad?
     .row
-      .col-md-5.required
+      .col-md-6.required
         .form-group
           = f.text_field :number, class: "form-control", placeholder: "Number"
-      .col-md-5
+      .col-md-6
         .form-group
           = f.select :company_id, options_from_collection_for_select(::Company.active, :id, :name, @call_in.company_id), {prompt: "Please Select", label: "Select Company"}, class: 'form-control'
-      .col-md-2
+      .col-md-6
         .form-group
-          = f.check_box :active, class: 'form-control'
+          = f.check_box :active, class: ''
   - else
     .row
       .col-md-4
@@ -26,12 +26,12 @@
         = f.select :user_id, options_from_collection_for_select(current_user.manageables, :id, :name, @call_in.user_id), {prompt: "Please Select", label: "Select User"}, class: 'form-control'
       .col-md-4
         = f.text_field :source_name, class: "form-control", placeholder: "Source Name"
-  %div{align: "center"}
+
     .col-md-12
-      .form-group
-        = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
-          = fa_icon "floppy-o"
-          Save
-        = link_to call_ins_path, class: "btn btn-danger" do
-          = fa_icon "close"
-          Cancel
+  .form-group
+    = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
+      
+      Save
+    = link_to call_ins_path, class: "btn btn-danger" do
+    
+      Cancel

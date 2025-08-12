@@ -1,10 +1,10 @@
 - unless params[:start_date] && params[:end_date]
   - params[:selected] = 'fbtn'
 
-= link_to "Today", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today, end_date: Date.today, selected: 'ibtn'), class: "ml-auto btn  btn-primary #{('elevation-2' if params[:selected] == 'ibtn')}"
-= link_to "Last 7 Days", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today-7.days, end_date: Date.today, selected: 'fbtn'), class: "btn  btn-primary  #{('elevation-2' if params[:selected] == 'fbtn')}"
-= link_to "Last 30 Days", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today-30.days, end_date: Date.today, selected: 'sbtn'), class: "btn  btn-primary  #{('elevation-2' if params[:selected] == 'sbtn')}"
-= link_to "This Month", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today.beginning_of_month, end_date: Date.today.end_of_month, selected: 'tbtn'), class: "btn  btn-primary #{('elevation-2' if params[:selected] == 'tbtn')}"
-= link_to "Last Month", polymorphic_path([:reports, locals[:report_name]], start_date: (Date.today-1.month).beginning_of_month, end_date: (Date.today-1.month).end_of_month, selected: 'lbtn'), class: "btn  btn-primary  #{('elevation-2' if params[:selected] == 'lbtn')}"
+= link_to "Today", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today, end_date: Date.today, selected: 'ibtn'), class: "ml-auto btn  btn-action-days #{('btn-active-tab' if params[:selected] == 'ibtn')}"
+= link_to "Last 7 Days", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today-7.days, end_date: Date.today, selected: 'fbtn'), class: "btn  btn-action-days  #{('btn-active-tab' if params[:selected] == 'fbtn')}"
+= link_to "Last 30 Days", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today-30.days, end_date: Date.today, selected: 'sbtn'), class: "btn  btn-action-days  #{('btn-active-tab' if params[:selected] == 'sbtn')}"
+= link_to "This Month", polymorphic_path([:reports, locals[:report_name]], start_date: Date.today.beginning_of_month, end_date: Date.today.end_of_month, selected: 'tbtn'), class: "btn  btn-action-days #{('btn-active-tab' if params[:selected] == 'tbtn')}"
+= link_to "Last Month", polymorphic_path([:reports, locals[:report_name]], start_date: (Date.today-1.month).beginning_of_month, end_date: (Date.today-1.month).end_of_month, selected: 'lbtn'), class: "btn  btn-action-days  #{('btn-active-tab' if params[:selected] == 'lbtn')}"
 - first_lead_date = current_user.company.leads.order(created_at: :asc).first&.created_at&.to_date || Date.today
-= link_to "Till Date", polymorphic_path([:reports, locals[:report_name]],start_date: first_lead_date, end_date: Date.today, selected: 'tdbtn'), class: "btn  btn-primary  #{('elevation-2' if params[:selected] == 'tdbtn')}"
+= link_to "Till Date", polymorphic_path([:reports, locals[:report_name]],start_date: first_lead_date, end_date: Date.today, selected: 'tdbtn'), class: "btn  btn-action-days  #{('btn-active-tab' if params[:selected] == 'tdbtn')}"

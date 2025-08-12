@@ -21,7 +21,7 @@
                   = link_to 'Add ExoPhone', new_exotel_sid_path, remote: true,class: 'btn btn-new ml-auto'
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th Name
@@ -34,8 +34,7 @@
                   - @exotel_sids.each do |exotel_sid|
                     %tr
                       %td
-                        %strong
-                          = exotel_sid.number
+                        = exotel_sid.number
                       %td
                         %span.more= exotel_sid.description
                       %td= (exotel_sid.is_active? ? "Active" : "Inactive")

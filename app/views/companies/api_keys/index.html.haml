@@ -22,7 +22,7 @@
 
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all #
@@ -51,7 +51,7 @@
                             data: {:confirm => "Would you like to permanently delete this API Keys?", "commit-class" => "btn btn-action btn-remove", "cancel-class" => "btn btn-action btn-remove"} do
                           = fa_icon "trash-o"
 
-        - if @keys.present?
-          .pagination-custom-holder
-            %strong{style: "margin-left: 0;"} Api Keys Count - #{@keys.count}
-            = will_paginate @keys, :class  =>  "ct-pag"
+          - if @keys.present?
+            .pagination-custom-holder
+              %label{style: "margin-left: 0;"} Api Keys Count - #{@keys.count}
+              = will_paginate @keys, :class  =>  "ct-pag"

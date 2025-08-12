@@ -6,26 +6,27 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Inactive Lead Report
-          %h1.m-0 Inactive Lead Report
+            %li.breadcrumb-item.active Drop Off Leads
+          %h1.m-0 Drop Off Leads
   .content
     .container-fluid
       .row
         .col-lg-12
           .search-card
             .row
-              .col-md-3
-                = render 'report_search'
-              .col-md-9
+              .col-md-5
+                .group-link
+                  = render 'report_search'
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                    = render 'icons/export'
+                    Export
+              .col-md-7
                 .group-link
                   = render 'reports_button', locals: {report_name: :dead}
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary" do
-                    = fa_icon "download"
-                    Export
           .table-body
             - plottable = {}
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all User

@@ -8,15 +8,15 @@
         - @country.errors.full_messages.each do |message|
           %li= message
   .row
-    .col-md-6
-      .form-group
-        = f.text_field :name, class: "form-control", placeholder: "Name"
-  %div{align: "center"}
     .col-md-12
       .form-group
-        = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
-          = fa_icon "floppy-o"
+        = f.text_field :name, class: "form-control", placeholder: "Name"
+
+    .col-md-12
+      .form-group
+        = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+        
           Save
-        = link_to countries_path, class: "btn btn-danger" do
-          = fa_icon "close"
+        = link_to countries_path, class: "btn btn-delete" do
+          
           Cancel

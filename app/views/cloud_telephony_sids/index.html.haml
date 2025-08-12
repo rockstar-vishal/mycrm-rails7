@@ -21,7 +21,7 @@
                   = link_to 'Add CloudTelephony', new_cloud_telephony_sid_path, remote: true,class: 'btn btn-new ml-auto'
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th Name
@@ -33,8 +33,7 @@
                   - @cloud_telephony_sids.each do |cloud_telephony_sid|
                     %tr
                       %td
-                        %strong
-                          = cloud_telephony_sid.number
+                        = cloud_telephony_sid.number
                       %td 
                         = cloud_telephony_sid.vendor
                       %td

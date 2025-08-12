@@ -11,24 +11,25 @@
           %h1.m-0 Outbound Calls
         - unless params[:is_advanced_search].present? || params[:search_query].present?
           .col-md-12
-            .lead-card.lead-missed
-              %h5
-                Missed Calls
-                = link_to outbound_logs_leads_path(missed_calls: true, is_advanced_search: true) do
-                  = @call_logs.missed.count
-                  = image_tag 'missed-call.svg'
-            .lead-card.lead-incoming
-              %h5
-                Today's Outbound Calls
-                = link_to outbound_logs_leads_path(todays_calls: true, is_advanced_search: true) do
-                  = @call_logs.todays_calls.count
-                  = image_tag 'incoming-call.svg'
-            .lead-card.lead-old-incoming
-              %h5
-                Past Outbound Calls
-                = link_to outbound_logs_leads_path(past_calls_only: true, is_advanced_search: true) do
-                  = @call_logs.past_calls.count
-                  = image_tag 'outgoing-call.svg'
+          .lead-card.lead-backlog
+            = link_to outbound_logs_leads_path(missed_calls: true, is_advanced_search: true), class: "lead-card-link" do
+              .lead-card-icon= @call_logs.missed.count
+              .lead-card-body
+                %span.title Missed Calls
+                %span.subtitle Tracker
+          .lead-card.lead-follow-up
+            = link_to outbound_logs_leads_path(todays_calls: true, is_advanced_search: true), class: "lead-card-link" do
+              .lead-card-icon= @call_logs.todays_calls.count
+              .lead-card-body
+                %span.title Today's Outbound Calls
+                %span.subtitle Tracker
+          .lead-card.lead-dead  
+            = link_to outbound_logs_leads_path(past_calls_only: true, is_advanced_search: true), class: "lead-card-link" do
+              .lead-card-icon= @call_logs.past_calls.count
+              .lead-card-body
+                %span.title Past Outbound Calls
+                %span.subtitle Tracker
+        
   .content
     .container-fluid
       .row
@@ -36,14 +37,15 @@
           .search-card
             .row
               .col-md-7
-                %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
-                  Advanced Search
-                  %i.fa.fa-angle-down
+                .group-link
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
               .col-md-5
                 .group-link
                   - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present?)
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
-                      = fa_icon "download"
+                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action ml-auto" do
+                      = render 'icons/export'
                       Export
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
@@ -192,7 +194,7 @@
                               = render partial: 'icons/edit'
               - if @call_logs.present?
                 %br
-                  %strong{style: "margin-left: 11px;"} Call Logs Count - #{@call_logs.count}
+                  %label Call Logs Count - #{@call_logs.count}
                   = will_paginate @call_logs, :class  =>  "ct-pag"
 :javascript
   $('.call').click(function(){

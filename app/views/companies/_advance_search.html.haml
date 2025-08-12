@@ -1,21 +1,24 @@
 #adv-searchbox.box-body
   = form_tag nil, method: :get, class: "filter-search-menu" do
     = hidden_field_tag :is_advanced_search, true
-    .col-xs-6.col-md-2
-      .form-group
-        .input-group
-          .input-group-addon
-            = fa_icon "calendar"
-          = text_field_tag :renewal_from, params[:renewal_from], class: "form-control dateFormat", placeholder: "Renewal Date From"
-    .col-xs-6.col-md-2
-      .form-group
-        .input-group
-          .input-group-addon
-            = fa_icon "calendar"
-          = text_field_tag :renewal_upto, params[:renewal_upto], class: "form-control dateFormat", placeholder: "Renewal Date Upto"
-    .w-100
-    .col-xs-6.col-md-2
-      .form-group
-        = button_tag type: "submit", class: "btn btn-primary btn-flatbtn" do
-          = fa_icon "search"
-          Search
+    .row
+      .col-12
+        %h4.mb-4 Smart Search
+      .col-xs-6.col-md-6
+        .form-group
+          .input-group
+            .input-group-addon
+              = fa_icon "calendar"
+            = text_field_tag :renewal_from, params[:renewal_from], class: "form-control dateFormat", placeholder: "Renewal Date From"
+      .col-xs-6.col-md-6
+        .form-group
+          .input-group
+            .input-group-addon
+              = fa_icon "calendar"
+            = text_field_tag :renewal_upto, params[:renewal_upto], class: "form-control dateFormat", placeholder: "Renewal Date Upto"
+      .w-100
+      .col-xs-6.col-md-4
+        .form-group
+          = button_tag type: "submit", class: "btn btn-primary btn-flatbtn" do
+            
+            Search

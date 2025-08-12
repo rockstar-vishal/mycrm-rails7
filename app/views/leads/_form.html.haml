@@ -22,7 +22,7 @@
         - unless current_user.is_telecaller?
           .col-md-3{class: ("required" if @company.is_required_fields?("mobile"))}
             .form-group
-              = f.text_field :mobile, class: "form-control", placeholder: "Mobile", required: @company.is_required_fields?("mobile"), disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("mobile"))
+              = f.text_field :mobile, class: "form-control", placeholder: "Contact", required: @company.is_required_fields?("mobile"), disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("mobile"))
     - if @company.is_allowed_field?("email")
       .col-md-3{class: ("required" if @company.is_required_fields?("email"))}
         .form-group

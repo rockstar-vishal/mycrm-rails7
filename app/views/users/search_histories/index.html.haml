@@ -6,8 +6,8 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Search Histories
-          %h1.m-0.text-dark Search Histories
+            %li.breadcrumb-item.active My Reports
+          %h1.m-0.text-dark My Reports
   .content
     .container-fluid
       .row
@@ -15,7 +15,7 @@
           .table-card
             .table-body
               .table-responsive
-                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap
+                %table.table.table-hover.dataTables.responsive.nowrap
                   %thead
                     %tr
                       %th.desktop #
@@ -35,4 +35,4 @@
                             Delete
           - if @histories.present?
             .pagination-custom-holder
-              %strong{style: "margin-left: 0;"} Searches Count - #{@histories.count}
+              %label{style: "margin-left: 0;"} Searches Count - #{@histories.count}

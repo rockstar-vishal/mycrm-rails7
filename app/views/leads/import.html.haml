@@ -12,11 +12,11 @@
   .content
     .container-fluid
       .row
-        .col-lg-12
-          .test-body
+        .col-lg-6
+          .import-card
             = form_tag import_leads_path, method: :post, multipart: true, class: '' do
               .row
-                .form-group.col-md-6
+                .form-group.col-md-12
                   .input-group
                     .custom-file
                       = file_field_tag :lead_file, accept: 'text/csv', :class=>"custom-file-input", :required=>true
@@ -25,5 +25,5 @@
                       = button_tag type: "submit", class: 'btn btn btn-new', data: { disable_with: 'Please wait...' } do
                         = fa_icon "upload"
                         Upload
-                  .form-group.col-md-12.mt-3.mb-4.p-0
-                    = link_to "Sample CSV", "/sample-leads.csv", :class=>"btn btn-download"
+                .col-md-12
+                  = link_to "Sample CSV", "/sample-leads.csv", :class=>"btn btn-download"

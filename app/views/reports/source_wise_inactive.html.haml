@@ -6,8 +6,8 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Source Inactive Lead Report
-          %h1.m-0 Source Inactive Lead Report
+            %li.breadcrumb-item.active Lead Origin Drop Off
+          %h1.m-0 Lead Origin Drop Off
   .content
     .container-fluid
       .row
@@ -15,17 +15,18 @@
           .search-card
             .row
               .col-md-3
+                .group-link
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                    = fa_icon "download"
+                    Export
               .col-md-9
                 .group-link
                   = render 'reports_button', locals: {report_name: :source_wise_inactive}
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
-                    = fa_icon "download"
-                    Export
               = render 'report_search'
           .table-body
             - plottable = {}
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all Source

@@ -23,7 +23,7 @@
 
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all Sr.
@@ -54,7 +54,10 @@
                       %td
                         = (camp.projects.pluck(:name).join(', ') rescue "")
                       %td
-                        = link_to "Import", campaigns_path, remote: true, class: "btn btn-action import-spend", data: {toggle: "modal", target: "#spendModal", campaign_id: camp.uuid}
+                        
+                        = link_to campaigns_path, remote: true, class: "btn btn-action import-spend", data: {toggle: "modal", target: "#spendModal", campaign_id: camp.uuid} do
+                          = render partial: 'icons/import'
+                          
                       %td
                         = link_to edit_campaign_path(camp.uuid), remote: true, class: "btn btn-action btn-edit" do
                           = render partial: 'icons/edit'

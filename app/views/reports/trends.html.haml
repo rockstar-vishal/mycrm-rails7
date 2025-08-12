@@ -6,19 +6,20 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Lead Volume Report
-          %h1.m-0 Lead Volume Report
+            %li.breadcrumb-item.active Lead Traffic
+          %h1.m-0 Lead Traffic
   .content
     .container-fluid
       .row
         .col-lg-12
           .search-card
             .row
-              .col-md-3
-                %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary btn-sm"}
-                  Advanced Search
-                  %i.fa.fa-angle-down
-              .col-md-9
+              .col-md-5
+                .group-link
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
+              .col-md-7
                 .group-link
                   = render 'reports_button', locals: {report_name: :trends}
             #adv-searchbox.box-body

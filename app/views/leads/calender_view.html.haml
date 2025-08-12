@@ -15,15 +15,16 @@
           .search-card
             .row
               .col-md-6
-                %a#adv-search.btn.btn-primary.btn-sm{:href => "javascript:void(0);"}
-                  Advanced Search
-                  %i.fa.fa-angle-down
+                .group-link
+                  %a#adv-search.btn.btn-filter.btn-sm{:href => "javascript:void(0);"}
+                    = render 'icons/filters'
+                    Smart Search
               .col-md-6
                 .group-link
-                  = link_to leads_path, class: "btn btn-primary ml-auto" do
-                    = fa_icon "table"
+                  = link_to leads_path, class: "btn btn-action ml-auto" do
+                    
                     Table View
-                  = link_to calender_view_leads_path, class: "btn btn-primary" do
+                  = link_to calender_view_leads_path, class: "btn btn-action" do
                     = fa_icon "refresh"
               
             = render partial: 'calender_view_advance_search'

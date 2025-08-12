@@ -1,6 +1,7 @@
-%a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
-  Advanced Search
-  %i.fa.fa-angle-down
+.group-link
+  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+    = render 'icons/filters'
+    Smart Search
 #adv-searchbox.box-body
   = form_tag nil, method: :get, class: "filter-search-menu" do
     .p-2

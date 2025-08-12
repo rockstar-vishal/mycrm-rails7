@@ -7,27 +7,32 @@
             %li.breadcrumb-item
               %a{:href => "/"} Home
             %li.breadcrumb-item.active
-              #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Closing Manager'} Report
+              #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Sales Manager'} Report
           %h1.m-0
-            #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Closing Manager'} Report
+            #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Sales Manager'} Report
   .content
     .container-fluid
       .row
         .col-lg-12
           .search-card
             .row
-              .col-md-3
-              .col-md-9
+              .col-md-5
+                .group-link
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
+                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                    = render 'icons/export'
+                    Export
+              .col-md-7
                 .group-link
                   = render 'reports_button', locals: {report_name: :closing_executives}
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary" do
-                    = fa_icon "download"
-                    Export
+                 
               = render 'report_search'
           .table-body
             - plottable = {}
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all User
