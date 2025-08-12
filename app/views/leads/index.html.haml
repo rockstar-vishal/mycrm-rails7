@@ -1,13 +1,13 @@
 .content-wrapper
   .content-header
     .container-fluid
-      .row.mb-2
+      .row
         .col-md-12
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Lead Management
-          %h1.m-0 Lead Management
+            %li.breadcrumb-item.active Funnel
+          %h1.m-0 Funnel
         - if @company.setting.present? && @company.enable_cards_on_advance_search
           = render "filtered_index_buckets", locals: {:@company => @company, :@leads => @leads}
         - elsif @company.card_status.reject(&:blank?).present?
@@ -23,7 +23,7 @@
           .table-card
             .search-card
               .row
-                .col-md-7
+                .col-md-5
                   .search-outer
                     = form_tag leads_path, method: :get do
                       .search-group
@@ -32,31 +32,32 @@
                           - params[:lead_statuses].each do |status_id|
                             = hidden_field_tag 'lead_statuses[]',  status_id
                         - unless params[:deactivated].present?   
-                          = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by name, enquiry no, email or phone"
+                          = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search leads"
                           .search-group-btn
                             = button_tag type: "submit", class: "btn btn-default search-btn" do
                               = fa_icon "search"
                             = link_to leads_path, class: "btn btn-default search-btn refresh" do
                               = fa_icon "refresh"
-                    %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary btn-sm"}
-                      Advanced Search
-                      %i.fa.fa-angle-down
-                .col-md-5
+                    %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                      = render 'icons/filters'
+                      Smart Search
+                .col-md-7
                   .group-link
                     - if current_user.is_super? || current_user.can_import
                       = link_to import_leads_path, :class=>"ml-auto", target: "_blank" do
-                        = fa_icon "upload"
+                        = render 'icons/import'
                         Import
                     - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && @company.setting.present? && @company.enable_executive_export_leads)
+
                       = link_to search_params.merge!(format: :csv), class: "" do
-                        = fa_icon "download"
+                        = render 'icons/export'
                         Export
                     - if current_user.is_super? && @company.enable_lead_export && current_user.company.daily_file_exports < 2
-                      = link_to search_params, remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
-                        = fa_icon "download"
+                      = link_to params.except(:action, :controller), remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
+                        = render 'icons/export'
                         Export All
                     = link_to calender_view_leads_path, class: "" do
-                      = fa_icon "calendar"
+                      = render 'icons/calendar'
                       Calender
                   
                   
@@ -74,15 +75,15 @@
                 - if current_user.is_super? || current_user.can_import?
                   = render 'bulk_action'
                 .table-responsive
-                  %table.table.table-bordered.table-condensed.table-striped.tablesorter
+                  %table.table.tablesorter
                     %thead
                       %tr
                         - unless params[:deactivated].present?
-                          %th{"data-sorter"=> "false", style: "width:3%;"}
+                          %th{"data-sorter"=> "false"}
                             = check_box_tag 'checkbox', nil, false, class: 'select-all bulk-select'
                         -if company_index_fields.include?("name")
-                          %th Name
-                          %th Source
+                          %th Lead
+                          %th Origin
                         -if magic_index_fields.include?("firm_name")
                           %th Firm Name
                         -if magic_index_fields.include?("designation")
@@ -90,19 +91,19 @@
                         -if magic_index_fields.include?("area")
                           %th Area
                         -if company_index_fields.include?("mobile")
-                          %th Call/Mobile
+                          %th Dialler
                         -if company_index_fields.include?("user_id")
-                          %th Assigned To
+                          %th Lead Owner
                         -if @company.setting.present? && @company.enable_meeting_executives && company_index_fields.include?("closing_executive")
                           %th= @company.find_label("closing_executive").present? ? (@company.find_label("closing_executive").custom_value.present? ? @company.find_label("closing_executive").custom_value : @company.find_label("closing_executive").default_value) : 'Closing Executive'
                         -if company_index_fields.include?("status_id")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
                               = link_to search_params.merge(key: "status_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
-                                Status
+                                Stage
                             - else
                               = link_to search_params.merge(key: "status_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
-                                Status
+                                Stage
                         -if company_index_fields.include?('presale_stage_id')
                           %th Stage
                         -if company_index_fields.include?("project_id")
@@ -112,21 +113,21 @@
                                 Project
                             - else
                               = link_to search_params.merge(key: "project_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
-                                Project
+                                Product
                         -if company_index_fields.include?("broker_id")
                           %th Broker
                         -if company_index_fields.include?("comment")
-                          %th Description
+                          %th Notes
                         -if company_index_fields.include?("other_phones")
                           %th Other Contacts
                         -if company_index_fields.include?("ncd")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
                               = link_to search_params.merge(key: "ncd", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
-                                Next Call Date
+                                Follow up 
                             - else
                               = link_to search_params.merge(key: "ncd", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
-                                Next Call Date
+                                Follow up 
                         -if company_index_fields.include?("budget")
                           %th Budget
                         -if company_index_fields.include?("sub_source")
@@ -156,7 +157,7 @@
                         - magic_index_fields.each do |field|
                           %th
                             = field.pretty_name
-                        %th Action
+                        %th Task
                     %tbody
                       - if @leads.present?
                         - @leads.each do |lead|
@@ -167,7 +168,7 @@
                                 = check_box_tag 'lead_ids[]', lead.id, false, class: 'bulk-select'
                             -if company_index_fields.include?("name")
                               %td
-                                - lead_name = lead.name.present? ? lead.name : '--'
+                                - lead_name = lead.name.present? ? lead.name.downcase : '--'
                                 = link_to lead_name, params[:deactivated].present? ? "#" : lead_path(lead), remote: true, class: "show-detail-btn"
                               %td 
                                 - if company_index_fields.include?("source_id") && current_user.check_source_presence
@@ -202,20 +203,22 @@
                               %td= lead.postsale_user.name rescue nil
                             -if company_index_fields.include?("status_id")
                               %td
-                                = lead.status.name rescue nil
-                                - if lead.visits.present?
-                                  - if current_user.company.enable_advance_visits
-                                    - visit_count = lead.visits.executed.count
-                                  - else
-                                    - visit_count = lead.visits.count
-                                  - unless visit_count.zero?
-                                    %br
-                                    = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-bs-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
-                                      = "Visits: #{visit_count}"
+                                .stage-fix
+                                  .badge-status= lead.status.name rescue nil
+                                  - if lead.visits.present?
+                                    - if current_user.company.enable_advance_visits
+                                      - visit_count = lead.visits.executed.count
+                                    - else
+                                      - visit_count = lead.visits.count
+                                    - unless visit_count.zero?
+                                      %br
+                                      = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-bs-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
+                                        = "Visits: #{visit_count}"
                             -if company_index_fields.include?('presale_stage_id')
                               %td= lead.presales_stage&.name
                             -if company_index_fields.include?("project_id")
-                              %td= lead.project.name rescue nil
+                              %td
+                                .badge-status-project= lead.project.name rescue nil
                             - if company_index_fields.include?("broker_id")
                               %td
                                 = lead.broker&.name
@@ -283,10 +286,6 @@
                   
                   %strong{style: "text-align: center; display: block;"} Lead Count - #{@leads_count}
                   = will_paginate @leads, :class  =>  "ct-pag"
-:css
-  th a {
-    color:#fff;
-  }
 
 :javascript
   $(document).ready(function(){

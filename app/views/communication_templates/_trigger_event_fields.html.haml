@@ -1,5 +1,5 @@
 = javascript_include_tag 'notification_templates'
-.nested-fields.col-md-12#event-nested_fields{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
+.nested-fields.col-md-12#event-nested_fields{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px; margin-bottom:10px"}
   .row
     .col-md-3
       .form-group
@@ -34,10 +34,11 @@
     .col-md-12
       .form-group
         %label.col-sm-6.control-label{:for => "exampleInputFile"} Notification Template:
-        #communication_attributes.row
-          = f.fields_for :communication_attributes do |attribute|
-            = render "communication_attribute_fields", :f => attribute
-          .links.m-4
-            = link_to_add_association "Add Text & Attribute", f, :communication_attributes, class: "btn btn-primary"
+        #communication_attributes
+          .row
+            = f.fields_for :communication_attributes do |attribute|
+              = render "communication_attribute_fields", :f => attribute
+            .links.m-4
+              = link_to_add_association "Add Text & Attribute", f, :communication_attributes, class: "btn btn-download"
   %center
     = link_to_remove_association "Remove", f, class: "btn btn-danger btn-sm"

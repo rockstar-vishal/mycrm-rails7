@@ -2,12 +2,17 @@
   .content-header
     .container-fluid
       .row.mb-2
-        .col-md-9
+        .col-12
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Users
-          %h1.m-0 Users
+        .col-md-6
+          %h1.m-0.text-dark Users
+        .col-md-6
+          - if current_user.may_add_user?
+            = link_to 'Add New User', new_user_path, class: 'btn btn-new float-right'
+
   .content
     .container-fluid
       .row
@@ -18,25 +23,23 @@
                 .search-outer
                   = form_tag users_path, method: :get do
                     .search-group 
-                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by name, email or phone"
+                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search users"
                       .search-group-btn
                         = button_tag type: "submit", class: "btn btn-default search-btn" do
                           = fa_icon "search"
                         = link_to users_path, class: "btn btn-default search-btn refresh" do
                           = fa_icon "refresh"
-                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-primary"}
-                    Advanced Search
-                    %i.fa.fa-angle-down
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
               .col-md-5
                 .group-link
                   - if current_user.is_super?
                     = link_to users_params.merge!(format: :csv), class: "btn btn-primary ml-auto" do
-                      = fa_icon "download"
+                      = render 'icons/export'
                       Export
                 
-                  - if current_user.may_add_user?
-                    = link_to 'Add New User', new_user_path,
-                      class: 'btn btn-new'
+                  
               #adv-searchbox.box-body
                 = form_tag nil, method: :get, class: "filter-search-menu" do
                   = hidden_field_tag :is_advanced_search, true
@@ -84,7 +87,7 @@
                             Search
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th Full Name
@@ -114,7 +117,7 @@
                           = link_to user_path(user.uuid), class: "btn btn-danger", method: :delete,
                             data: {:confirm => "Would you like to permanently delete this user?", "commit-class" => "btn btn-success", "cancel-class" => "btn btn-danger"}, style: "padding: 0px; width: 20px;" do
                             = fa_icon "trash-o"
-        - if @users.present?
-          .pagination-custom-holder
-            %strong{style: "margin-left: 0;"} Users Count - #{@users.total_entries}
-            = will_paginate @users, :class  =>  "ct-pag"
+            - if @users.present?
+              .pagination-custom-holder
+                %label{style: "margin-left: 0;"} Users Count - #{@users.total_entries}
+                = will_paginate @users, :class  =>  "ct-pag"

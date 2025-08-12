@@ -17,13 +17,13 @@
       = hidden_field_tag :enable_advance_visits, @lead.company.setting.present? && @lead.company.enable_advance_visits
       .row
         - if @company.is_allowed_for_visits?('source_id')
-          .col-md-6
+          .col-md-12
             = f.select :source_id, options_from_collection_for_select(@company.sources, :id, :name, f.object.source_id), {:prompt=>true}
       .col-md-12
         .form-group
           = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
-            = fa_icon "floppy-o"
+            
             Save
           = link_to onsite_leads_path, class: "btn btn-danger" do
-            = fa_icon "close"
+           
             Cancel

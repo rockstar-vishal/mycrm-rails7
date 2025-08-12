@@ -21,7 +21,7 @@
                   = link_to 'Add New ExoPhone', new_mcube_sid_path, remote: true,class: 'btn btn-new ml-auto'
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th Name
@@ -32,8 +32,7 @@
                   - @mcube_sids.each do |mcube_sid|
                     %tr
                       %td
-                        %strong
-                          = mcube_sid.number
+                        = mcube_sid.number
                       %td
                         %span.more= mcube_sid.description
                       %td= (mcube_sid.is_active? ? "Active" : "Inactive")

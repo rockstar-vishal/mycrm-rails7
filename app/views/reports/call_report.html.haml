@@ -12,20 +12,24 @@
     .container-fluid
       .row
         .col-lg-12
-          .card
-            .card-header
-              - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present? && current_user.company.enable_call_center_dashboard)
-                = link_to call_log_report_params.merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
-                  = fa_icon "download"
-                  Export
-              .pull-right
-                %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:-2px;", :class=>"btn btn-primary btn-sm"}
-                  Advanced Search
-                  %i.fa.fa-angle-down
-              = link_to call_log_report_params.merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
-                = fa_icon "download"
-                Export
-              = render 'reports_button', locals: {report_name: :call_report}
+          
+          .search-card
+            .row
+              .col-md-5
+                .group-link
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
+                  - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present? && current_user.company.enable_call_center_dashboard)
+                    = link_to call_log_report_params.merge!(format: :csv), class: "btn btn-action" do
+                      = render 'icons/export'
+                      Export
+                    = link_to call_log_report_params.merge!(format: :csv), class: "btn btn-action" do
+                      = render 'icons/export'
+                      Export
+              .col-md-7
+                .group-link
+                  = render 'reports_button', locals: {report_name: :call_report}
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
                 = hidden_field_tag :is_advanced_search, true
@@ -100,7 +104,7 @@
               - total_avg_talk_time = 0
               - total_avg_duration = 0
               .table-responsive
-                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                   %thead
                     %tr
                       %th.all User

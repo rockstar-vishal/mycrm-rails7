@@ -16,7 +16,7 @@
       = hidden_field_tag :authenticity_token, form_authenticity_token
       = hidden_field_tag :enable_advance_visits, @lead.company.setting.present? && @lead.company.enable_advance_visits
       .row
-        .col-md-6
+        .col-md-4
           = f.text_field :date, :value=>(Time.zone.parse(f.object.date.to_s) rescue nil), label: 'Visit Date', class: "form-control datetimepicker", placeholder: "Visit Date"
         - if @company.is_allowed_for_visits?('status_id')
           .col-md-6
@@ -46,8 +46,8 @@
         - if @company.is_allowed_for_visits?('finalization_period')
           .col-md-6
             = f.text_field :finalization_period, class: "form-control", placeholder: "Finalization Period"
-        .visit_executed_fields
-          .col-md-6
+        .col-12.visit_executed_fields
+          .col-md-12
             = f.file_field :site_visit_form, label: 'Visit Form', class: "form-control"
       .visit_executed_fields
         .row
@@ -82,11 +82,11 @@
               = f.text_field :own_contribution_maximum, class: "form-control", placeholder: "Maximum Own Contriution", label: "Maximum Own Contribution"
       .col-md-12
         .form-group
-          = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
-            = fa_icon "floppy-o"
+          = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+           
             Save
-          = link_to lead_path(@lead), remote: true, class: "btn btn-danger" do
-            = fa_icon "close"
+          = link_to lead_path(@lead), remote: true, class: "btn btn-delete" do
+            
             Cancel
 :javascript
   $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});

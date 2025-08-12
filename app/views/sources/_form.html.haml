@@ -17,19 +17,19 @@
           {include_blank: "Status"}, class: 'form-control'
     .col-md-2
       .form-group
-        = f.check_box :is_cp, class: 'form-control'
+        = f.check_box :is_cp, class: ''
     .col-md-2
       .form-group
-        = f.check_box :is_digital, class: 'form-control'
+        = f.check_box :is_digital, class: ''
     .col-md-2
       .form-group
-        = f.check_box :is_reference, class: 'form-control'
-  %div{align: "center"}
+        = f.check_box :is_reference, class: ''
+
     .col-md-12
       .form-group
         = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
-          = fa_icon "floppy-o"
+         
           Save
         = link_to sources_path, class: "btn btn-danger" do
-          = fa_icon "close"
+          
           Cancel

@@ -6,9 +6,9 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Fb Pages
+            %li.breadcrumb-item.active Meta Sync
         .col-sm-12
-          %h1.m-0 Fb Pages
+          %h1.m-0 Meta Sync
   .content
     .container-fluid
       .row
@@ -16,10 +16,10 @@
           .search-card
             .row
               .col-md-3
-                = button_tag "Re-Load From Facebook", id: "fb-login", class: 'loginBtn loginBtn--facebook', style: "color:white;"
+                = button_tag "Re-Load From Meta", id: "fb-login", class: 'loginBtn loginBtn--facebook', style: "color:white;"
               .col-md-9
           .table-body
-            %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.table-striped
+            %table.table.table-hover.dataTables.responsive.table-striped
               %thead
                 %tr
                   %th Page FB ID

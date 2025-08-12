@@ -6,8 +6,8 @@
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
-            %li.breadcrumb-item.active Brokers
-          %h1.m-0 Brokers
+            %li.breadcrumb-item.active Broker Setup
+          %h1.m-0 Broker Setup
   .content
     .container-fluid
       .row
@@ -18,7 +18,7 @@
                 .search-outer
                   = form_tag brokers_path, method: :get do
                     .search-group
-                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search by name/firm name/contact .."
+                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search Broker."
                       .search-group-btn
                         = button_tag type: "submit", class: "btn btn-default search-btn" do
                           = fa_icon "search"
@@ -42,7 +42,7 @@
                   = link_to 'Add New Broker', new_broker_path, remote: true, class: 'btn btn-new ml-auto'
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all Name

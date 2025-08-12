@@ -29,21 +29,21 @@
             = link_to '#', class: "nav-link #{'active' if ['leads','users/search_histories'].include?(params[:controller])}" do
               = render partial: 'icons/leadManagement'
               %p
-                Lead Management
+                Deal track
             %ul.nav.nav-treeview
               %li.nav-item
                 = link_to leads_path, class: "nav-link #{'active' if (params[:controller] =="leads" && params[:action] == 'index')}" do
-                  = render partial: 'icons/line'
-                  %p Pipeline
+                  = render partial: 'icons/funnel'
+                  %p Funnel
               - if current_user.is_super? || current_user.is_sl_admin?
                 %li.nav-item
                   = link_to prepare_bulk_update_leads_path, class: "nav-link #{'active' if params[:action] == 'prepare_bulk_update'}" do
-                    = render partial: 'icons/line'
-                    %p Bulk Update
+                    = render partial: 'icons/importFile'
+                    %p Smart Import
               - if (current_user.company.expected_visit_ids.present? || current_user.company.expected_site_visit_id.present?)
                 %li.nav-item
                   = link_to reports_site_visit_planned_path, class: "nav-link #{'active' if (params[:action] == 'site_visit_planned')}" do
-                    = render partial: 'icons/line'
+                    = render partial: 'icons/calendaricon'
                     %p SVP Dashboard
               - if current_user.company.setting.present? && current_user.company.enable_customize_status_report
                 %li.nav-item
@@ -52,17 +52,17 @@
                     %p Customize Status Dashboard
               %li.nav-item
                 = link_to users_search_histories_path, class: "nav-link #{'active' if params[:controller] == 'users/search_histories'}" do
-                  = render partial: 'icons/line'
-                  %p Personalised Reports
+                  = render partial: 'icons/trend'
+                  %p My Reports
               - unless (current_user.is_meeting_executive && current_user.is_executive?)
                 %li.nav-item
                   = link_to call_logs_leads_path, class: "nav-link #{'active' if params[:action] == 'call_logs'}" do
-                    = render partial: 'icons/line'
-                    %p Communication Analysis
+                    = render partial: 'icons/trend'
+                    %p Conversation Tracker
                 %li.nav-item
                   = link_to outbound_logs_leads_path, class: "nav-link #{'active' if params[:action] == 'outbound_logs'}" do
-                    = render partial: 'icons/line'
-                    %p Outgoing Calls
+                    = render partial: 'icons/calllog'
+                    %p Outbound Tracker
               - if current_user.company.setting.present? && current_user.company.setting.enable_lead_tracking
                 %li.nav-item
                   = link_to dead_or_recycle_leads_path, class: "nav-link #{'active' if params[:controller] == 'leads/dead_or_recycle'}" do
@@ -71,8 +71,8 @@
               - if current_user.is_super? && current_user.company.setting.present? && current_user.company.enable_call_center_dashboard
                 %li.nav-item
                   = link_to statistics_exotel_sids_path, class: "nav-link #{'active' if params[:action] == 'statistics'}" do
-                    = render partial: 'icons/line'
-                    %p Call Center Dashboard
+                    = render partial: 'icons/voicePanel'
+                    %p VoiceOps Panel
           - if current_user.company.setting.present? && current_user.company.enable_broker_management
             %li.nav-item
               = link_to brokers_path, class: "nav-link #{'active' if ['brokers'].include?(params[:controller])}" do
@@ -87,7 +87,7 @@
             %ul.nav.nav-treeview
               %li.nav-item
                 = link_to file_exports_path, class: "nav-link #{'active' if (params[:controller] =="agreements" && params[:action] == 'index')}" do
-                  = render partial: 'icons/line'
+                  = render partial: 'icons/export'
                   %p Downloads
           - if current_user.can_access_project
             %li.nav-item
@@ -98,28 +98,28 @@
             = link_to '#', class: "nav-link #{'active' if ['reports'].include?(params[:controller])}" do
               = render partial: 'icons/reports'
               %p
-                Reports
+                Impact Panel
               
             %ul.nav.nav-treeview
               - if current_user.can_access_presale?
                 - if current_user.is_super? || current_user.is_sl_admin?
                   %li.nav-item
                     = link_to reports_trends_path, class: "nav-link #{'active' if (params[:action] == 'trends')}" do
-                      = render partial: 'icons/line'
-                      %p Lead Volume Report
+                      = render partial: 'icons/trend'
+                      %p Lead Traffic
                 %li.nav-item
                   = link_to reports_leads_path, class: "nav-link #{'active' if (params[:action] == 'leads')}" do
-                    = render partial: 'icons/line'
-                    %p Team PRF Report
+                    = render partial: 'icons/leadReport'
+                    %p User Engagement
                 %li.nav-item
                   = link_to reports_projects_path, class: "nav-link #{'active' if (params[:action] == 'projects')}" do
-                    = render partial: 'icons/line'
-                    %p Projects Report
+                    = render partial: 'icons/projectReport'
+                    %p Product Engagement
                 - if current_user.check_source_presence
                   %li.nav-item
                     = link_to reports_source_path, class: "nav-link #{'active' if (params[:action] == 'source')}" do
-                      = render partial: 'icons/line'
-                      %p Sources Report
+                      = render partial: 'icons/adReport'
+                      %p Lead Origin Analysis
                 - if current_user.company.setting.present? && current_user.company.enable_source_wise_report
                   %li.nav-item
                     = link_to reports_source_report_path, class: "nav-link #{'active' if (params[:action] == 'source_report')}" do
@@ -133,8 +133,8 @@
                 - if (current_user.is_super? || (current_user.company.setting.present? && !current_user.company.disable_marketing_roi_executive_access))
                   %li.nav-item
                     = link_to reports_campaigns_path, class: "nav-link #{'active' if (params[:action] == 'campaigns')}" do
-                      = render partial: 'icons/line'
-                      %p Marketing ROI Report
+                      = render partial: 'icons/campaign'
+                      %p Marketing Analysis
                 - if (current_user.company.setting.present? && current_user.company.enable_campaign_report)
                   %li.nav-item
                     = link_to reports_campaigns_report_path, class: "nav-link #{'active' if (params[:action] == 'campaigns_report')}" do
@@ -142,50 +142,50 @@
                       %p Campaigns Report
                 %li.nav-item
                   = link_to reports_channel_partner_path, class: "nav-link #{'active' if (params[:action] == 'channel_partner')}" do
-                    = render partial: 'icons/line'
-                    %p Channel Partner Report
+                    = render partial: 'icons/partner'
+                    %p Broker Engagement
                 - if current_user.company.setting.present? && current_user.company.enable_site_visit_planned_tracker && (current_user.company.expected_visit_ids.present? || current_user.company.expected_site_visit_id.present?)
                   %li.nav-item
                     = link_to reports_site_visit_planned_tracker_path, class: "nav-link #{'active' if (params[:action] == 'site_visit_planned_tracker')}" do
                       = render partial: 'icons/line'
-                      %p SVP Tracker
+                      %p Booking Ratio
                 - if current_user.company.setting.present? && current_user.company.enable_call_center_dashboard
                   %li.nav-item
                     = link_to reports_call_report_path, class: "nav-link #{'active' if (params[:action] == 'call_report')}" do
-                      = render partial: 'icons/line'
-                      %p Calls report
+                      = render partial: 'icons/calllog'
+                      %p Dialer Summary
                 %li.nav-item
                   = link_to reports_backlog_path, class: "nav-link #{'active' if (params[:action] == 'backlog')}" do
-                    = render partial: 'icons/line'
-                    %p Backlog Report
+                    = render partial: 'icons/backlog'
+                    %p MFA  (Missed Future Activity)
                 %li.nav-item
                   = link_to reports_closing_executive_backlog_path, class: "nav-link #{'active' if (params[:action] == 'closing_executive_backlog')}" do
-                    = render partial: 'icons/line'
-                    %p Closing Manager Backlog Report
+                    = render partial: 'icons/salesReport'
+                    %p Sales Manager MFA
                 %li.nav-item
                   = link_to reports_activity_path, class: "nav-link #{'active' if (params[:action] == 'activity')}" do
-                    = render partial: 'icons/line'
-                    %p Activity Report
+                    = render partial: 'icons/activityReport'
+                    %p Effort Report
                 %li.nav-item
                   = link_to reports_dead_path, class: "nav-link #{'active' if (params[:action] == 'dead')}" do
-                    = render partial: 'icons/line'
-                    %p Inactive Lead Report
+                    = render partial: 'icons/inactive'
+                    %p Drop Off Leads
                 %li.nav-item
                   = link_to reports_source_wise_inactive_path, class: "nav-link #{'active' if (params[:action] == 'source_wise_inactive')}" do
-                    = render partial: 'icons/line'
-                    %p Inactive Lead Source Report
+                    = render partial: 'icons/sourceDrop'
+                    %p Lead Origin Drop Off
                 %li.nav-item
                   = link_to reports_visits_path, class: "nav-link #{'active' if (params[:action] == 'visits')}" do
-                    = render partial: 'icons/line'
-                    %p SVC User Report
+                    = render partial: 'icons/visitReport'
+                    %p Visit Tracker
                 %li.nav-item
                   = link_to reports_sales_dashboard_path, class: "nav-link #{'active' if (params[:action] == 'sales_dashboard')}" do
                     = render partial: 'icons/line'
                     %p Sales Dashboard Report
                 %li.nav-item
                   = link_to reports_source_wise_visits_path, class: "nav-link #{'active' if (params[:action] == 'source_wise_visits')}" do
-                    = render partial: 'icons/line'
-                    %p SVC Source Report
+                    = render partial: 'icons/visitTracker'
+                    %p Origin Visit Tracker
                 - if current_user.company.setting.present? && current_user.company.setting.enable_presale_user_visits_report
                   %li.nav-item
                     = link_to reports_presale_visits_path, class: "nav-link #{'active' if (params[:action] == 'presale_visits')}" do
@@ -195,9 +195,9 @@
               - if current_user.can_access_postsale?
                 %li.nav-item
                   = link_to reports_closing_executives_path, class: "nav-link #{'active' if (params[:action] == 'closing_executives')}" do
-                    = render partial: 'icons/line'
+                    = render partial: 'icons/managerReport'
                     %p
-                      #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Closing Manager'} Report
+                      #{current_user.company.find_label("closing_executive").present? ? (current_user.company.find_label("closing_executive").custom_value.present? ? current_user.company.find_label("closing_executive").custom_value : current_user.company.find_label("closing_executive").default_value) : 'Sales Manager'} Report
               - if current_user.is_super? && current_user.company.is_allowed_for_visits?('user_id')
                 %li.nav-item
                   = link_to reports_site_visit_userwise_path, class: "nav-link #{'active' if (params[:action] == 'site_visit_userwise')}" do
@@ -208,85 +208,85 @@
               = link_to '#', class: "nav-link #{'active' if ['call_ins', 'users', 'projects'].include?(params[:controller])}" do
                 = render partial: 'icons/settings'
                 %p
-                  Settings
+                  Control Center
                 
               %ul.nav.nav-treeview
                 %li.nav-item
                   = link_to call_ins_path, class: "nav-link #{'active' if (params[:controller] == 'call_ins')}" do
-                    = render partial: 'icons/line'
-                    %p Manage CallIns
+                    = render partial: 'icons/calllog'
+                    %p Call Intake Manager
                 %li.nav-item
                   = link_to campaigns_path, class: "nav-link #{'active' if (params[:controller] == 'campaigns')}" do
-                    = render partial: 'icons/line'
-                    %p Manage Campaigns
+                    = render partial: 'icons/campaign'
+                    %p Campaign Manager
                 %li.nav-item
                   = link_to users_path, class: "nav-link #{'active' if params[:controller] == 'users'}" do
-                    = render partial: 'icons/line'
-                    %p Manage Users
+                    = render partial: 'icons/usersIcon'
+                    %p User Management
                 %li.nav-item
                   = link_to configurations_path, class: "nav-link #{'active' if params[:controller] == 'leads' && params[:action] == 'configurations'}" do
-                    = render partial: 'icons/line'
-                    %p Configurations
+                    = render partial: 'icons/config'
+                    %p Setup
                 %li.nav-item
                   = link_to companies_fb_pages_path, class: "nav-link #{'active' if params[:controller] == 'companies/fb_pages'}" do
-                    = render partial: 'icons/line'
-                    %p Facebook Integration
+                    = render partial: 'icons/meta'
+                    %p Meta Sync
                 %li.nav-item
                   = link_to brokers_path, class: "nav-link #{'active' if params[:controller] == 'brokers'}" do
-                    = render partial: 'icons/line'
-                    %p Manage Brokers
+                    = render partial: 'icons/brokers'
+                    %p Broker Setup
                 %li.nav-item
                   = link_to projects_path, class: "nav-link #{'active' if params[:controller] == 'projects'}" do
-                    = render partial: 'icons/line'
-                    %p Manage Projects
+                    = render partial: 'icons/projectReport'
+                    %p Manage Setup
                 %li.nav-item
                   = link_to sub_sources_path, class: "nav-link #{'active' if params[:controller] == 'sub_sources'}" do
-                    = render partial: 'icons/line'
-                    %p Manage Sub Source
+                    = render partial: 'icons/adReport'
+                    %p Sub-Source Setup
                 %li.nav-item
                   = link_to notification_templates_path, class: "nav-link #{'active' if params[:controller] == 'notification_templates'}" do
-                    = render partial: 'icons/line'
-                    %p Manage Notification Templates
+                    = render partial: 'icons/smsreport'
+                    %p Template Manager
                 %li.nav-item
                   = link_to companies_api_keys_path, class: "nav-link #{'active' if params[:controller] == 'companies/api_keys'}" do
-                    = render partial: 'icons/line'
-                    %p API Keys
+                    = render partial: 'icons/api'
+                    %p Connection Keys
           %li.nav-item.has-treeview{class: "#{['exotel_sids', 'mcube_sids', 'cloud_telephony_sids'].include?(params[:controller]) ? 'menu-open' : ''}"}
             = link_to '#', class: "nav-link #{'active' if ['exotel_sids', 'mcube_sids', 'cloud_telephony_sids'].include?(params[:controller])}" do
               = render partial: 'icons/clicktocall'
-              %p Cloud Telephony Sids
+              %p Call Integration
               
             %ul.nav.nav-treeview
               %li.nav-item
                 = link_to exotel_sids_path, class: "nav-link #{'active' if params[:controller] == 'exotel_sids'}" do
-                  = render partial: 'icons/line'
-                  %p Exotel Click to Call
+                  = render partial: 'icons/callSetup'
+                  %p Exotel
               %li.nav-item
                 = link_to mcube_sids_path, class: "nav-link #{'active' if params[:controller] == 'mcube_sids'}" do
-                  = render partial: 'icons/line'
-                  %p Mcube Click to Call
+                  = render partial: 'icons/callSetup'
+                  %p Mcube
               %li.nav-item
                 = link_to cloud_telephony_sids_path, class: "nav-link #{'active' if params[:controller] == 'cloud_telephony_sids'}" do
-                  = render partial: 'icons/line'
-                  %p Others Click to Call
+                  = render partial: 'icons/callSetup'
+                  %p Auxiliary
           - if current_user.company.setting.present? && current_user.company.enable_accounts
             %li.nav-item.has-treeview{class: "#{['payment_plans', 'cost_sheets'].include?(params[:controller]) ? 'menu-open' : ''}"}
               = link_to '#', class: "nav-link #{'active' if ['payment_plans', 'cost_sheets'].include?(params[:controller])}" do
-                %i.nav-icon.fa.fa-tasks.ct-settings-icon
+                = render partial: 'icons/settings'
                 %p
-                  Accounts
+                  Finance
                 
               %ul.nav.nav-treeview
                 %li.nav-item
                   = link_to cost_sheets_path, class: "nav-link #{'active' if (params[:controller] == 'cost_sheets')}" do
-                    
-                    %p Manage Cost Sheets
+                    = render partial: 'icons/line'
+                    %p Cost Sheets
           - if current_user.company.inventory_integration_enable
             %li.nav-item.has-treeview{class: "#{['companies/flats'].include?(params[:controller]) ? 'menu-open' : ''}"}
               = link_to '#', class: "nav-link #{'active' if ['companies/flats'].include?(params[:controller])}" do
-                %i.nav-icon.fa.fa-tasks.ct-settings-icon
+                = render partial: 'icons/line'
                 %p
-                  Biz Integration
+                  PostPulse Integration
                 
               %ul.nav.nav-treeview
                 %li.nav-item
@@ -296,24 +296,28 @@
           - if current_user.company.setting.present? && current_user.company.enable_inventory_management
             %li.nav-item.has-treeview{class: "#{['companies/inventories'].include?(params[:controller]) ? 'menu-open' : ''}"}
               = link_to companies_inventories_path, class: "nav-link #{'active' if ['companies/inventories'].include?(params[:controller])}" do
-                %i.nav-icon.fa.fa-tasks.ct-settings-icon
+                = render partial: 'icons/line'
                 %p
-                  Inventory
+                  Inventory Panel
                 
               %ul.nav.nav-treeview
                 %li.nav-item
                   = link_to companies_inventories_path, class: "nav-link #{'active' if (params[:controller] == 'companies/inventories')}" do
-                    
+                    = render partial: 'icons/line'
                     %p Manage Inventory
 
 %aside.control-sidebar.control-sidebar-dark
   %div
     %ul.profile-menu
       %li
-        = link_to edit_profile_users_path, class: '' do
-          %i.icon.ion-md-person.ct-profile-icon.fa.fa-user>
+        .info
+          %span Logged in as
+          = current_user.name
+      %li.nav-item
+        = link_to edit_profile_users_path, class: 'nav-profile' do
+          = render 'icons/profileIcon'
           Profile
-      %li
-        = link_to destroy_user_session_path, method: :delete, class: '' do
-          %i.icon.ion-md-lock.ct-logout-icon.fa.fa-lock
+      %li.nav-item
+        = link_to destroy_user_session_path, method: :delete, class: 'nav-profile' do
+          = render 'icons/logout'
           Logout

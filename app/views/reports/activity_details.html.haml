@@ -14,14 +14,14 @@
         .col-lg-12
           .card
             .card-header
-              .pull-right
-                = link_to activity_search_params.merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
+              .group-link
+                = link_to activity_search_params.merge!(format: :csv), class: "btn btn-action" do
                   = fa_icon "download"
                   Export
               %h3.card-title= @user.name
             .card-body
               .table-responsive
-                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                   %thead
                     %tr
                       %th.all Date

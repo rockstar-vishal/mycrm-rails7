@@ -2,38 +2,40 @@
   .content-header
     .container-fluid
       .row.mb-2
-        .col-md-9
+        .col-12
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Cities
+        .col-md-6
           %h1.m-0.text-dark Cities
+        .col-md-6
+          = link_to 'Add New City', new_city_path, remote: true, class: 'btn btn-primary float-right btn-sm'
+
   .content
     .container-fluid
       .row
         .col-lg-12
-          .card
-            .card-header
-              .box-header.row
-                .box-tools.col-md-12{:style=>"top:inherit;"}
-                  .float-left
+          .table-card
+            .search-card
+              .row
+                .col-md-5
+                  .search-outer
                     = form_tag(cities_path, :method => :get) do
-                      .input-group.input-group-sm
+                      .search-group
                         = text_field_tag :search_string, params[:search_string], :placeholder => "Search Name/City", :class => 'form-control'
-                        .input-group-btn
-                          = button_tag type: "submit", class: "btn btn-default btn-sm pd-fixes" do
+                        .search-group-btn
+                          = button_tag type: "submit", class: "btn btn-default search-btn" do
                             = fa_icon "search"
-                  .float-right
-                    .input-group
-                      = link_to cities_params.merge!(format: :csv), class: "btn btn-primary btn-sm", style: "right: 5px;" do
-                        = fa_icon "download"
-                        Export
-                      .input-group-btn
-                        = link_to 'Add New City', new_city_path, remote: true,
-                          class: 'btn btn-primary float-right btn-sm'
-            .card-body
+                .col-md-7
+                  .group-link
+                    = link_to cities_params.merge!(format: :csv), class: "btn btn-action ml-auto" do
+                      = render 'icons/export'
+                      Export
+
+            .table-body
               .table-responsive
-                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
+                %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
                   %thead
                     %tr
                       %th.all Name
@@ -44,8 +46,12 @@
                         %td
                           = city.name
                         %td
-                          = link_to (fa_icon "pencil"), edit_city_path(city), remote: true, class: "btn btn-primary btn-sm"
-          - if @cities.present?
-            .pagination-custom-holder
-              %strong{style: "margin-left: 0;"} Cities Count - #{@cities.total_entries}
-              = will_paginate @cities, :class  =>  "ct-pag"
+                          .action-wrapper
+                            = link_to edit_city_path(city), remote: true, class: "btn btn-action btn-sm" do
+                              = render 'icons/editIcon'
+                              Edit Cities
+                        
+              - if @cities.present?
+                .pagination-custom-holder
+                  %label{style: "margin-left: 0;"} Cities Count - #{@cities.total_entries}
+                  = will_paginate @cities, :class  =>  "ct-pag"
