@@ -1,8 +1,8 @@
 class Leads::Visit < ActiveRecord::Base
 
   belongs_to :lead
-  belongs_to :user
-  belongs_to :source
+  belongs_to :user, optional: true
+  belongs_to :source, optional: true
   has_many :visits_projects, class_name: 'Leads::VisitsProject'
   has_many :projects, class_name: '::Project', through: :visits_projects
   validates :date, presence: true

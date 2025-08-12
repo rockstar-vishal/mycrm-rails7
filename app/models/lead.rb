@@ -31,7 +31,7 @@ class Lead < ActiveRecord::Base
   belongs_to :user
   belongs_to :presale_user, class_name: 'User', foreign_key: :presale_user_id, optional: true
   belongs_to :postsale_user, class_name: 'User', foreign_key: :closing_executive, optional: true
-  belongs_to :last_lead_modified_user, class_name: 'User', foreign_key: :last_modified_by
+  belongs_to :last_lead_modified_user, class_name: 'User', foreign_key: :last_modified_by, optional: true
   belongs_to :status
   belongs_to :call_in, optional: true
   belongs_to :city, optional: true
