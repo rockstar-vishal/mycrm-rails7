@@ -66,13 +66,13 @@
                       %td
                         = (ct.active ? "Yes" : "No")
                       %td
-                        .action-wrapper
-                          = link_to edit_communication_template_path(ct), class: "btn btn-action btn-edit", target: "_blank" do
-                            = render partial: 'icons/edit'
                         
-                          = link_to communication_template_path(ct), method: :delete, remote: true, data: { confirm: 'Are you sure?', disable_with: 'Deleting...' }, class: "btn btn-action btn-sm btn-remove" do
-                            = render partial: 'icons/clear'
-        - if @templates.present?
-          .pagination-custom-holder
-            %strong{style: "margin-left: 0;"} Templates Count - #{@templates.count}
-            = will_paginate @templates, :class  =>  "ct-pag"
+                        = link_to edit_communication_template_path(ct), class: "btn btn-action btn-edit", target: "_blank" do
+                          = render partial: 'icons/edit'
+                      
+                        = link_to (fa_icon "trash"), communication_template_path(ct), method: :delete, remote: true, data: { confirm: 'Are you sure?', disable_with: 'Deleting...' }, class: "btn btn-action btn-remove" 
+                            
+            - if @templates.present?
+              .pagination-custom-holder
+                %label{style: "margin-left: 0;"} Templates Count - #{@templates.count}
+                = will_paginate @templates, :class  =>  "ct-pag"

@@ -37,7 +37,7 @@
                               = render 'icons/editIcon'
                               Edit Country
                         
-            - if @countries.present?
-              .pagination-custom-holder
-                %label{style: "margin-left: 0;"} Countries Count - #{@countries.total_entries}
-                = will_paginate @countries, :class  =>  "ct-pag"
+              - if @countries.present?
+                .pagination-custom-holder
+                  %label{style: "margin-left: 0;"} Countries Count - #{@countries.total_entries}
+                  = will_paginate @countries, :class  =>  "ct-pag"

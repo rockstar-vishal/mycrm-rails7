@@ -117,7 +117,7 @@
                           = link_to user_path(user.uuid), class: "btn btn-danger", method: :delete,
                             data: {:confirm => "Would you like to permanently delete this user?", "commit-class" => "btn btn-success", "cancel-class" => "btn btn-danger"}, style: "padding: 0px; width: 20px;" do
                             = fa_icon "trash-o"
-        - if @users.present?
-          .pagination-custom-holder
-            %strong{style: "margin-left: 0;"} Users Count - #{@users.total_entries}
-            = will_paginate @users, :class  =>  "ct-pag"
+            - if @users.present?
+              .pagination-custom-holder
+                %label{style: "margin-left: 0;"} Users Count - #{@users.total_entries}
+                = will_paginate @users, :class  =>  "ct-pag"
