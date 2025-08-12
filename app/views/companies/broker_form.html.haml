@@ -1,11 +1,18 @@
 .content-wrapper
+  .content-header
+    .container-fluid
+      .row.mb-2
+        .col-md-9
+          %ol.breadcrumb
+            %li.breadcrumb-item
+              %a{:href => "/"} Home
+            %li.breadcrumb-item.active Broker Form
+          %h1.m-0.text-dark Edit Broker Form For #{@company.name}
   .content
     .container-fluid
       .row
         .col-lg-12
           .card
-            .card-header
-              %h4.mb-0#newFormTitle Edit Broker Form For #{@company.name}
             .card-body
               = bootstrap_form_for(@company) do |f|
                 - if @company.errors.any?
@@ -25,11 +32,11 @@
                     %div{align: "center"}
                       .col-md-12
                         .form-group
-                          = button_tag type: "submit", class: "btn btn-primary", data: {disable_with: "Please Wait..."} do
-                            = fa_icon "floppy-o"
+                          = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+                          
                             Save
-                          = link_to companies_path, class: "btn btn-danger" do
-                            = fa_icon "close"
+                          = link_to companies_path, class: "btn btn-delete" do
+                           
                             Cancel
 :javascript
   $('.multiselect').multiSelect();

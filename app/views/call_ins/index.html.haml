@@ -2,55 +2,53 @@
   .content-header
     .container-fluid
       .row.mb-2
-        .col-md-9
+        .col-12
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Call Ins
+        .col-md-6
+          %h1.m-0.text-dark Call Ins
+        .col-md-6
+          - if current_user.is_sysad?
+            = link_to 'Add New Number', new_call_in_path, remote: true, class: 'btn btn-primary float-right btn-sm'   
+
           
   .content
     .container-fluid
       .row
         .col-lg-12
-          .search-card
-            .row
-              .col-md-3
-                .group-link
-                  %h4 Call Ins
-              .col-md-9
-              - if current_user.is_sysad?
-                .group-link
-                  = link_to 'Add New Number', new_call_in_path, remote: true, class: 'btn btn-primary'   
-          .table-body
-            .table-responsive
-              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
-                %thead
-                  %tr
-                    %th.all Number
-                    - unless current_user.is_sysad?
-                      %th.desktop Project
-                      %th.desktop User
-                      %th.desktop Source
-                    %th.all Active
-                    %th.all Action
-                %tbody
-                  - @call_ins.each do |call_in|
+          .card
+            .table-body
+              .table-responsive
+                %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
+                  %thead
                     %tr
-                      %td
-                        = call_in.number
+                      %th.all Number
                       - unless current_user.is_sysad?
+                        %th.desktop Project
+                        %th.desktop User
+                        %th.desktop Source
+                      %th.all Active
+                      %th.all Action
+                  %tbody
+                    - @call_ins.each do |call_in|
+                      %tr
                         %td
-                          = call_in.project.name rescue '-'
+                          = call_in.number
+                        - unless current_user.is_sysad?
+                          %td
+                            = call_in.project.name rescue '-'
+                          %td
+                            = call_in.user.name rescue '-'
+                          %td
+                            = call_in.source_name rescue '-'
                         %td
-                          = call_in.user.name rescue '-'
+                          = call_in.active ? "Yes" : "No"
                         %td
-                          = call_in.source_name rescue '-'
-                      %td
-                        = call_in.active ? "Yes" : "No"
-                        %td
-                        = link_to edit_call_in_path(call_in.uuid), remote: true, class: "btn btn-action btn-edit", insidelink: true do
-                          = render partial: 'icons/edit'
-        - if @call_ins.present?
-          .pagination-custom-holder
-            %strong{style: "margin-left: 0;"} Call Ins Count - #{@call_ins.count}
-            = will_paginate @call_ins, :class  =>  "ct-pag"
+                          = link_to edit_call_in_path(call_in.uuid), remote: true, class: "btn btn-action btn-edit", insidelink: true do
+                            = render partial: 'icons/edit'
+            - if @call_ins.present?
+              .pagination-custom-holder
+                %label{style: "margin-left: 0;"} Call Ins Count - #{@call_ins.count}
+                = will_paginate @call_ins, :class  =>  "ct-pag"

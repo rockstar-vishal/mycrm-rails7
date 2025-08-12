@@ -2,12 +2,17 @@
   .content-header
     .container-fluid
       .row.mb-2
-        .col-md-9
+        .col-12
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Users
-          %h1.m-0 Users
+        .col-md-6
+          %h1.m-0.text-dark Users
+        .col-md-6
+          - if current_user.may_add_user?
+            = link_to 'Add New User', new_user_path, class: 'btn btn-new float-right'
+
   .content
     .container-fluid
       .row
@@ -34,9 +39,7 @@
                       = render 'icons/export'
                       Export
                 
-                  - if current_user.may_add_user?
-                    = link_to 'Add New User', new_user_path,
-                      class: 'btn btn-new'
+                  
               #adv-searchbox.box-body
                 = form_tag nil, method: :get, class: "filter-search-menu" do
                   = hidden_field_tag :is_advanced_search, true

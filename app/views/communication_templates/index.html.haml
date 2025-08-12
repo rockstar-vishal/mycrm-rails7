@@ -2,33 +2,31 @@
   .content-header
     .container-fluid
       .row.mb-2
-        .col-md-9
+        .col-12
           %ol.breadcrumb
             %li.breadcrumb-item
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Notifications
+        .col-md-6
           %h1.m-0.text-dark Notification Templates
+        .col-md-6
+          = link_to 'Add New Template', new_communication_template_path, class: 'btn btn-primary float-right btn-sm', target: '_blank'
+
   .content
     .container-fluid
       .row
         .col-lg-12
-          .card
-            .card-header
-              .float-right
-                .input-group
-                  .input-group-btn
-                    = link_to 'Add New Template', new_communication_template_path, class: 'btn btn-primary float-right btn-sm', target: '_blank'
-              .float-right
-                .input-group
-                  .input-group-btn
-                    %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:-2px;", :class=>"btn btn-primary btn-sm"}
-                      Advanced Search
-                      %i.fa.fa-angle-down
-              %h4.mb-0 Notifications
+          .search-card
+            .group-link
+              %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                = render 'icons/filters'
+                Smart Search
+              
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
                 = hidden_field_tag :is_advanced_search, true
                 .card-header
+                  %h5.mb-2.text-dark Smart Search Notification Templates
                   .custom-search
                     .row
                       .col-md-3
@@ -39,38 +37,42 @@
                         .form-group
                           %label Select Company
                           = select_tag :company_ids, options_from_collection_for_select(Company.all, :id, :name, params[:company_ids]), multiple: true, class: "form-control multi-select-list"
-                      .col-md-3
+                      .col-md-12
                         .form-group
                           %label.label-block &nbsp;
-                          = button_tag type: "submit", class: "btn btn-primary btn-sm pd-fixes align-fixes" do
-                            = fa_icon "search"
-                          = link_to nil, class: "btn btn-primary btn-sm pd-fixes align-fixes" do
+                          = button_tag type: "submit", class: "btn btn-primary" do
+                            Search
+                          = link_to nil, class: "btn btn-delete" do
                             = fa_icon "refresh"
-            .card-body
-              .table-responsive
-                %table.table.table-bordered.table-hover.dataTables.table-sm.responsive.nowrap{style: 'width:100%!important'}
-                  %thead
+          .table-body
+            .table-responsive
+              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
+                %thead
+                  %tr
+                    %th.all Notification
+                    %th.all Type
+                    %th.all Company
+                    %th.all Active
+                    %th.all Action
+                %tbody
+                  - @templates.each do |ct|
                     %tr
-                      %th.all Notification
-                      %th.all Type
-                      %th.all Company
-                      %th.all Active
-                      %th.all Action
-                  %tbody
-                    - @templates.each do |ct|
-                      %tr
-                        %td
-                          = ct.template_name
-                        %td
-                          = ct.notification_type
-                        %td
-                          = ct.company&.name
-                        %td
-                          = (ct.active ? "Yes" : "No")
-                        %td
-                          = link_to fa_icon("pencil"), edit_communication_template_path(ct), class: "btn btn-primary btn-sm", target: "_blank"
-                          = link_to (fa_icon "trash-o"), communication_template_path(ct), method: :delete, remote: true, data: { confirm: 'Are you sure?', disable_with: 'Deleting...' }, class: "btn btn-danger btn-sm"
-          - if @templates.present?
-            .pagination-custom-holder
-              %strong{style: "margin-left: 0;"} Templates Count - #{@templates.count}
-              = will_paginate @templates, :class  =>  "ct-pag"
+                      %td
+                        = ct.template_name
+                      %td
+                        = ct.notification_type
+                      %td
+                        = ct.company&.name
+                      %td
+                        = (ct.active ? "Yes" : "No")
+                      %td
+                        .action-wrapper
+                          = link_to edit_communication_template_path(ct), class: "btn btn-action btn-edit", target: "_blank" do
+                            = render partial: 'icons/edit'
+                        
+                          = link_to communication_template_path(ct), method: :delete, remote: true, data: { confirm: 'Are you sure?', disable_with: 'Deleting...' }, class: "btn btn-action btn-sm btn-remove" do
+                            = render partial: 'icons/clear'
+        - if @templates.present?
+          .pagination-custom-holder
+            %strong{style: "margin-left: 0;"} Templates Count - #{@templates.count}
+            = will_paginate @templates, :class  =>  "ct-pag"
