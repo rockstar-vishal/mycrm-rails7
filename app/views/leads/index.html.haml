@@ -202,16 +202,17 @@
                               %td= lead.postsale_user.name rescue nil
                             -if company_index_fields.include?("status_id")
                               %td
-                                .badge-status= lead.status.name rescue nil
-                                - if lead.visits.present?
-                                  - if current_user.company.enable_advance_visits
-                                    - visit_count = lead.visits.executed.count
-                                  - else
-                                    - visit_count = lead.visits.count
-                                  - unless visit_count.zero?
-                                    %br
-                                    = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
-                                      = "Visits: #{visit_count}"
+                                .stage-fix
+                                  .badge-status= lead.status.name rescue nil
+                                  - if lead.visits.present?
+                                    - if current_user.company.enable_advance_visits
+                                      - visit_count = lead.visits.executed.count
+                                    - else
+                                      - visit_count = lead.visits.count
+                                    - unless visit_count.zero?
+                                      %br
+                                      = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
+                                        = "Visits: #{visit_count}"
                             -if company_index_fields.include?('presale_stage_id')
                               %td= lead.presales_stage&.name
                             -if company_index_fields.include?("project_id")

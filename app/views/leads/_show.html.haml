@@ -416,13 +416,15 @@
                             = link_to (fa_icon("external-link", class: 'text-light')), visit.site_visit_form.url(:original, false), target: '_blank', class: "btn btn-primary btn-sm"
                         - if @lead.company.setting.present? && @lead.company.enable_sv_form_print
                           %td
-                            = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
+                            = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-action" do
                               %i.fa.fa-print{"aria-hidden" => "true"}
                         %td
-                          = link_to edit_visit_lead_path(@lead, visit), remote: true, class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;" do
-                            = fa_icon "pencil"
-                          - if current_user.is_super?
-                            = link_to fa_icon('trash', class: 'text-light'), delete_visit_lead_path(@lead, visit), remote: true, method: :delete, class: 'btn btn-danger btn-sm', data: {confirm: "Are you sure?"}
+                          .action-wrapper
+                            = link_to edit_visit_lead_path(@lead, visit), remote: true, class: "btn btn-action btn-edit" do
+                              = render partial: 'icons/edit'
+                            - if current_user.is_super?
+                              = link_to delete_visit_lead_path(@lead, visit), remote: true, method: :delete, class: 'btn btn-action btn-remove', data: {confirm: "Are you sure?"} do
+                                = render partial: 'icons/clear'
             - else
               %h3
                 = "No Visits Avaliable"

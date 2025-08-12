@@ -2,7 +2,7 @@
 
 
 body{
-  background: linear-gradient(180deg, #ecf9fb, #eeffe3, #ecf9fb);
+  background: linear-gradient(180deg, #ecf9fb, #ecf9fb, #ecf9fb);
   font-family: "Rubik", sans-serif;
 
   color: #212529;
@@ -304,6 +304,7 @@ div#adv-searchbox {
   font-weight: 500;
   padding: 10px 20px;
   border-radius: 10px;
+  margin-left: 5px!important;
   &:hover{
     color: #fff;
     background-image: linear-gradient(-20deg, #ff416c 0%, #ff416c 100%);
@@ -2013,8 +2014,8 @@ button.multiselect.dropdown-toggle.btn.btn-default{
     color:#098026;
   }
   &.btn-remove{
-    color:#e96c6c;
-    min-width: 42px;
+    color:#e96c6c!important;
+    min-width: 42px!important;
   }
   &.import-spend{
     font-weight: 500;
@@ -2396,5 +2397,18 @@ ul.profile-menu  li a i {
   &:hover{
     background: #dc3545;
     color: #fff;
+  }
+}
+.stage-fix{
+      display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.bg-gradient-success{
+  background: #00cdac!important;
+  border: 1px solid #00cdac!important;
+  &:hover{
+    color:#fff;
+    background: #01923d!important;
   }
 }
