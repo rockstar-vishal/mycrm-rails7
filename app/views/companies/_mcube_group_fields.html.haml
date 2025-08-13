@@ -1,8 +1,14 @@
-.nested-fields.col-md-4{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
-  .form-group.required
-    = f.text_field :number,  :class=>"form-control"
-  .form-group
-    = f.text_field :group_name, class: "form-control"
-    = f.check_box :is_active
-  %center
-    = link_to_remove_association "Remove", f, :class=>"btn btn-danger"
+.nested-fields.col-md-6
+  .clone-wrap{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px; margin-bottom: 20px;"}
+    .row
+      .col-md-6
+        .form-group.required
+          = f.text_field :number,  :class=>"form-control"
+      .col-md-6
+        .form-group
+          = f.text_field :group_name, class: "form-control"
+      .col-md-6
+        = f.check_box :is_active
+      .col-md-12
+        %center
+          = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"

@@ -23,7 +23,7 @@
           .table-card
             .search-card
               .row
-                .col-md-5
+                .col-md-6
                   .search-outer
                     = form_tag leads_path, method: :get do
                       .search-group
@@ -41,7 +41,7 @@
                     %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                       = render 'icons/filters'
                       Smart Search
-                .col-md-7
+                .col-md-6
                   .group-link
                     - if current_user.is_super? || current_user.can_import
                       = link_to import_leads_path, :class=>"ml-auto", target: "_blank" do

@@ -102,7 +102,7 @@
                 %tbody
                   - @users.each do |user|
                     %tr
-                      %td= link_to user.name, user_path(user.uuid), remote: true
+                      %td= link_to user.name, user_path(user.uuid), remote: true, class: "show-detail-btn"
                       %td= user.email
                       %td= user.mobile
                       %td= user.role.name rescue nil

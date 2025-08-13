@@ -1,17 +1,32 @@
-.nested-fields.col-md-4{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
-  .form-group
-    = f.text_field :section_heading, class: "form-control"
-    = f.select :name, options_for_select((::Company.sv_allowed_options).map{|k| [k, k]}, f.object.name), {include_blank: "Please Select"}, class: 'form-control'
-    = f.text_field :label, class: "form-control"
-    = f.check_box :is_required
-    = f.check_box :is_select_list, class: 'custom-checkbox'
-    .item-list{:style => ("display:none;" unless f.object.is_select_list)}
-      = f.text_field :items, value: f.object.items.join(',') || ''
-    - if f.object.structure.present? && f.object.structure.company.enable_sv_form_print
-      = f.check_box :print_enabled
-    = f.number_field :field_position, label: "Position", required: (!f.object.structure.present? || (f.object.structure.present? && !f.object.structure.structure_fields.present?) || (f.object.structure.present? && f.object.structure.structure_fields.map{|x| x.field_position}.compact.present?))
-  %center
-    = link_to_remove_association "Remove", f, :class=>"btn btn-danger"
+.nested-fields.col-md-6
+  .clone-wrap{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px; margin-bottom: 20px;"}
+    .row
+      .col-md-6
+        .form-group
+          = f.text_field :section_heading, class: "form-control"
+      .col-md-6
+        .form-group
+          = f.select :name, options_for_select((::Company.sv_allowed_options).map{|k| [k, k]}, f.object.name), {include_blank: "Please Select"}, class: 'form-control'
+      .col-md-6
+        .form-group
+          = f.text_field :label, class: "form-control"
+      .col-md-6
+        .form-group
+          = f.number_field :field_position, label: "Position", required: (!f.object.structure.present? || (f.object.structure.present? && !f.object.structure.structure_fields.present?) || (f.object.structure.present? && f.object.structure.structure_fields.map{|x| x.field_position}.compact.present?))
+      .w-100
+      .col-md-6
+        .form-group
+          = f.check_box :is_required
+      .col-md-6
+        .form-group
+          = f.check_box :is_select_list, class: 'custom-checkbox'
+          .item-list{:style => ("display:none;" unless f.object.is_select_list)}
+            = f.text_field :items, value: f.object.items.join(',') || ''
+          - if f.object.structure.present? && f.object.structure.company.enable_sv_form_print
+            = f.check_box :print_enabled
+      .col-md-12
+        %center
+          = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"
 
 :javascript
   $(document).ready(function(){
