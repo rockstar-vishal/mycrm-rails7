@@ -2,16 +2,15 @@
 
 
 body{
-  background: linear-gradient(180deg, #ecf9fb, #ecf9fb, #ecf9fb);
+  background: #ecf9fb;
   font-family: "Rubik", sans-serif;
-
   color: #212529;
 }
 a{
   color: #212529;
 }
 .main-sidebar{
- background: rgba(255, 255, 255, 0.7);
+ background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(18px);
   border-right: 1px solid #e3e7eb;
 }
@@ -360,9 +359,11 @@ ul.profile-menu {
     list-style: none;
 }
 ul.profile-menu  li a{
-	display: block;
-	padding: 10px;
-	    border-bottom: 1px solid #e3e7eb;
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid #dfdfdf;
+  align-items: center;
+  gap: 10px;
 }
 ul.profile-menu  li a i {
 	margin-right:8px;
@@ -386,6 +387,9 @@ ul.profile-menu  li a i {
 }
 .table tr:last-child td{
   border-bottom: 1px solid #e3e7eb;
+}
+.table td {
+  vertical-align: middle;
 }
 .table.dataTable{
   margin: 0px!important;
@@ -643,7 +647,7 @@ body:not(.layout-fixed).layout-navbar-fixed .wrapper .main-sidebar .sidebar {
     border: none;
     border-bottom: 1px solid #e3e7eb;
     border-radius: 0px;
-    padding: 12px 0;
+    padding: 12px 10px;
     background: transparent;
   }
 }
@@ -1116,11 +1120,7 @@ li.sendemail:hover a{
     box-shadow: none
   }
 }
-span.lead-title {
-  display: block;
-  font-size: 14px;
-  opacity: .8;
-}
+
 h4.lead-heading{
     font-weight: 500;
     font-size: 14px;
@@ -1647,11 +1647,12 @@ ul.multiselect-container.dropdown-menu {
   color:#212529;
   display: block;
   opacity: .8;
+  font-size: 14px;
 }
  .lead-info{
   display: block;
-  color: #040e24;
-  font-weight: 400;
+  color: #040e24!important;
+  font-weight: 500;
   font-size: 15px;
 }
 .chart-custom{
@@ -2261,7 +2262,6 @@ ul.profile-menu {
     list-style: none;
 }
 ul.profile-menu  li a{
-	display: block;
 	padding: 10px;
 	    border-bottom: 1px solid #dfdfdf;
       svg{
@@ -2403,12 +2403,48 @@ ul.profile-menu  li a i {
       display: flex;
     gap: 4px;
     align-items: center;
+    .bg-gradient-success{
+  background: rgba(93, 222, 201, 0.1)!important;
+  color: #00cdac!important;
+  border: 1px solid #00cdac!important;
+      display: flex;
+    align-items: center;
+   &::after{
+    content:"";
+    width:14px;
+    height:14px;
+    margin-left:5px;
+    display:inline-block;
+    background:currentColor;
+    /* Chevron (right) using SVG mask so it inherits text color */
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 2 8 6 4 10'/></svg>") center / 12px 12px no-repeat;
+            mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 2 8 6 4 10'/></svg>") center / 12px 12px no-repeat;
+    opacity:.75;
+    transition:transform .25s, opacity .25s;
+  }
+
+  &:hover::after{
+    transform:translateX(4px);
+    opacity:1;
+  }
+  &:hover{
+    color:#fff!important;
+    background: #00cdac!important;
+  }
+}
 }
 .bg-gradient-success{
   background: #00cdac!important;
   border: 1px solid #00cdac!important;
+}
+.btn-remove-small{
+  padding: 5px 10px;
+   color: #dc3545;
+  border: 1px solid #dc3545;
+  font-size: 12px;
+  border-radius: 4px;
   &:hover{
-    color:#fff;
-    background: #01923d!important;
+    background: darken(#dc3545, 5%);
+    color: #fff;
   }
 }
