@@ -123,7 +123,7 @@ $(document).ready(function() {
   $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
   $('.datetimepickerncd').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
   $('.datetimepickerleaseexpired').datetimepicker({timepicker: false,format:'d/m/Y', maxDate: today});
-  // For Modal
+  // For Modal - Bootstrap 5
   document.addEventListener('show.bs.modal', function(event) {
     if (event.target.id === 'modal-window') {
       $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
@@ -132,6 +132,30 @@ $(document).ready(function() {
         timepicker: false,
         format:'d/m/Y'
       });
+    }
+  });
+  
+  // Fix Bootstrap 5 modal close button focus issues
+  document.addEventListener('hide.bs.modal', function(event) {
+    if (event.target.id === 'modal-window') {
+      // Remove focus from any focused elements before hiding
+      var focusedElement = event.target.querySelector(':focus');
+      if (focusedElement) {
+        focusedElement.blur();
+      }
+    }
+  });
+  
+  // Handle modal close button clicks properly
+  $(document).on('click', '.modal .close[data-bs-dismiss="modal"]', function(e) {
+    e.preventDefault();
+    // Remove focus before closing
+    this.blur();
+    // Get the modal instance and hide it
+    var modalElement = this.closest('.modal');
+    var modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
     }
   });
   $('.dateFormat').datetimepicker({

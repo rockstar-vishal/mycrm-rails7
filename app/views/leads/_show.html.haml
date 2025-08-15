@@ -329,7 +329,7 @@
       .lead-body
         .row
           .form-group.col-md-12
-            = link_to 'New Visit Entry',new_visit_lead_path(@lead), class: 'btn btn-new btn-sm'
+            = link_to 'New Visit Entry',new_visit_lead_path(@lead), class: 'btn btn-new btn-sm', remote: true
             .table-body
             - if @lead.visits.present?
               .table-responsive

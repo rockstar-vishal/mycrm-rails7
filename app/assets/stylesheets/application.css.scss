@@ -9,6 +9,27 @@
 @import "jquery.datetimepicker";
 @import "multi-select";
 
+// Bootstrap 5 Modal Focus Fixes
+.modal .close[data-bs-dismiss="modal"] {
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Ensure proper focus management for Bootstrap 5 modals
+.modal[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.modal[aria-hidden="false"] {
+  pointer-events: auto;
+}
+
 /*
  * This is a manifest file that'll be compiled into application.css, which will include all the files
  * listed below.
