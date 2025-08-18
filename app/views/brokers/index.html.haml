@@ -13,8 +13,8 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-7
+            .action-bar
+              %div
                 .search-outer
                   = form_tag brokers_path, method: :get do
                     .search-group
@@ -24,7 +24,7 @@
                           = fa_icon "search"
                         = link_to brokers_path, class: "btn btn-default search-btn refresh" do
                           = fa_icon "refresh"
-              .col-md-5
+              %div
                 .group-link
                   - if current_user.company.setting.present? && current_user.company.enable_broker_bulk_update
                     .input-group-btn
@@ -76,6 +76,6 @@
                         = link_to broker_path(broker.uuid), class: "btn btn-action btn-remove", method: :delete,
                           data: {:confirm => "Would you like to permanently delete this CP?", "commit-class" => "btn btn-action btn-remove", "cancel-class" => "btn btn-action"} do
                           = fa_icon "trash-o"
-        .pagination-custom-holder
-          %strong{style: "margin-left: 0;"} Brokers Count - #{@brokers.count}
-          = will_paginate @brokers, :class  =>  "ct-pag"
+            .pagination-custom-holder
+              %label{style: "margin-left: 0;"} Brokers Count - #{@brokers.count}
+              = will_paginate @brokers, :class  =>  "ct-pag"

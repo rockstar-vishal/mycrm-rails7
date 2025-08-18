@@ -40,10 +40,11 @@
                       %td= key.user.name rescue "-"
                       %td= key.project.name rescue "-"
                       %td
-                        %span{id: "actualLink-#{key.id}"}
-                          = key.key
-                        %button.clipboard-btn.btn.btn-action{"data-clipboard-text"=>key.key}
-                          = fa_icon "copy"
+                        .uuid-copy
+                          %span.uuid-value{id: "actualLink-#{key.id}"}
+                            = key.key
+                          %button.clipboard-btn.btn.btn-action{"data-clipboard-text"=>key.key}
+                            = fa_icon "copy"
                       %td
                         = link_to edit_companies_api_key_path(key.uuid), remote: true, class: "btn btn-action btn-edit" do
                           = render partial: 'icons/edit'

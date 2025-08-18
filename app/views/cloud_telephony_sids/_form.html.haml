@@ -23,11 +23,11 @@
     .col-md-6
       .form-group
         = f.select :vendor, options_for_select((CloudTelephonySid.vendors.keys).map{|k| [k, k]}, f.object.vendor), {include_blank: "Please Select"}, class: 'form-control'
-    .col-md-2
-      .form-group.mt-4.checkboxSpacing
-        = f.check_box :is_active, class: 'custom-checkbox'
+    .col-md-12
+      .form-group.pl-3
+        = f.check_box :is_active, class: ''
 
-  %div
+
     .col-md-12
       .form-group
         = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do

@@ -13,8 +13,8 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-5
+            .action-bar
+              %div
                 .group-link
                   %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                     = render 'icons/filters'
@@ -22,7 +22,7 @@
                   = link_to search_params.merge!(format: :csv), class: "btn btn-action" do
                     = render 'icons/export'
                     Export
-              .col-md-7
+              %div
                 .group-link
                   = render 'reports_button', locals: {report_name: :closing_executive_backlog}
             #adv-searchbox.box-body
@@ -34,23 +34,23 @@
                         %h5.mt-0 Search By Date
                       .col-md-6
                         = render partial: 'shared/date_range_display'
+                      .col-md-6
+                        = render partial: 'shared/ncd_filter'
                       .col-12
                         %h5.mt-0 Search By Project Details
-                      .col-md-3
+                      .col-md-6
                         = render partial: 'shared/projects_filter'
-                      .col-md-3
+                      .col-md-6
                         .form-group
                           %label Select Users
                           = select_tag :closing_executive, options_from_collection_for_select(current_user.manageables.meeting_executives, :id, :name, params[:closing_executive]), multiple: true, class: "form-control multi-select-list"
-                      .col-md-3
+                      .col-md-6
                         = render partial: 'shared/managers_filter'
-                      .col-md-3
+                      .col-md-6
                         = render partial: 'shared/sources_filter'
                       - if current_user.company.is_allowed_field?("customer_type")
-                        .col-md-3
+                        .col-md-6
                           = render partial: 'shared/customer_type_filter'
-                      .col-md-6
-                        = render partial: 'shared/ncd_filter'
                       .col-md-12
                         = button_tag type: "submit", class: "btn btn-primary" do
                           Search

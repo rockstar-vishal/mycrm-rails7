@@ -1,244 +1,248 @@
 .col-md-12
-  %label.mb-3.control-label{:for => "exampleInputFile"} Setting:
+
   = f.fields_for :setting do |s|
     .row
-      .col-md-2
+      .col-md-3
         = s.check_box :back_dated_ncd_allowed
-      .col-md-2
+      .col-md-3
         = s.check_box :czentrixcloud_enable
-      .col-md-2
+      .col-md-3
         = s.check_box :can_assign_all_users
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_user_wise_assign_all_users
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_client_admin_assigning
-      .col-md-2
+      .col-md-3
         = s.check_box :default_lead_user_enable
-      .col-md-2
+      .col-md-3
         = s.check_box :can_show_lead_phone
-      .col-md-2
+      .col-md-3
         = s.check_box :restrict_duplicate_other_contact_leads
-      .col-md-2
+      .col-md-3
         = s.check_box :set_mobile_10_digit_mandatory
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_whatsapp_action
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_email_action
-      .col-md-2
+      .col-md-3
         = s.check_box :global_validation
-      .col-md-2
+      .col-md-3
         = s.check_box :hide_next_call_date
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_lead_direct_edit
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_lead_tracking
-      .col-md-2
+      .col-md-3
         = s.check_box :call_response_report
-      .col-md-2
+      .col-md-3
         =s.check_box :edit_profile_not_allowed
-      .col-md-2
+      .col-md-3
         =s.check_box :enable_source_wise_sub_source
-      .col-md-2
+      .col-md-3
         = f.check_box :round_robin_enabled
-      .col-md-2.project_wise_round_robin
+      .col-md-3.project_wise_round_robin
         = s.check_box :project_wise_round_robin, label: 'Project Wise Round Robin'
-      .col-md-2.project_wise_round_robin
+      .col-md-3.project_wise_round_robin
         = s.check_box :secondary_level_round_robin, label: 'Secondary Level Round Robin'
-      .col-md-2.project_wise_round_robin
+      .col-md-3.project_wise_round_robin
         = s.check_box :closing_executive_round_robin
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_callerdesk_sid
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_presale_user_visits_report
-      .col-md-2
+      .col-md-3
         = s.check_box :visit_filter_enable
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_visit_expiring_card
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_call_center_dashboard
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_broker_management
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_inventory_management
-      .col-md-2
+      .col-md-3
         = s.check_box :hide_lead_mobile_for_executive
-      .col-md-2
+      .col-md-3
         = s.check_box :can_send_lead_assignment_mail
-      .col-md-2
+      .col-md-3
         = s.check_box :way_to_voice_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_site_visit_planned_tracker
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_executive_export_leads
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_executive_to_assign_users
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_sv_closing_executive_assignment
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_booking_done_fields
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_booking_loan_fields
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_country_in_project
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_cards_on_advance_search
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_visit_counter_card
-      .col-md-2
+      .col-md-3
         = s.check_box :set_svp_default_7_days
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_advance_visits
-      .col-md-2
+      .col-md-3
         = s.check_box :disable_visit_finance_section
-      .col-md-2
+      .col-md-3
         = s.check_box :set_ncd_non_mandatory_for_booked_status
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_ncd_sort_nulls_last
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_meeting_executives
-      .col-md-2
+      .col-md-3
         = s.check_box :can_clone_lead
-      .col-md-2
+      .col-md-3
         = s.check_box :open_closed_lead_enabled, label: 'Open Closed Lead Enabled?'
-      .col-md-2
+      .col-md-3
         = s.check_box :can_add_users
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_lead_log_export
-      .col-md-2
+      .col-md-3
         = s.check_box :fb_campaign_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :project_campaign_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :managerwise_closing_executive_active
-      .col-md-2
+      .col-md-3
         = s.check_box :can_delete_users
-      .col-md-2
+      .col-md-3
         = s.check_box :restrict_sv_form_duplicate_lead_visit
-      .col-md-2
+      .col-md-3
         = s.check_box :mobicomm_sms_service_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :my_sms_shop_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :pg_sms_api_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :exotel_sms_integration_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :is_sv_project_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_sub_source_report
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_managerwise_report
-      .col-md-2
+      .col-md-3
         = s.check_box :disable_marketing_roi_executive_access
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_marketing_report_subsource_filter
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_activity_report_user_logs
-      .col-md-2
+      .col-md-3
         =s.check_box :enable_activity_report_source_logs
-      .col-md-2
+      .col-md-3
         =s.check_box :enable_campaign_report
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_source
-      .col-md-2
+      .col-md-3
         = s.check_box :secondary_source_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :sms360_enabled
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_smtp_settings
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_user_incentive
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_broker_bulk_update
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_import_brokers
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_export_brokers
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_source_wise_report
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_customize_status_report
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_status_wise_notification
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_restricted_fields
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_project_share
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_sv_form_print
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_deactivate_leads
-      .col-md-2
+      .col-md-3
         =s.check_box :enable_accounts
-      .col-md-2
+      .col-md-3
         =s.check_box :enable_gre_source_report
-      .col-md-2
+      .col-md-3
         =s.check_box :enable_gre_partner_access
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_partner_crm_integration
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_sv_partner
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_mcrm_complete_lead_update
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_lead_number
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_lead_export
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_project_brochure
-      .col-md-2
+      .col-md-3
         = s.check_box :enable_push_notify_closing_manager
-      .col-md-2
+      .col-md-3
         = s.check_box :disable_sv_provenance
-      .col-md-2
+      .col-md-3
         = s.check_box :nine_nine_update_enabled
-      .col-md-2
+      .col-md-3
         = s.text_field :nine_nine_profile_id, hide_label: true, placeholder: 'Enter Nine Nine Profile Id'
-      .col-md-2
+      .col-md-3
         = s.select :template_flag_name, options_for_select([['ravima','ravima'], ['panom', 'panom'], ['ceratec', 'ceratec'], ['amruttara', 'amruttara'], ['ashapura', 'ashapura']], (@company.template_flag_name)),{ hide_label: 'true',include_blank: "Email Template Flag" }, {class: "form-control"}
-      .col-md-2
+      .col-md-3
         .form-group
           = s.select :chart_type, options_for_select([["Pie Chart","Pie Chart"], ["Bar Chart", "Bar Chart"]], @company.chart_type), {hide_label: 'true', include_blank: "Chart Type"},{class: 'form-control'}
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :enable_advance_mcube
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :mcube_outbound_number_rotation_enabled
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :enabled_project_wise_access
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :enabled_source_wise_search_access
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :enable_nextel_whatsapp_triggers
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :cp_rm_access_enabled, label: 'CP RM Access Enabled?'
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :booking_form_enabled
-      .col-md-2
+      .col-md-3
         .form-group
           = s.check_box :only_10_digit_mobile_number_enabled
-    %label.mt-3.control-label Biz Integration:
-    .row.mt-1
-      .col-md-2
-        = s.check_box :biz_integration_enable
-      .col-md-12#biz_integration_subfield
-        .row
-          .col-md-3
-            = s.check_box :client_integration_enable, label: 'Client Integration?'
-          .col-md-3
-            = s.check_box :broker_integration_enable, label: 'Cp Integration?'
-          .col-md-3
-            = s.check_box :inventory_integration_enable, label: 'Inventory Integration?'
-          .col-md-3
-            = s.check_box :enable_expire_block_flat_details
-          .col-md-3
-            = s.check_box :enable_flat_details
+    
+      .col-12
+        %h4.lead-heading
+          Biz Integration
+        .lead-body
+          .row
+            .col-md-3
+              = s.check_box :biz_integration_enable
+            .col-md-12#biz_integration_subfield
+              .row
+                .col-md-3
+                  = s.check_box :client_integration_enable, label: 'Client Integration?'
+                .col-md-3
+                  = s.check_box :broker_integration_enable, label: 'Cp Integration?'
+                .col-md-3
+                  = s.check_box :inventory_integration_enable, label: 'Inventory Integration?'
+                .col-md-3
+                  = s.check_box :enable_expire_block_flat_details
+                .col-md-3
+                  = s.check_box :enable_flat_details
 %br
 :javascript
   const toggleProjectWiseRoundRobin = (flag) => flag === true ? $(".project_wise_round_robin").show() : $(".project_wise_round_robin").hide();

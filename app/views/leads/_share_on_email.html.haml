@@ -4,16 +4,18 @@
       = label_tag "Email To"
       = select_tag "email_to[]", options_from_collection_for_select(current_user.manageables, :id, :name, params[:email_to]), class: "form-control multi-select-list", multiple: true
   .col-md-8
-    = label_tag "Subject"
-    = text_field_tag :subject, params[:subject],
-      class: "subject form-control", value: "Please check the following leads"
-  .col-md-12
-    = label_tag "Message"
-    = text_area_tag :message, params[:message],
-      class: "form-control", :rows => 2, :cols => 30, :type=>"text"
-  .col-md-12  
-    = button_tag type: "submit", value: "send_email_to_team", class: 'btn btn-new mt-3' do
-      Send
+    .row
+      .col-md-8
+        = label_tag "Subject"
+        = text_field_tag :subject, params[:subject],
+          class: "subject form-control", value: "Please check the following leads"
+      .col-md-12
+        = label_tag "Message"
+        = text_area_tag :message, params[:message],
+          class: "form-control", :rows => 2, :cols => 30, :type=>"text"
+      .col-md-12  
+        = button_tag type: "submit", value: "send_email_to_team", class: 'btn btn-new mt-3' do
+          Send
     
 :css
   li.sendemail{

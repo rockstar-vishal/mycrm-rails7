@@ -1,20 +1,34 @@
-.nested-fields.custom-sv.col-md-4{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
-  .form-group.required
-    = f.select :section_heading, options_for_select((Company.find(params[:id]).sv_form.structure_fields.pluck(:section_heading).uniq rescue ""), f.object.section_heading), {include_blank: "Select"}, class: 'form-control'
-    = f.text_field :name,  :class=>"form-control"
-    = f.text_field :pretty_name, class: "form-control"
-    = f.select :datatype, options_for_select(MagicField.datatypes, f.object.datatype), {include_blank: "Select DataType"}, class: 'form-control'
-    = f.select :is_sv_required, options_for_select([["No", false], ["Yes", true]], f.object.is_sv_required), required: true, label: "Is Required", prompt: "Please select"
-    = f.check_box :is_select_list, class: 'custom-checkbox'
-    .item-list{:style => ("display:none;" unless f.object.is_select_list?)}
-      = f.text_field :items, value: f.object.items.join(',')
-    - if @company.enable_sv_form_print
-      = f.check_box :print_enabled
-    - structures=Company.find(params[:id]).structures
-    = f.number_field :field_position, label: "Position", required: (!structures.present? || (f.object.new_record? && structures.last.present? && structures.last.structure_fields.map{|x| x.field_position}.compact.present?))
-    = f.hidden_field :type_scoped, value: 'Lead'
-  %center
-    = link_to_remove_association "Remove", f, :class=>"btn btn-danger"
+.nested-fields.custom-sv.col-md-6
+  .clone-wrap{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px; margin-bottom: 20px;"}
+    .row
+      .col-md-6
+        .form-group.required
+          = f.select :section_heading, options_for_select((Company.find(params[:id]).sv_form.structure_fields.pluck(:section_heading).uniq rescue ""), f.object.section_heading), {include_blank: "Select"}, class: 'form-control'
+      .col-md-6
+        .form-group.required
+          = f.text_field :name,  :class=>"form-control"
+      .col-md-6
+        .form-group.required
+          = f.text_field :pretty_name, class: "form-control"
+      .col-md-6
+        .form-group.required
+          = f.select :datatype, options_for_select(MagicField.datatypes, f.object.datatype), {include_blank: "Select DataType"}, class: 'form-control'
+      .col-md-6
+        .form-group.required
+          = f.select :is_sv_required, options_for_select([["No", false], ["Yes", true]], f.object.is_sv_required), required: true, label: "Is Required", prompt: "Please select"
+      .col-md-12
+        .form-group.required
+          = f.check_box :is_select_list, class: 'custom-checkbox'
+          .item-list{:style => ("display:none;" unless f.object.is_select_list?)}
+            = f.text_field :items, value: f.object.items.join(',')
+          - if @company.enable_sv_form_print
+            = f.check_box :print_enabled
+          - structures=Company.find(params[:id]).structures
+          = f.number_field :field_position, label: "Position", required: (!structures.present? || (f.object.new_record? && structures.last.present? && structures.last.structure_fields.map{|x| x.field_position}.compact.present?))
+          = f.hidden_field :type_scoped, value: 'Lead'
+      .col-md-12
+        %center
+          = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"
 :javascript
   $(".custom-checkbox").change(function () {
     var isChecked = $(this).closest('[type=checkbox]').is(':checked')

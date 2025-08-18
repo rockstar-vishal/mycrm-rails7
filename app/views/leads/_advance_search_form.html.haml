@@ -33,18 +33,19 @@
         %h5 Search By Project Details    
       .col-xs-6.col-md-3
         .form-group
-          %label Project Name
-          = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects.sorted, :id, :name, params[:project_ids]), multiple: true, class: "form-control multi-select-list", data: {prompt_name: 'Project'}
-      .col-xs-6.col-md-3
-        .form-group
           %label Lead Number
           = text_field_tag :lead_no, params[:lead_no], class: "form-control", placeholder: "Lead Number"
       - if current_user.check_source_presence
         - sources=current_user.is_marketing_manager? ? current_user.accessible_sources : current_user.company.sources
-        .col-xs-6.col-md-3
-          .form-group
-            %label Lead Source
-            = select_tag :source_id, options_from_collection_for_select(sources, :id, :name, params[:source_id]), prompt: "Lead Source", class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Source'}
+      .w-100
+      .col-xs-6.col-md-6
+        .form-group
+          %label Project Name
+          = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects.sorted, :id, :name, params[:project_ids]), multiple: true, class: "form-control multi-select-list", data: {prompt_name: 'Project'}
+      .col-xs-6.col-md-6
+        .form-group
+          %label Lead Source
+          = select_tag :source_id, options_from_collection_for_select(sources, :id, :name, params[:source_id]), prompt: "Lead Source", class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Source'}
       - if @company.is_allowed_field?("sub_source")
         
         .col-xs-6.col-md-3
@@ -130,9 +131,10 @@
             = text_field_tag :visited_date_upto, params[:visited_date_upto], class: "form-control dateFormat", placeholder: "Select Date"
       .col-12
         %h5 Search By Channel partner 
-      .col-xs-6.col-md-3
+      .col-xs-6.col-md-6
         .form-group
           = select_tag :broker_ids, options_from_collection_for_select(current_user.company.brokers, :id, :name, params[:broker_ids]), prompt: "Channel Partner", class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Channel Partner'}
+      .w-100
       - if current_user.company.is_allowed_field?("lease_expiry_date")
         .col-xs-6.col-md-3
           .form-group
@@ -150,35 +152,36 @@
               = text_field_tag :expired_upto, params[:expired_upto], class: "form-control dateFormat", placeholder: "Select Date"
       .col-12
         %h5 Search By Lead Details 
-      .col-xs-6.col-md-3
+      .col-xs-6.col-md-6
         .form-group
           = label_tag 'Status'
           = select_tag "lead_statuses", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Status'}
-      .col-xs-6.col-md-3
+      .col-xs-6.col-md-6
         .form-group
           = label_tag 'Stage'
           = select_tag "lead_stages", options_from_collection_for_select(current_user.company.company_stages, :stage_id, :stage_name, params[:lead_stages]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Status'}
       - if @company.setting.present? && @company.enable_country_in_project
-        .col-xs-6.col-md-3
+        .col-xs-6.col-md-6
           .form-group
             = label_tag "Country"
             = select_tag :country_ids, options_from_collection_for_select(Country.all, :id, :name, params[:country_ids]),
-              multiple: true, class: "multi-select-list", data: {prompt_name: 'Country'}
-      .col-xs-6.col-md-3
+              multiple: true, class: "form-control multi-select-list", data: {prompt_name: 'Country'}
+      .col-xs-6.col-md-6
         .form-group
           = label_tag "City"
           = select_tag :city_ids, options_from_collection_for_select(City.all, :id, :name, params[:city_ids]),
-            multiple: true, class: "multi-select-list", data: {prompt_name: 'City'}
-      .col-xs-6.col-md-3
+            multiple: true, class: "form-control multi-select-list", data: {prompt_name: 'City'}
+      .col-xs-6.col-md-6
         .form-group
           = label_tag "Locality"
           = select_tag :locality_ids, options_from_collection_for_select(Locality.all, :id, :name, params[:locality_ids]),
-            multiple: true, class: "multi-select-list", data: {prompt_name: 'Locality'}
+            multiple: true, class: "form-control multi-select-list", data: {prompt_name: 'Locality'}
       - if @company.is_allowed_field?("state")
         .col-xs-6.col-md-3
           .form-group
             = label_tag "State"
             = text_field_tag :state, params[:name], class: "form-control", placeholder: "State"
+      .w-100
       .col-md-3
         .form-group.selct-check
           = label_tag "Visited"
@@ -194,29 +197,30 @@
       .col-12
         %h5 Search By Manager/Executive 
       - users = @company.can_assign_all_users ? @company.users.active : @company.users.active.where(:id=>current_user.manageable_ids)
-      .col-xs-6.col-md-3
+      .col-xs-6.col-md-6
         .form-group
           = label_tag "Assigned To"
           = select_tag "assigned_to[]", options_from_collection_for_select(users, :id, :name, params[:assigned_to]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Assigned To'}
       - if @company.setting.present? && @company.enable_meeting_executives && @company.is_allowed_field?("closing_executive")
-        .col-xs-6.col-md-3
+        .col-xs-6.col-md-6
           .form-group
             = label_tag "Closing Executive"
             = select_tag "closing_executive[]", options_from_collection_for_select(current_user.manageables.meeting_executives, :id, :name, params[:closing_executive]), class: "form-control multi-select-list", multiple: true
-      .col-xs-6.col-md-3
+      .col-xs-6.col-md-6
         .form-group
           = label_tag "Manager"
           = select_tag :manager_id, options_from_collection_for_select(current_user.manageables.managers, :id, :name, params[:manager_id]), prompt: "Select Manager", class: "form-control multiselect"
       - if @company.is_allowed_field?("broker_id")
-        .col-xs-6.col-md-3
+        .col-xs-6.col-md-6
           .form-group
             = label_tag "Broker"
             = select_tag :broker_ids, options_from_collection_for_select(current_user.company.brokers, :id, :name, params[:broker_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Select Broker'}
-      .col-xs-6.col-md-3
+      .col-xs-6.col-md-6
         .form-group
           = label_tag "Dead Reason"
           = select_tag :dead_reasons, options_from_collection_for_select(@company.reasons.active, :id, :reason, params[:dead_reasons]), class: "form-control multi-select-list", multiple: true
       
+      .w-100
       - if @company.is_allowed_field?("token_date")
         .col-xs-6.col-md-3
           .form-group

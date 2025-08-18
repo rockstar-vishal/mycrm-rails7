@@ -8,25 +8,22 @@
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Bulk Update
         .col-sm-12
-          %h1.m-0.text-dark Brokers
+          %h1.m-0.text-dark Brokers Bulk Update
     .container-fluid
       .row
-        .col-lg-12
-          .card
-            .card-header
-              %h3 Brokers
-            .card-body
-              = form_tag import_bulk_update_brokers_path, method: :put, multipart: true, class: '' do
-                .row
-                  .col-md-6
-                    .form-group.mb-3.p-0
-                      .input-group
-                        .custom-file
-                          = file_field_tag :brokers_update_file, accept: 'text/csv', :class=>"custom-file-input", :required=>true
-                          %label.custom-file-label{:for => "inputGroupFile04"} Choose file
-                        .input-group-append
-                          = button_tag type: "submit", class: 'btn btn-warning btn-sm', data: { disable_with: 'Please wait...' } do
-                            = fa_icon "upload"
-                            Upload
-                      .form-group.col-md-12.mt-3.mb-4.p-0
-                        = link_to "Sample CSV", "/bulk_broker_update_sample.csv", :class=>"btn btn-primary btn-sm mt-2"
+        .col-lg-6
+          .import-card
+            = form_tag import_bulk_update_brokers_path, method: :put, multipart: true, class: '' do
+              .row
+                .col-md-12
+                  .form-group
+                    .input-group
+                      .custom-file
+                        = file_field_tag :brokers_update_file, accept: 'text/csv', :class=>"custom-file-input", :required=>true
+                        %label.custom-file-label{:for => "inputGroupFile04"} Choose file
+                      .input-group-append
+                        = button_tag type: "submit", class: 'btn btn-new ', data: { disable_with: 'Please wait...' } do
+                          = fa_icon "upload"
+                          Upload
+                .col-md-12
+                  = link_to "Sample CSV", "/bulk_broker_update_sample.csv", :class=>"btn btn-primary btn-sm mt-2"

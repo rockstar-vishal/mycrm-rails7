@@ -20,25 +20,25 @@
       .form-group
         = f.select :city_id, options_from_collection_for_select(City.all, :id, :name, f.object.city_id), {include_blank: "Select City"}, class: 'form-control'
     .col-md-4
-      = f.text_field :address, class: 'form-control'
+      = f.text_field :address, class: 'form-control', placeholder: "Address"
     .col-md-4
-      = f.number_field :housing_token, class: 'form-control', label: "Housing Project ID"
+      = f.number_field :housing_token, class: 'form-control', label: "Housing Project ID", placeholder: "Housing Project ID"
     .col-md-4
-      = f.text_field :mb_token, class: 'form-control', label: "MB Project ID"
+      = f.text_field :mb_token, class: 'form-control', label: "MB Project ID", placeholder: "MB Project ID"
     .col-md-4
-      = f.text_field :nine_token, class: 'form-control', label: "99 Acres Project ID"
+      = f.text_field :nine_token, class: 'form-control', label: "99 Acres Project ID", placeholder: "99 Acres Project ID"
     - if project_form.present? && project_form.allowed_fields.include?("smartping_project_id")
       .col-md-4
-        = f.text_field :smartping_project_id, class: 'form-control', label: "Smartping Project ID"
+        = f.text_field :smartping_project_id, class: 'form-control', label: "Smartping Project ID", placeholder: "Smartping Project ID"
     .col-md-4
-      = f.text_field :property_codes, class: 'form-control', value: f.object.property_codes&.join(','), label: "Property Codes", multiple: true
+      = f.text_field :property_codes, class: 'form-control', value: f.object.property_codes&.join(','), label: "Property Codes", multiple: true, placeholder: "Property Codes"
     .col-md-4
-      = f.text_field :fb_form_nos, class: 'form-control', value: f.object.fb_form_nos&.join(','), label: "Fb Form", multiple: true
+      = f.text_field :fb_form_nos, class: 'form-control', value: f.object.fb_form_nos&.join(','), label: "Fb Form", multiple: true, placeholder: "Fb Form"
     .col-md-12
       = f.text_area :description, class: "form-control", value: f.object.description, placeholder: "Description", rows: "4", hide_label: true
     - if project_form.present? && project_form.allowed_fields.include?("brochure_link")
       .col-md-4
-        = f.text_field :brochure_link, class: 'form-control', label: "Brochure Link"
+        = f.text_field :brochure_link, class: 'form-control', label: "Brochure Link", placeholder: "Brochure Link"
     - if project_form.present? && project_form.allowed_fields.include?("project_brochure_file_name")
       .col-md-4
         = f.file_field :project_brochure, label: 'Brochure', class: "form-control"
@@ -47,64 +47,67 @@
         = f.file_field :banner_image, label: 'Banner', class: "form-control"
     - if project_form.present? && project_form.allowed_fields.include?("location")
       .col-md-4
-        = f.text_field :location, class: 'form-control', label: "Location"
+        = f.text_field :location, class: 'form-control', label: "Location", placeholder: "Location"
     - if project_form.present? && project_form.allowed_fields.include?("contact")
       .col-md-4
-        = f.text_field :contact, class: 'form-control', label: "Contact"
+        = f.text_field :contact, class: 'form-control', label: "Contact", placeholder: "Contact"
     .col-md-12
       = f.text_field :sv_form_budget_options, class: 'form-control', label: "Sv Form Budget Options"
 
   .w-100
   -if current_user.company.round_robin_enabled? && current_user.company.project_wise_round_robin
-    %hr
+    
     .row
       .col-md-6
         .form-group.ch-select
           = f.select :dyn_assign_user_ids, options_from_collection_for_select(current_user.manageables.round_robin_users, :id, :name, f.object.dyn_assign_user_ids), { label: 'Round Robin User', include_blank: false, include_hidden: false}, {class: 'form-control chosen-select', multiple: true}
   .w-100
   -if current_user.company.closing_executive_round_robin && current_user.company.project_wise_round_robin
-    %hr
+    
     .row
       .col-md-6
         .form-group.ch-select
           = f.select :dyn_assign_closing_executive_ids, options_from_collection_for_select(current_user.manageables.meeting_executives, :id, :name, f.object.dyn_assign_closing_executive_ids), { label: 'Round Robin Closing Executive', include_blank: false, include_hidden: false}, {class: 'form-control chosen-select', multiple: true}
-  %hr
+  
   .row
     .col-md-2
-      .form-group.mt-4.checkboxSpacing
-        = f.check_box :active, class: 'custom-checkbox'
+      .form-group
+        = f.check_box :active, class: ''
     .col-md-2
-      .form-group.mt-4.checkboxSpacing
-        = f.check_box :is_default, label: 'Default', class: 'custom-checkbox'
+      .form-group
+        = f.check_box :is_default, label: 'Default', class: ''
   .w-100
-  %hr
+  
   .col-md-12
     .form-group
       %label.col-sm-2.control-label{:for => "exampleInputFile"} FB Ads Id:
-      #fb_ads_ids.row
-        = f.fields_for :fb_ads_ids do |fb_add|
-          = render "fb_ads_id_fields", :f => fb_add
-        .links.m-4
-          = link_to_add_association "Add ADS IDs", f, :fb_ads_ids, class: "btn btn-primary"
-  %hr
+      #fb_ads_ids
+        .row
+          = f.fields_for :fb_ads_ids do |fb_add|
+            = render "fb_ads_id_fields", :f => fb_add
+          .links.pl-2
+            = link_to_add_association "Add ADS IDs", f, :fb_ads_ids, class: "btn btn-primary btn-sm"
+  
   .col-md-12
     .form-group
       %label.col-sm-6.control-label{:for => "exampleInputFile"} FB Forms:
-      #projects_fb_forms.row
-        = f.fields_for :projects_fb_forms do |project_fb_form|
-          = render "projects_fb_form_fields", :f => project_fb_form
-        .links.m-4
-          = link_to_add_association "Add FB Forms", f, :projects_fb_forms, class: "btn btn-primary"
-  %hr
+      #projects_fb_forms
+        .row
+          = f.fields_for :projects_fb_forms do |project_fb_form|
+            = render "projects_fb_form_fields", :f => project_fb_form
+          .links.pl-2
+            = link_to_add_association "Add FB Forms", f, :projects_fb_forms, class: "btn btn-primary btn-sm"
+  
   - if current_user.is_marketing_manager? && current_user.company.present? && current_user.company.secondary_level_round_robin
     .col-md-12
       .form-group
         %label.col-sm-6.control-label{:for => "exampleInputFile"} Round Robin Settings:
-        #user_managers.row
-          = f.fields_for :round_robin_settings do |rrs|
-            = render "round_robin_setting_fields", :f => rrs
-          .links
-            = link_to_add_association "Add Round Robin Configuration", f, :round_robin_settings, class: "btn btn-primary m-3"
+        #user_managers
+          .row
+            = f.fields_for :round_robin_settings do |rrs|
+              = render "round_robin_setting_fields", :f => rrs
+            .links.pl-2
+              = link_to_add_association "Add Round Robin Configuration", f, :round_robin_settings, class: "btn btn-primary btn-sm"
   .w-100
   %div
     .col-md-12

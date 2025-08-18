@@ -63,7 +63,7 @@
                           - property_code="%0D%0A%F0%9F%91%89+Project+Code+%3A+#{project.property_codes.join(',')}" if project.property_codes.present?
                           -contact="%0D%0A%F0%9F%91%89+Contact+%3A+#{project.contact}" if project_form.present? && project_form.allowed_fields.include?("contact") && project.contact.present?
                           - description = "%0D%0A%F0%9F%91%89+Description+%3A+#{project.description}" if project.description.present?
-                          %a.share{"data-action" => "share/whatsapp/share", :href => "https://web.whatsapp.com/send?text=%F0%9F%91%89+Project+Name+%3A+#{project.name}%0D%0A%F0%9F%91%89+Project+City+%3A+#{project.city.name rescue '-'}%0D%0A%F0%9F%91%89+Address+%3A+#{project.address}+#{description}+#{locations}+#{contact}+#{broucher_link}+#{project_brochure}+#{banner_image}", :target=>'_blank', class: "btn btn-primary m-r-5", style: "padding: 4px 8px; width: auto; border-radius: 50%!important;"}
+                          %a.share{"data-action" => "share/whatsapp/share", :href => "https://web.whatsapp.com/send?text=%F0%9F%91%89+Project+Name+%3A+#{project.name}%0D%0A%F0%9F%91%89+Project+City+%3A+#{project.city.name rescue '-'}%0D%0A%F0%9F%91%89+Address+%3A+#{project.address}+#{description}+#{locations}+#{contact}+#{broucher_link}+#{project_brochure}+#{banner_image}", :target=>'_blank', class: "btn btn-action"}
                             %i.fa.fa-whatsapp{"aria-hidden" => "true"}
             .pagination-custom-holder
               %label{style: "margin-left: 0;"} Projects Count - #{@projects.count}

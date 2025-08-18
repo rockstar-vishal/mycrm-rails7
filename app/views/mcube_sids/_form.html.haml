@@ -23,18 +23,18 @@
     .col-md-6
       .form-group
         = f.select :sub_source_id, options_from_collection_for_select(@current_user.company.sub_sources, :id, :name, f.object.sub_source_id), {prompt: true, label: 'SubSources'}, class: 'form-control'
-    .col-md-6
+    .col-md-12
       .form-group
         = f.select :default_numbers, options_from_collection_for_select(current_user.company.users.active.where.not(mobile: ''), :mobile, :numbers_with_name, f.object.default_numbers), {}, class: 'form-control multi-select-list', multiple: true
     .w-100
+    .col-md-2.pl-3
+      .form-group
+        = f.check_box :is_active, class: ''
     .col-md-2
-      .form-group.checkboxSpacing
-        = f.check_box :is_active, class: 'custom-checkbox'
-    .col-md-2
-      .form-group.checkboxSpacing
-        = f.check_box :is_round_robin_enabled, class: 'custom-checkbox', label: 'RR Enabled?'
+      .form-group
+        = f.check_box :is_round_robin_enabled, class: '', label: 'RR Enabled?'
 
-  %div
+  
     .col-md-12
       .form-group
         = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do

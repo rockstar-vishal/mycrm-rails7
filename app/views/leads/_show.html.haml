@@ -333,7 +333,7 @@
             .table-body
             - if @lead.visits.present?
               .table-responsive
-                %table.table.table-hover
+                %table.table.table-hover.nowrap
                   %thead
                     %tr
                       %th #
@@ -418,13 +418,13 @@
                           %td
                             = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-action" do
                               %i.fa.fa-print{"aria-hidden" => "true"}
-                        %td
-                          .action-wrapper
-                            = link_to edit_visit_lead_path(@lead, visit), class: "btn btn-action btn-edit" do
-                              = render partial: 'icons/edit'
-                            - if current_user.is_super?
-                              = link_to delete_visit_lead_path(@lead, visit), method: :delete, class: 'btn btn-action btn-remove', data: {turbo_confirm: "Are you sure?"} do
-                                = render partial: 'icons/clear'
+                        %td.nowrap
+                          
+                          = link_to edit_visit_lead_path(@lead, visit), class: "btn btn-action btn-edit" do
+                            = render partial: 'icons/edit'
+                          - if current_user.is_super?
+                            = link_to delete_visit_lead_path(@lead, visit), method: :delete, class: 'btn btn-action btn-remove', data: {turbo_confirm: "Are you sure?"} do
+                              = render partial: 'icons/clear'
             - else
               %h3
                 = "No Visits Avaliable"
