@@ -275,6 +275,7 @@ class LeadsController < ApplicationController
           name=row["Name"]
           mobile=row["Phone"]
           email= row["Email"]
+          address = row["Address"]
           other_phones=row["Other Contacts"]
           sub_source = row["Sub Source"]&.strip
           lead_status_id=(@company.statuses.find_id_from_name(row["Lead Status"].strip) rescue nil)
@@ -303,6 +304,7 @@ class LeadsController < ApplicationController
             other_phones: other_phones,
             email: email,
             status_id: lead_status_id,
+            address: address,
             user_id: user_id,
             project_id: project_id,
             source_id: source_id,
