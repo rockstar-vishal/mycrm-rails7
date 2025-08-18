@@ -2,4 +2,4 @@
   .col-md-12
     .form-group
       %label Select Projects
-      = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects.sorted, :id, :name, params[:project_ids]),multiple: true, class: "form-control multi-select-list"
+      = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects.sorted, :id, :name, params[:project_ids]),multiple: true, prompt: "Select Project", class: "tomselect-checkbox"

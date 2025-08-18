@@ -37,15 +37,15 @@
                         = render partial: 'shared/visited_range_selector'
                       .col-12
                         %h5.mt-0 Search By Project Details
-                      .col-md-3
+                      .col-md-6
                         = render partial: 'shared/projects_filter'
                       - if current_user.check_source_presence
-                        .col-md-3
+                        .col-md-6
                           = render partial: 'shared/sources_filter'
-                      .col-md-3
+                      .col-md-6
                         = render partial: 'shared/managers_filter'
                       - if current_user.company.is_allowed_field?("customer_type")
-                        .col-md-3
+                        .col-md-6
                           = render partial: 'shared/customer_type_filter'
                       - if current_user.company.setting.present? && current_user.company.setting.visit_filter_enable
                         .col-md-3

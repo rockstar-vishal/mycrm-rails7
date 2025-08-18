@@ -67,7 +67,7 @@
                               .col-md-6
                                 .form-group
                                   %label Select status
-                                  = select_tag :visit_status_ids, options_from_collection_for_select(current_user.company.expected_visit_statuses, :id, :name, params[:visit_status_ids]),multiple: true, class: "form-control multi-select-list"
+                                  = select_tag :visit_status_ids, options_from_collection_for_select(current_user.company.expected_visit_statuses, :id, :name, params[:visit_status_ids]),multiple: true, prompt: "Select status", class: "tomselect-checkbox"
                             .col-12
                               %h5 Search By Manager 
                             .col-md-6

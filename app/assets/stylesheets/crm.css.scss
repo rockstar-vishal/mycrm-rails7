@@ -2503,3 +2503,47 @@ border-radius: 10px;
 .table-responsive{
   scrollbar-width: thin;
 }
+.ts-control{
+  min-height: 47px;
+  border: 1px solid #ebe8e8!important;
+  border-radius: 10px!important;
+}
+.ts-wrapper.multi .ts-control > div.item{
+    color: #fff!important;
+    background: #00cdac!important;
+    border: none!important;
+    border-radius: 30px!important;
+    font-size: 12px!important;
+    font-weight: 500!important;
+    padding: 0 10px!important;
+}
+.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove{
+   border: none!important;
+}
+.ts-wrapper.multi .ts-control > div.clear-button  {
+  color: #dc3545 !important;
+  background: #f8dbde !important;
+  border-color: #dc3545 !important;
+  border-radius: 30px!important;
+  right: 10px!important;
+}
+.ts-dropdown{
+  border: 1px solid #ebe8e8!important;
+  border-radius: 10px!important;
+  padding: 8px 12px!important;
+  font-size: 14px!important;
+  box-shadow: none!important;
+}
+.plugin-dropdown_input .dropdown-input{
+  border: 1px solid #ebe8e8!important;
+    border-radius: 10px!important;
+    margin-bottom: 5px!important;
+}
+.ts-dropdown .option{
+  display: flex;
+  border-radius: 10px!important;
+}
+.tom-selectcss-fix .form-select{
+  border: none!important;
+  padding: 0!important;
+}

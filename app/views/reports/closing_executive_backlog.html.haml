@@ -43,7 +43,7 @@
                       .col-md-6
                         .form-group
                           %label Select Users
-                          = select_tag :closing_executive, options_from_collection_for_select(current_user.manageables.meeting_executives, :id, :name, params[:closing_executive]), multiple: true, class: "form-control multi-select-list"
+                          = select_tag :closing_executive, options_from_collection_for_select(current_user.manageables.meeting_executives, :id, :name, params[:closing_executive]), multiple: true, prompt: "Select Project", class: "tomselect-checkbox"
                       .col-md-6
                         = render partial: 'shared/managers_filter'
                       .col-md-6

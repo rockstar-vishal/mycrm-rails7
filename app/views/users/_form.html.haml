@@ -35,7 +35,7 @@
                 = f.text_field :mobile, class: "form-control", placeholder: "Mobile Number"
             .col-md-3.required
               .form-group
-                = f.select :role_id, options_from_collection_for_select(current_user.accessible_roles, :id, :name, (f.object.role_id rescue nil)), {include_blank: "Select Role", label: 'Role'},{class: 'form-control', data: {supervisor_value: current_user.accessible_roles.supervisor.ids, user_project_access: (current_user.company.setting.present? && current_user.company.enabled_project_wise_access && current_user.is_super?)}}
+                = f.select :role_id, options_from_collection_for_select(current_user.accessible_roles, :id, :name, (f.object.role_id rescue nil)), {include_blank: "Select Role", label: 'Role'},{class: 'tomselect-checkbox', data: {supervisor_value: current_user.accessible_roles.supervisor.ids, user_project_access: (current_user.company.setting.present? && current_user.company.enabled_project_wise_access && current_user.is_super?)}}
             .col-md-3
               .form-group
                 = f.password_field :password, class: 'form-control', placeholder: "Password"

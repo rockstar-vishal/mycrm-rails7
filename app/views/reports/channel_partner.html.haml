@@ -48,7 +48,7 @@
                         .form-group
                           %label Select Firm Name
                           - firm_names = current_user.company.brokers.pluck(:firm_name).reject(&:blank?).map(&:downcase).uniq
-                          = select_tag :firm_names, options_for_select(firm_names, params[:firm_names]), multiple: true, class: "form-control multi-select-list"
+                          = select_tag :firm_names, options_for_select(firm_names, params[:firm_names]), multiple: true, prompt: "Select Firm Name", class: "tomselect-checkbox"
                       .col-md-3
                         .form-group
                           %label Broker Name

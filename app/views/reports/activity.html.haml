@@ -45,7 +45,7 @@
                       .col-md-6
                         .form-group
                           %label Select Status
-                          = select_tag "lead_statuses[]", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Select Status'}
+                          = select_tag "lead_statuses[]", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), prompt: "Select Status", class: "tomselect-checkbox", multiple: true, data: {prompt_name: 'Select Status'}
                       .col-md-6
                         = render partial: 'shared/managers_filter'
                       - if current_user.company.is_allowed_field?("customer_type")

@@ -67,6 +67,22 @@ $(document).ready(function() {
     cssClass: ''
   });
 
+  document.querySelectorAll('.tomselect-checkbox').forEach(function(el) {
+  new TomSelect(el, {
+    maxItems: 30,
+    plugins: {
+      'clear_button': {},
+      'remove_button': {},
+      'dropdown_input': {},
+      'checkbox_options': {
+        checkedClassNames:   ['ts-checked'],
+        uncheckedClassNames: ['ts-unchecked']
+      }
+    }
+  });
+});
+
+
   // clipboard js
 
   // Initialize tooltips for Bootstrap 5
