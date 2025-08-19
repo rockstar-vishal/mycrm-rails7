@@ -1,9 +1,9 @@
-.nested-fields.col-md-12{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
-  .col-md-6.mb-3
+.nested-fields.col-md-4
+  .col-md-12{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px; margin-bottom: 20px;"}
     .form-group.required
       = f.collection_select :stage_id, Stage.active, :id, :name, { hide_label: 'true' },{class: "form-control"}
     %center
-      = link_to_remove_association "Remove", f, :class=>"btn btn-danger"
+      = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"
   - if f.object.persisted?
     .col-md-12
       .form-group.row

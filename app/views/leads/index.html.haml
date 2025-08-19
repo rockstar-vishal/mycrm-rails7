@@ -1,13 +1,13 @@
 .content-wrapper
   .content-header
-    .container-fluid
-      .row
-        .col-md-12
-          %ol.breadcrumb
-            %li.breadcrumb-item
-              %a{:href => "/"} Home
-            %li.breadcrumb-item.active Funnel
-          %h1.m-0 Funnel
+    .row
+      .col-md-12
+        %ol.breadcrumb
+          %li.breadcrumb-item
+            %a{:href => "/"} Home
+          %li.breadcrumb-item.active Funnel
+        %h1.m-0 Funnel
+      .col-md-12
         - if @company.setting.present? && @company.enable_cards_on_advance_search
           = render "filtered_index_buckets", locals: {:@company => @company, :@leads => @leads}
         - elsif @company.card_status.reject(&:blank?).present?
@@ -22,8 +22,8 @@
         .col-lg-12
           .table-card
             .search-card
-              .row
-                .col-md-5
+              .action-bar
+                %div
                   .search-outer
                     = form_tag leads_path, method: :get do
                       .search-group
@@ -41,7 +41,7 @@
                     %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                       = render 'icons/filters'
                       Smart Search
-                .col-md-7
+                %div
                   .group-link
                     - if current_user.is_super? || current_user.can_import
                       = link_to import_leads_path, :class=>"ml-auto", target: "_blank" do
@@ -75,7 +75,7 @@
                 - if current_user.is_super? || current_user.can_import?
                   = render 'bulk_action'
                 .table-responsive
-                  %table.table.tablesorter
+                  %table.table.tablesorter.table-hover
                     %thead
                       %tr
                         - unless params[:deactivated].present?
@@ -284,7 +284,7 @@
                   %div#zentrixcloudiframeHolder
                 - if @leads.present?
                   
-                  %strong{style: "text-align: center; display: block;"} Lead Count - #{@leads_count}
+                  %label{style: "text-align: center; display: block;"} Lead Count - #{@leads_count}
                   = will_paginate @leads, :class  =>  "ct-pag"
 
 :javascript

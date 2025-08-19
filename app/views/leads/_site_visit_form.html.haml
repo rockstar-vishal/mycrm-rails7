@@ -29,14 +29,14 @@
             .form-group.ch-select
               = f.select :project_ids, options_from_collection_for_select(current_user.company.projects, :id, :name, f.object.project_ids), { label: 'Projects'}, {class: 'form-control chosen-select', multiple: true}
         .w-100
-        .col-md-6#check_visit_executed{:style => ("display:none;" unless (@lead.company.setting.present? && @lead.company.enable_advance_visits))}
+        .col-md-12#check_visit_executed{:style => ("display:none;" unless (@lead.company.setting.present? && @lead.company.enable_advance_visits))}
           .row
-            .col-md-6
-              = f.check_box :is_visit_executed, class: "visit_executed", style: "margin-top: 40px;"
-            .col-md-6
-              = f.check_box :is_postponed, class: "visit_postponed", style: "margin-top: 40px;"
-            .col-md-6
-              = f.check_box :is_canceled, class: "visit_postponed", style: "margin-top: 40px;"
+            .col-md-4
+              = f.check_box :is_visit_executed, class: "visit_executed"
+            .col-md-4
+              = f.check_box :is_postponed, class: "visit_postponed"
+            .col-md-4
+              = f.check_box :is_canceled, class: "visit_postponed"
         - if @company.is_allowed_for_visits?('location')
           .col-md-6
             = f.text_field :location, class: "form-control", placeholder: "Location"
@@ -47,8 +47,8 @@
           .col-md-6
             = f.text_field :finalization_period, class: "form-control", placeholder: "Finalization Period"
         .col-12.visit_executed_fields
-          .col-md-12
-            = f.file_field :site_visit_form, label: 'Visit Form', class: "form-control"
+        
+          = f.file_field :site_visit_form, label: 'Visit Form', class: "form-control"
       .visit_executed_fields
         .row
           .col-md-12
@@ -80,14 +80,14 @@
           - if @company.is_allowed_for_visits?('own_contribution_maximum')
             .col-md-6
               = f.text_field :own_contribution_maximum, class: "form-control", placeholder: "Maximum Own Contriution", label: "Maximum Own Contribution"
-      .col-md-12
-        .form-group
-          = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
-           
-            Save
-          = link_to lead_path(@lead), remote: true, class: "btn btn-delete" do
-            
-            Cancel
+      
+      .form-group
+        = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+          
+          Save
+        = link_to lead_path(@lead), remote: true, class: "btn btn-delete" do
+          
+          Cancel
 :javascript
   $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
   $(".finance").click(function(){

@@ -1,5 +1,5 @@
-.nested-fields.col-md-4{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
-  .form-group.required
+.nested-fields.col-md-4
+  .form-group.required{:style => "border: 1px dashed #999; border-radius: 5px; padding: 20px;"}
     = f.text_field :number, :value=>f.object.number, :class=>"form-control", label: 'Ads ID'
-  %center
-    = link_to_remove_association "Remove", f, :class=>"btn btn-danger"
+    %center
+      = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"

@@ -67,6 +67,33 @@ $(document).ready(function() {
     cssClass: ''
   });
 
+  document.querySelectorAll('.tomselect-checkbox').forEach(function(el) {
+  new TomSelect(el, {
+    maxItems: 30,
+    plugins: {
+      'clear_button': {},
+      'remove_button': {},
+      'dropdown_input': {},
+      'checkbox_options': {
+        checkedClassNames:   ['ts-checked'],
+        uncheckedClassNames: ['ts-unchecked']
+      }
+    }
+  });
+});
+
+  // Single select TomSelect configuration
+  document.querySelectorAll('.tomselect-single').forEach(function(el) {
+  new TomSelect(el, {
+    maxItems: 1,
+    plugins: {
+      'clear_button': {},
+      'dropdown_input': {}
+    }
+  });
+});
+
+
   // clipboard js
 
   // Initialize tooltips for Bootstrap 5
@@ -440,4 +467,40 @@ function initiateLeadCalender() {
     }
   });
 }
+
+// Reinitialize TomSelect fields after modal content loads
+$(document).on('shown.bs.modal', function() {
+  // Reinitialize tomselect-checkbox fields
+  document.querySelectorAll('.tomselect-checkbox').forEach(function(el) {
+    // Check if TomSelect is already initialized
+    if (!el.classList.contains('ts-hidden-accessible')) {
+      new TomSelect(el, {
+        maxItems: 30,
+        plugins: {
+          'clear_button': {},
+          'remove_button': {},
+          'dropdown_input': {},
+          'checkbox_options': {
+            checkedClassNames:   ['ts-checked'],
+            uncheckedClassNames: ['ts-unchecked']
+          }
+        }
+      });
+    }
+  });
+  
+  // Reinitialize tomselect-single fields
+  document.querySelectorAll('.tomselect-single').forEach(function(el) {
+    // Check if TomSelect is already initialized
+    if (!el.classList.contains('ts-hidden-accessible')) {
+      new TomSelect(el, {
+        maxItems: 1,
+        plugins: {
+          'clear_button': {},
+          'dropdown_input': {}
+        }
+      });
+    }
+  });
+});
 

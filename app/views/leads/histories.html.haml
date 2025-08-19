@@ -14,21 +14,21 @@
       .row
         .col-lg-12
           - default_tab = (@default_tab.presence || 'SMS').to_s.downcase
-          %ul.nav.nav-tabs.nav-justified
-            %li{:class => ("active" if @default_tab == 'SMS')}
-              = link_to '#tab1', class: "nav-link #{('active' if @default_tab == 'SMS')}", "data-toggle"=>"tab" do
+          %ul.nav.nav-tabs
+            %li.nav-item
+              = link_to '#tab1', class: "nav-link #{'active' if default_tab == 'sms'}", id: 'tab1-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab1", "aria-selected" => (default_tab == 'sms').to_s do
                 SMS
-            %li{:class => ("active" if @default_tab == 'lead-attempt')}
-              = link_to '#tab2', class: "nav-link #{('active' if @default_tab == 'lead-attempt')}", "data-toggle"=>"tab" do
+            %li.nav-item
+              = link_to '#tab2', class: "nav-link #{'active' if default_tab == 'lead-attempt'}", id: 'tab2-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab2", "aria-selected" => (default_tab == 'lead-attempt').to_s do
                 Lead Attempt
-            %li{:class => ("active" if @default_tab == 'updates')}
-              = link_to '#tab3', class: "nav-link #{('active' if @default_tab == 'updates')}", "data-toggle"=>"tab" do
+            %li.nav-item
+              = link_to '#tab3', class: "nav-link #{'active' if default_tab == 'updates'}", id: 'tab3-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab3", "aria-selected" => (default_tab == 'updates').to_s do
                 Updates
-            %li{:class => ("active" if @default_tab == 'incoming-call')}
-              = link_to '#tab4', class: "nav-link #{('active' if @default_tab == 'incoming-call')}", "data-toggle"=>"tab" do
+            %li.nav-item
+              = link_to '#tab4', class: "nav-link #{'active' if default_tab == 'incoming'}", id: 'tab4-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab4", "aria-selected" => (default_tab == 'incoming').to_s do
                 Incoming Call
-            %li{:class => ("active" if @default_tab == 'outgoing-call')}
-              = link_to '#tab5', class: "nav-link #{('active' if @default_tab == 'outgoing-call')}", "data-toggle"=>"tab" do
+            %li.nav-item
+              = link_to '#tab5', class: "nav-link #{'active' if default_tab == 'outgoing'}", id: 'tab5-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab5", "aria-selected" => (default_tab == 'outgoing').to_s do
                 Outgoing Call
           .tab-content
             #tab1.tab-pane.fade{class: "#{'show active' if default_tab == 'sms'}", role: 'tabpanel', 'aria-labelledby' => 'tab1-tab'}
@@ -166,7 +166,7 @@
                    
                 .table-body
                   .table-responsive
-                    %table.table.table-hover.dataTable-sorting-false.responsive.nowrap.export1{style: 'width:100%!important'}
+                    %table.table.table-hover.dataTables.dataTable-sorting-false.responsive.nowrap.export1{style: 'width:100%!important'}
                       %thead
                         %tr
                           %td From

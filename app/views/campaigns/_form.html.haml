@@ -12,7 +12,7 @@
         = f.text_field :title, class: "form-control", placeholder: "Title"
     .col-md-6
       .form-group
-        = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), prompt: "Lead Source" , class: "form-control multi-select-list", multiple: true
+        = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), prompt: "Select Source", class: "tomselect-single"
 
   .row
     .col-md-4
@@ -36,15 +36,13 @@
           .w-100
             .available-projects
               %label Available Projects
-              %select{ multiple: true, class: "form-control available-projects-list" }
+              %select{ multiple: true, class: "form-control available-projects-list " }
                 - current_user.company.projects.each do |project|
                   - unless @campaign.projects.include?(project)
                     %option{ value: project.id }= project.name
-          .w-1{ style: "    width: 80px; display: flex ; align-items: center; justify-content: center; padding-top: 20px;" }
-            .controls
-              %i.fa.fa-arrow-right.move-right.mb-2{ style: "cursor: pointer;" }
-              %br
-              %i.fa.fa-arrow-left.move-left{ style: "cursor: pointer;" }
+          .w-1{ style: "    width: 80px; display: flex ; align-items: center; justify-content: center; padding: 20px;" }
+            
+            =image_tag 'switch.png', alt: '', height: '32', width: '32', class: ''
           .w-100
             .selected-projects
               %label Selected Projects
@@ -128,4 +126,19 @@
       no_results_text: 'No results matched',
       width: '100%'
     });
+    
+    // Initialize TomSelect for source field
+    if (typeof TomSelect !== 'undefined') {
+      $('.tomselect-single').each(function() {
+        if (!$(this).hasClass('ts-hidden-accessible')) {
+          new TomSelect(this, {
+            maxItems: 1,
+            plugins: {
+              'clear_button': {},
+              'dropdown_input': {}
+            }
+          });
+        }
+      });
+    }
   });

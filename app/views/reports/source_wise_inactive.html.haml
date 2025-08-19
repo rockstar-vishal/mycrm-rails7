@@ -13,13 +13,13 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-3
+            .action-bar
+              %div
                 .group-link
                   = link_to search_params.merge!(format: :csv), class: "btn btn-action" do
                     = fa_icon "download"
                     Export
-              .col-md-9
+              %div
                 .group-link
                   = render 'reports_button', locals: {report_name: :source_wise_inactive}
               = render 'report_search'
