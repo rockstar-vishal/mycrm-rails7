@@ -36,8 +36,8 @@ gem 'image_processing', '~> 1.2'
 gem 'has_magic_fields', '~> 0.1'
 
 # Background jobs
-gem 'resque', '~> 2.7'
-gem 'resque-scheduler', '~> 4.1'
+gem 'resque', '~> 2.7.0'
+gem 'resque-scheduler', '~> 4.11.0'
 
 # Search
 gem 'elasticsearch-model'

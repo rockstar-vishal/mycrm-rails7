@@ -1,21 +1,14 @@
 require 'resque/scheduler'
 require 'resque/scheduler/server'
 
-# Defer job loading until after Rails is fully initialized to avoid circular dependencies
+# Configure Resque to use proper Rails autoloading
 Rails.application.config.after_initialize do
   begin
-    # Only load job files if Rails is fully initialized and we're not in a problematic state
-    if defined?(Rails) && Rails.application && !defined?(Rails::Console)
-      Dir["#{Rails.root}/app/jobs/*.rb"].each do |file|
-        begin
-          require file
-        rescue => e
-          Rails.logger.warn "Warning: Could not load job file #{file}: #{e.message}" if defined?(Rails) && Rails.logger
-        end
-      end
-    end
+    # Let Rails handle job loading automatically through Zeitwerk
+    # This is more reliable than manual file loading
+    Rails.logger.info "Resque jobs will be loaded automatically by Rails autoloader"
   rescue => e
-    Rails.logger.warn "Warning: Could not load job files: #{e.message}" if defined?(Rails) && Rails.logger
+    Rails.logger.warn "Warning: Could not configure Resque: #{e.message}"
   end
 end
 
