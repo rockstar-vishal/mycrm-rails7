@@ -7,10 +7,12 @@ redis_config = {
   db: defined?(CRMConfig) ? CRMConfig.redis_db : ENV['REDIS_DB'] || 0
 }
 
+namespace_tag = CRMConfig.redis_namespace || "leadquest"
+
 redis_config[:password] = defined?(CRMConfig) ? CRMConfig.redis_password : ENV['REDIS_PASSWORD'] if defined?(CRMConfig) ? CRMConfig.redis_password.present? : ENV['REDIS_PASSWORD'].present?
 
 $redis = Redis.new(redis_config)
-$redis_ns = Redis::Namespace.new("leadquest:#{Rails.env}", redis: $redis)
+$redis_ns = Redis::Namespace.new("#{namespace_tag}:#{Rails.env}", redis: $redis)
 
 # Configure Resque to use the Redis connection
 Resque.redis = $redis_ns
