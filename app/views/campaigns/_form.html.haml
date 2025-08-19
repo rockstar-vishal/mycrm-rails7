@@ -12,7 +12,7 @@
         = f.text_field :title, class: "form-control", placeholder: "Title"
     .col-md-6
       .form-group
-        = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), prompt: "Select Project", class: "tomselect-checkbox", multiple: true
+        = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), prompt: "Select Source", class: "tomselect-single"
 
   .row
     .col-md-4
@@ -126,4 +126,19 @@
       no_results_text: 'No results matched',
       width: '100%'
     });
+    
+    // Initialize TomSelect for source field
+    if (typeof TomSelect !== 'undefined') {
+      $('.tomselect-single').each(function() {
+        if (!$(this).hasClass('ts-hidden-accessible')) {
+          new TomSelect(this, {
+            maxItems: 1,
+            plugins: {
+              'clear_button': {},
+              'dropdown_input': {}
+            }
+          });
+        }
+      });
+    }
   });
