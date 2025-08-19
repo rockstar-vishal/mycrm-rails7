@@ -2508,7 +2508,7 @@ border-radius: 10px;
   border: 1px solid #ebe8e8!important;
   border-radius: 10px!important;
 }
-.ts-wrapper.multi .ts-control > div.item{
+.ts-wrapper.multi .ts-control > div.item, .tomselect-single  .item{
     color: #fff!important;
     background: #00cdac!important;
     border: none!important;
@@ -2546,4 +2546,22 @@ border-radius: 10px;
 .tom-selectcss-fix .form-select{
   border: none!important;
   padding: 0!important;
+}
+.tomselect-single  .item{
+      display: flex;
+    align-items: center;
+}
+.tomselect-single.plugin-clear_button .clear-button{
+ color: #dc3545 !important;
+  background: #f8dbde !important;
+  border-color: #dc3545 !important;
+  border-radius: 30px!important;
+  right: 10px!important;
+      width: 20px;
+    display: flex
+;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    line-height: 1;
 }

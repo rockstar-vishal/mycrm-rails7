@@ -60,10 +60,12 @@
                           = label_tag :display_from, 'Mobile', class: 'control-label'
                           .form-group
                             = text_field_tag :mobile, params[:mobile], class: "form-control", placeholder: "Mobile No."
+                        .col-12
+                          %h5 Search By User Role
                         .col-xs-6.col-md-6
                           = label_tag :display_from, 'Role', class: 'control-label'
                           .form-group
-                            = select_tag "role_ids", options_from_collection_for_select(current_user.accessible_roles, :id, :name, params[:role_ids]), class: "form-control tomselect-checkbox", multiple: true, data: { prompt: 'Select Role' }
+                            = select_tag "role_ids", options_from_collection_for_select(current_user.accessible_roles, :id, :name, params[:role_ids]), class: " tomselect-checkbox", multiple: true, data: { prompt: 'Select Role' }
                         .col-12
                           %h5 Search By Dates
                         .col-xs-6.col-md-3
