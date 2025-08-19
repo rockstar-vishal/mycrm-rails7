@@ -1,4 +1,4 @@
-class ProcessWhatsAppTrigger
+class ProcessWhatsappTrigger
 
   @queue = :process_whatspp
   @process_whatsapp_logger = Logger.new('log/process_email.log')
