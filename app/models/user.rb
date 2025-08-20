@@ -295,7 +295,7 @@ class User < ActiveRecord::Base
     def send_push_notifications(company)
       url = "http://#{company.domain}/leads?is_advanced_search=true&exact_ncd_from=#{(Time.zone.now+15.minutes).to_i}&exact_ncd_upto=#{(Time.zone.now+30.minutes).to_i}"
       message_text = "Reminder To Call Leads. Next Call In 30 Mins. <a href=#{url} target='_blank'>click here</a>"
-      Pusher.trigger(company.uuid, 'ncd_reminder', {message: message_text.html_safe, notifiables: all.pluck(:uuid)})
+      # Pusher.trigger(company.uuid, 'ncd_reminder', {message: message_text.html_safe, notifiables: all.pluck(:uuid)})
     end
 
     def send_browser_push_notifications(company)
@@ -425,7 +425,7 @@ class User < ActiveRecord::Base
     else
       message_text = "Incoming Call From Unknown (#{calling_no})"
     end
-    Pusher.trigger(self.company.uuid, 'incoming_call', {message: message_text, notifiables: [self.uuid]})
+    # Pusher.trigger(self.company.uuid, 'incoming_call', {message: message_text, notifiables: [self.uuid]})
   end
 
 end

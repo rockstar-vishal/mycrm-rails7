@@ -26,13 +26,13 @@ class Lead < ActiveRecord::Base
   has_many :call_attempts, dependent: :destroy
   has_many :custom_audits, class_name: "CustomAudit", foreign_key: :auditable_id, dependent: :destroy
   has_many :magic_attributes, class_name: 'MagicAttribute', dependent: :destroy
-  belongs_to :source
+  belongs_to :source, optional: true
   belongs_to :project
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :presale_user, class_name: 'User', foreign_key: :presale_user_id, optional: true
   belongs_to :postsale_user, class_name: 'User', foreign_key: :closing_executive, optional: true
   belongs_to :last_lead_modified_user, class_name: 'User', foreign_key: :last_modified_by, optional: true
-  belongs_to :status
+  belongs_to :status, optional: true
   belongs_to :call_in, optional: true
   belongs_to :city, optional: true
   belongs_to :locality, optional: true
@@ -423,7 +423,7 @@ class Lead < ActiveRecord::Base
     if self.company.events.include?("lead_create")
       url = "http://#{self.company.domain}/leads/#{self.id}/edit"
       message_text = "Lead #{self.name}, assigned to #{self.user&.name} has been created at #{self.created_at.strftime('%d-%b-%y %H:%M %p')}. <a href=#{url} target='_blank'>click here</a>"
-      Pusher.trigger(self.company.uuid, 'lead_create', {message: message_text, notifiables: [self.user.uuid]})
+      # Pusher.trigger(self.company.uuid, 'lead_create', {message: message_text, notifiables: [self.user.uuid]})
     end
   end
 

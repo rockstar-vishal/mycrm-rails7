@@ -95,7 +95,7 @@ class Leads::CallLog < ActiveRecord::Base
       else
         message_text = "Missed an Incoming call from Unknown (#{self.from_number})"
       end
-      Pusher.trigger(self.lead.company.uuid, 'missed_call', {message: message_text, notifiables: [user.uuid]})
+      # Pusher.trigger(self.lead.company.uuid, 'missed_call', {message: message_text, notifiables: [user.uuid]})
     end
   end
 
