@@ -225,6 +225,7 @@ class UsersController < ApplicationController
         :users_sources_attributes => [:id, :_destroy, :source_id, :user_id],
         :user_detail_attributes => [:id, :paid_incentive, :pending_incentive, :earned_incentive]
       )
+      permitted = permitted.except(:password, :password_confirmation) if permitted[:password].blank?
       permitted.merge!(company_id: params[:user][:company_id]) if current_user.is_sysad?
       permitted
     end
