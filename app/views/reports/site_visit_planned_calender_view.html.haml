@@ -14,7 +14,7 @@
         .col-lg-12
           .card
             .card-header
-              = link_to params.except(:action, :controller).delete(calender_view: :true), class: "btn btn-action float-right" do
+              = link_to params.except(:action, :controller).to_unsafe_h.except(:calender_view), class: "btn btn-action float-right" do
                 
                 Table View
             .card-body.custom-calender
