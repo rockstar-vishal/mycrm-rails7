@@ -170,7 +170,7 @@ module Api
       def create_service_api_log
         ServiceApiLog.create(
           entry_type: 'tatateleservice',
-          payload: params.except(:controller, :format)
+          payload: params.except(:controller, :format).to_unsafe_h
         )
       end
 
