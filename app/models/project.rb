@@ -15,7 +15,7 @@ class Project < ActiveRecord::Base
   has_many :fb_ads_ids, class_name: 'FbAdsId'
   belongs_to :company
   belongs_to :city
-  belongs_to :country
+  belongs_to :country, optional: true
   has_many :leads, dependent: :restrict_with_error
   has_many :round_robin_settings, class_name: 'RoundRobinSetting'
   validates :name, :company, presence: true
