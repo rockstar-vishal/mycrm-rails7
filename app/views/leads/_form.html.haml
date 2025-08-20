@@ -29,9 +29,9 @@
           = f.text_field :email, class: "form-control", placeholder: "Primary Email", label: "Primary Email", required: @company.is_required_fields?("email"), disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("email"))
     - if @company.is_allowed_field?("project_id")
       - label = @company.find_label("project_id").present? ? (@company.find_label("project_id").custom_value.present? ? @company.find_label("project_id").custom_value : @company.find_label("project_id").default_value) : 'Project'
-      .col-md-3.required.ch-select
+      .col-md-3.required
         .form-group
-          = f.select :project_id, options_from_collection_for_select(@company.projects.active.sorted, :id, :name, @lead.project_id), {prompt: true, label: label}, class: 'form-control chosen-select', disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("project_id"))
+          = f.select :project_id, options_from_collection_for_select(@company.projects.active.sorted, :id, :name, @lead.project_id), {prompt: true, label: label}, class: 'form-control', disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("project_id"))
     - if @company.requirement?
       = render "requirement_form", :f => f
     - if @company.role_statuses.present?
@@ -112,12 +112,12 @@
           = f.select :source_id, options_from_collection_for_select(sources, :id, :name, f.object.source_id), {include_blank: "Source"}, {class: 'form-control', disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("source_id")), data: {channel_partner_value: f.object.company.cp_sources.ids, referece_value: f.object.company.referal_sources.ids, is_broker_required: f.object.company.is_required_fields?("broker_id"), ref_name_required: f.object.company.is_required_fields?("referal_name"), ref_mob_required: f.object.company.is_required_fields?("referal_mobile")}}
     - if @company.secondary_source_enabled
       .col-md-3
-        .form-group.ch-select
+        .form-group
           %label Secondary Source
-          = f.select :secondary_source_ids, options_from_collection_for_select(@company.sources, :id, :name, f.object.secondary_source_ids), { hide_label: true}, {class: 'form-control chosen-select', multiple: true, data: {}, disabled: true}
+          = f.select :secondary_source_ids, options_from_collection_for_select(@company.sources, :id, :name, f.object.secondary_source_ids), { hide_label: true}, {class: 'form-control tomselect-single', multiple: true, data: {}, disabled: true}
     .col-md-3#broker_select{:style => ("display:none;" unless f.object.company.cp_sources.ids.include?(f.object.source_id)), class: ("required" if @company.is_required_fields?("broker_id"))}
-      .form-group.ch-select
-        = f.select :broker_id, options_from_collection_for_select(@company.brokers.reorder(nil).order('name'), :id, :name_with_firm_name, f.object.broker_id), { label: 'Broker', prompt: "Please select"}, {class: 'form-control chosen-select', multiple: false, disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("broker_id"))}
+      .form-group
+        = f.select :broker_id, options_from_collection_for_select(@company.brokers.reorder(nil).order('name'), :id, :name_with_firm_name, f.object.broker_id), { label: 'Broker', prompt: "Please select"}, {class: 'form-control tomselect-single', multiple: false, disabled: f.object.new_record? ? false : (f.object.can_disable? && @company.restricted_lead_fields.include?("broker_id"))}
     .col-md-6#reference_detail{:style => ("display:none;" unless f.object.company.referal_sources.ids.include?(f.object.source_id))}
       .row
         .col-md-6{class: ("required" if @company.is_required_fields?("referal_name"))}
