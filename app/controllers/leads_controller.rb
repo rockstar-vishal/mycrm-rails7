@@ -164,6 +164,9 @@ class LeadsController < ApplicationController
         render_modal('show', {:class=>'right'})
       end
     else
+      # Only show the visit that was being added, not all visits
+      # Find the visit that was being added (the one with validation errors)
+      @visits = @lead.visits.select { |v| v.new_record? || v.errors.any? }.first || @lead.visits.build
       render_modal('site_visit_form')
     end
   end

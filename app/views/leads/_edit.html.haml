@@ -127,7 +127,19 @@
 :javascript
   var date = new Date();
   var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  $('.datetimepickerncd_modal').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
+  // Initialize Flatpickr for NCD modal fields
+  flatpickr('.datetimepickerncd_modal', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    minDate: today,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
   $("#lead_status_id").change(function () {
     if($(this).val()){
       var stage_url = "/leads/" + $(this).val() + "/stages";

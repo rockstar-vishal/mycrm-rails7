@@ -98,9 +98,15 @@
       });
     });
 
-    $('.dateFormat').datetimepicker({
-      timepicker: false,
-      format: 'd/m/Y'
+    // Initialize Flatpickr for date fields
+    flatpickr('.dateFormat', {
+      enableTime: false,
+      dateFormat: 'd/m/Y',
+      allowInput: true,
+      clickOpens: true,
+      locale: {
+        firstDayOfWeek: 1
+      }
     });
 
     $(".currency_input").on("keyup", function(e) {

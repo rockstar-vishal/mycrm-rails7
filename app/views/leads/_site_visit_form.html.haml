@@ -3,7 +3,7 @@
   %button.close{"aria-label" => "Close", "data-bs-dismiss" => "modal", :type => "button", onclick: "this.blur();"}
     %span{"aria-hidden" => "true"} ×
 .modal-body
-  = bootstrap_form_for @lead, url: :create_visit_lead, method: :post, remote: true do |f|
+  = bootstrap_form_for @lead, url: create_visit_lead_path(@lead), method: :post, remote: true, multipart: true do |f|
     - if @lead.errors.any?
       #error_explanation
         %h2
@@ -12,7 +12,7 @@
         %ul
           - @lead.errors.full_messages.each do |message|
             %li= message
-    = f.fields_for :visits, @visits, remote: true do |f|
+    = f.fields_for :visits, @visits || @lead.visits.build, remote: true do |f|
       = hidden_field_tag :authenticity_token, form_authenticity_token
       = hidden_field_tag :enable_advance_visits, @lead.company.setting.present? && @lead.company.enable_advance_visits
       .row
@@ -89,7 +89,37 @@
           
           Cancel
 :javascript
-  $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
+  // Ensure form submits as AJAX even with file uploads
+  $(document).ready(function() {
+    $('form[data-remote]').on('submit', function(e) {
+      var form = $(this);
+      var formData = new FormData(this);
+      
+      $.ajax({
+        url: form.attr('action'),
+        type: form.attr('method'),
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'script'
+      });
+      
+      e.preventDefault();
+    });
+  });
+  
+  // Initialize Flatpickr for datetime fields
+  flatpickr('.datetimepicker', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
   $(".finance").click(function(){
     $("#finance-content").toggle();
   });

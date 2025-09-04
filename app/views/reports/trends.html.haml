@@ -50,5 +50,77 @@
                           = button_tag type: "submit", class: "btn btn-new" do
                             Search
           .table-body
-            .chart-canvas.d-none.d-sm-block
-              = area_chart [{name: "Leads Generated", data: @lead_gen.map{|k| [k['created_date'], k['count']]}}, {name: "Visits Done", data: @visits.map{|k| [k['visit_date'], k['count']]}}, {name: "Conversions", data: @conversions.map{|k| [k['conversion_date'], k['count']]}}], download: true, zeros: true, library: {animation: {easing: 'easeOutQuart'}}
+            .chart-canvas{:style => "min-height: 400px; width: 100%; border: 1px solid #ddd; padding: 20px;"}
+              - if @lead_gen.present? || @visits.present? || @conversions.present?
+                = area_chart [{name: "Leads Generated", data: @lead_gen.map{|k| [k['created_date'], k['count']]}}, {name: "Visits Done", data: @visits.map{|k| [k['visit_date'], k['count']]}}, {name: "Conversions", data: @conversions.map{|k| [k['conversion_date'], k['count']]}}], download: true, zeros: true
+              - else
+                .alert.alert-info
+                  %h4 No data available for the selected date range
+                  %p Please try selecting a different date range or check your filters.
+
+:javascript
+  $(document).ready(function() {
+    console.log('=== Trends Page Debug ===');
+    console.log('Page loaded successfully');
+    
+    // Check data availability
+    var leadGenData = #{@lead_gen.to_json.html_safe};
+    var visitsData = #{@visits.to_json.html_safe};
+    var conversionsData = #{@conversions.to_json.html_safe};
+    
+    console.log('Lead gen data length:', leadGenData.length);
+    console.log('Visits data length:', visitsData.length);
+    console.log('Conversions data length:', conversionsData.length);
+    
+    // Log sample data
+    if (leadGenData.length > 0) {
+      console.log('Sample lead gen data:', leadGenData.slice(0, 3));
+    }
+    if (visitsData.length > 0) {
+      console.log('Sample visits data:', visitsData.slice(0, 3));
+    }
+    if (conversionsData.length > 0) {
+      console.log('Sample conversions data:', conversionsData.slice(0, 3));
+    }
+    
+    // Check if Chartkick is loaded
+    if (typeof Chartkick !== 'undefined') {
+      console.log('✅ Chartkick is loaded');
+      console.log('Chartkick version:', Chartkick.VERSION);
+    } else {
+      console.error('❌ Chartkick is not loaded');
+    }
+    
+    // Check if Chart.js is loaded
+    if (typeof Chart !== 'undefined') {
+      console.log('✅ Chart.js is loaded');
+    } else {
+      console.error('❌ Chart.js is not loaded');
+    }
+    
+    // Check chart container
+    var chartContainer = $('.chart-canvas');
+    console.log('Chart container found:', chartContainer.length > 0);
+    console.log('Chart container height:', chartContainer.height());
+    console.log('Chart container width:', chartContainer.width());
+    
+    // Force chart redraw after a short delay
+    setTimeout(function() {
+      console.log('Attempting to redraw charts...');
+      if (typeof Chartkick !== 'undefined') {
+        Chartkick.eachChart(function(chart) {
+          console.log('Redrawing chart:', chart);
+          chart.redraw();
+        });
+      }
+    }, 2000);
+    
+    // Add error handling for chart loading
+    $(document).on('chartkick:load', function() {
+      console.log('Chart loaded successfully');
+    });
+    
+    $(document).on('chartkick:error', function(event, error) {
+      console.error('Chart error:', error);
+    });
+  });
