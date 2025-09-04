@@ -1656,9 +1656,14 @@ class Lead < ActiveRecord::Base
       return unless pending_updates
       
       pending_updates.each do |field_name, update_data|
-        magic_attribute = magic_attributes.find_or_initialize_by(magic_field: update_data[:magic_field])
-        magic_attribute.value = update_data[:value]
-        magic_attribute.save!
+        begin
+          magic_attribute = magic_attributes.find_or_initialize_by(magic_field: update_data[:magic_field])
+          magic_attribute.value = update_data[:value]
+          magic_attribute.save!
+        rescue => e
+          Rails.logger.error "Failed to update magic field #{field_name}: #{e.message}"
+          # Don't fail the entire save if magic field update fails
+        end
       end
       
       # Clear the pending updates

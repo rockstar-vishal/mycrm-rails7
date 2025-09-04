@@ -3,8 +3,15 @@ module MagicFieldsPermittable
 
   # Helper method to get magic field names for a company
   def magic_field_names_for_company(company)
-    # Force reload of magic fields to ensure they're properly loaded
-    company.magic_fields.reload.pluck(:name).map(&:to_sym) rescue []
+    # Use cached magic fields to avoid performance issues
+    Rails.cache.fetch("magic_fields_#{company.id}", expires_in: 1.hour) do
+      company.magic_fields.pluck(:name).map(&:to_sym) rescue []
+    end
+  end
+
+  # Invalidate magic fields cache for a company
+  def invalidate_magic_fields_cache(company)
+    Rails.cache.delete("magic_fields_#{company.id}")
   end
 
   # Helper method to build permitted parameters including magic fields
@@ -70,14 +77,26 @@ module MagicFieldsPermittable
       :booked_leads, :token_leads, :visit_cancel, :postponed, :budget_upto,
       :visit_counts, :visit_counts_num, :sub_source, :customer_type,
       :deactivated, :site_visit_from, :site_visit_upto, :reinquired_from,
-      :reinquired_upto, :is_qualified, :source_id
+      :reinquired_upto, :is_qualified, :source_id,
+      # Additional search parameters used in mobile CRM and other controllers
+      :as, :bs, :ss_id, :key, :sort, :page, :per_page, :display_from,
+      :start_date, :end_date, :call_direction, :first_call_attempt,
+      :lead_name, :call_from, :call_to, :missed_calls, :past_calls_only,
+      :todays_calls, :completed, :abandoned_calls, :updated_from, :updated_upto,
+      :incoming, :site_visit_cancel,
+      # Additional parameters from call logs and other search methods
+      :search_query, :is_advanced_search, :search_string, :calender_view,
+      :visit_status_ids, :renewal_from, :renewal_upto
     ]
     
     array_params = [
       :dead_reason_ids, :project_ids, :assigned_to, :lead_statuses,
       :city_ids, :locality_ids, :source_id, :lead_stages, :presale_user_id,
       :sub_source_ids, :lead_ids, :broker_ids, :country_ids,
-      :closing_executive, :dead_reasons, :sv_user, :manager_ids
+      :closing_executive, :dead_reasons, :sv_user, :manager_ids,
+      # Additional array parameters
+      :source_ids, :user_ids, :call_status, :abandoned_calls_status,
+      :role_ids, :lead_statuses, :project_ids, :broker_ids
     ]
     
     all_params = base_search_params + magic_fields + array_params

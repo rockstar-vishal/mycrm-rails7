@@ -10,10 +10,7 @@ class MagicFieldsService
   
   # Create a new lead with magic fields
   def create_lead_with_magic_fields(params_data)
-    # Ensure magic fields are properly loaded
-    @company.magic_fields.reload
-    
-    # Separate magic fields from regular attributes
+    # Use cached magic fields to avoid performance issues
     magic_field_names = magic_field_names_for_company(@company)
     regular_params = params_data.except(*magic_field_names.map(&:to_s))
     
@@ -22,10 +19,12 @@ class MagicFieldsService
     
     # Handle magic fields by creating MagicAttribute records
     magic_field_names.each do |field_name|
-      if params_data[field_name].present?
-        magic_field = @company.magic_fields.find_by(name: field_name.to_s)
+      # Convert field_name to string to match params_data keys
+      field_name_str = field_name.to_s
+      if params_data[field_name_str].present?
+        magic_field = @company.magic_fields.find_by(name: field_name_str)
         if magic_field
-          lead.magic_attributes.build(magic_field: magic_field, value: params_data[field_name])
+          lead.magic_attributes.build(magic_field: magic_field, value: params_data[field_name_str])
         end
       end
     end
@@ -39,10 +38,7 @@ class MagicFieldsService
   
   # Update an existing lead with magic fields
   def update_lead_with_magic_fields(lead, params_data)
-    # Ensure magic fields are properly loaded
-    @company.magic_fields.reload
-    
-    # Separate magic fields from regular attributes
+    # Use cached magic fields to avoid performance issues
     magic_field_names = magic_field_names_for_company(@company)
     regular_params = params_data.except(*magic_field_names.map(&:to_s))
     
@@ -52,12 +48,14 @@ class MagicFieldsService
     # Store magic field updates to be applied via callback
     magic_field_updates = {}
     magic_field_names.each do |field_name|
-      if params_data[field_name].present?
-        magic_field = @company.magic_fields.find_by(name: field_name.to_s)
+      # Convert field_name to string to match params_data keys
+      field_name_str = field_name.to_s
+      if params_data[field_name_str].present?
+        magic_field = @company.magic_fields.find_by(name: field_name_str)
         if magic_field
           magic_field_updates[field_name] = {
             magic_field: magic_field,
-            value: params_data[field_name]
+            value: params_data[field_name_str]
           }
         end
       end
@@ -71,7 +69,8 @@ class MagicFieldsService
   
   # Build lead parameters with magic fields for a specific company
   def build_lead_params_with_magic_fields(additional_params = [])
-    build_lead_params_with_magic_fields(@company, additional_params)
+    # Call the concern method, not self
+    super(@company, additional_params)
   end
   
   # Get magic field names for the company
