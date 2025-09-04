@@ -91,7 +91,6 @@ class UsersController < ApplicationController
     end
   end
   
-  private
   
   def decode_image_data(encoded_data)
     # Custom decoding approach matching the encoding method
@@ -111,7 +110,15 @@ class UsersController < ApplicationController
     else
       flash[:alert] = "Cannot enable Round Robin Assignment - #{company.errors.full_messages.join(', ')}"
     end
-    redirect_to configurations_path and return
+    
+    respond_to do |format|
+      format.js do
+        render js: "window.location.href = '#{configurations_path}';"
+      end
+      format.html do
+        redirect_to configurations_path
+      end
+    end
   end
 
   def disable_round_robin
@@ -121,7 +128,15 @@ class UsersController < ApplicationController
         params[:users_list].include?(user.id.to_s) ? user.update(:round_robin_enabled => true) : user.update(:round_robin_enabled => false)
       else
         flash[:alert] = "Atleast one user should have round robin enabled"
-        redirect_to request.referer and return
+        respond_to do |format|
+          format.js do
+            render js: "window.location.href = '#{request.referer}';"
+          end
+          format.html do
+            redirect_to request.referer
+          end
+        end
+        return
       end
     end
 
@@ -138,7 +153,15 @@ class UsersController < ApplicationController
     else
       flash[:alert] = "Cannot disable this functionality - #{company.errors.full_messages.join(',')}"
     end
-    redirect_to request.referer and return
+    
+    respond_to do |format|
+      format.js do
+        render js: "window.location.href = '#{request.referer}';"
+      end
+      format.html do
+        redirect_to request.referer
+      end
+    end
   end
 
   def destroy
