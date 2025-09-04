@@ -157,6 +157,7 @@ $(document).ready(function() {
     minuteIncrement: 30,
     allowInput: true,
     clickOpens: true,
+    closeOnSelect: true,
     locale: {
       firstDayOfWeek: 1
     }
@@ -171,6 +172,7 @@ $(document).ready(function() {
     minDate: today,
     allowInput: true,
     clickOpens: true,
+    closeOnSelect: true,
     locale: {
       firstDayOfWeek: 1
     }
@@ -183,6 +185,7 @@ $(document).ready(function() {
     maxDate: today,
     allowInput: true,
     clickOpens: true,
+    closeOnSelect: true,
     locale: {
       firstDayOfWeek: 1
     }
@@ -198,6 +201,7 @@ $(document).ready(function() {
         minuteIncrement: 30,
         allowInput: true,
         clickOpens: true,
+        closeOnSelect: true,
         locale: {
           firstDayOfWeek: 1
         }
@@ -212,6 +216,7 @@ $(document).ready(function() {
         minDate: today,
         allowInput: true,
         clickOpens: true,
+        closeOnSelect: true,
         locale: {
           firstDayOfWeek: 1
         }
@@ -223,6 +228,7 @@ $(document).ready(function() {
         dateFormat: 'd/m/Y',
         allowInput: true,
         clickOpens: true,
+        closeOnSelect: true,
         locale: {
           firstDayOfWeek: 1
         }
@@ -259,6 +265,7 @@ $(document).ready(function() {
     dateFormat: 'd/m/Y',
     allowInput: true,
     clickOpens: true,
+    closeOnSelect: true,
     locale: {
       firstDayOfWeek: 1
     }

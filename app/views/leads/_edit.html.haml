@@ -3,7 +3,7 @@
   %button.close{"aria-label" => "Close", "data-bs-dismiss" => "modal", :type => "button"}
     %span{"aria-hidden" => "true"} ×
 .modal-body
-  = bootstrap_form_for @lead, remote: true do |f|
+  = bootstrap_form_for @lead, remote: true, multipart: true do |f|
     - if @lead.errors.any?
       #error_explanation
         %h2
@@ -289,4 +289,23 @@
     if($("#lead_presale_stage_id").val() == "16") {
       $("#lead_qualified").prop("checked", true).prop("disabled", true);
     }
+  });
+
+  // Ensure form submits as AJAX even with file uploads
+  $(document).ready(function() {
+    $('form[data-remote]').on('submit', function(e) {
+      var form = $(this);
+      var formData = new FormData(this);
+      
+      $.ajax({
+        url: form.attr('action'),
+        type: form.attr('method'),
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'script'
+      });
+      
+      e.preventDefault();
+    });
   });
