@@ -27,7 +27,7 @@
 //= require pusher
 //= require adminlte.min
 //= require jquery-tablesorter
-//= require jquery.datetimepicker
+// Flatpickr is loaded via CDN
 //= require custom_field_toggles
 //= require_tree .
 
@@ -148,17 +148,84 @@ $(document).ready(function() {
   // clipboard js ends
   var date = new Date();
   var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
-  $('.datetimepickerncd').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
-  $('.datetimepickerleaseexpired').datetimepicker({timepicker: false,format:'d/m/Y', maxDate: today});
+  
+  // Initialize Flatpickr for datetime fields
+  flatpickr('.datetimepicker', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
+  
+  // Initialize Flatpickr for NCD fields with minimum date
+  flatpickr('.datetimepickerncd', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    minDate: today,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
+  
+  // Initialize Flatpickr for lease expired fields with maximum date
+  flatpickr('.datetimepickerleaseexpired', {
+    enableTime: false,
+    dateFormat: 'd/m/Y',
+    maxDate: today,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
   // For Modal - Bootstrap 5
   document.addEventListener('show.bs.modal', function(event) {
     if (event.target.id === 'modal-window') {
-      $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
-      $('.datetimepickerncd_modal').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
-      $('.dateFormat').datetimepicker({
-        timepicker: false,
-        format:'d/m/Y'
+      // Initialize Flatpickr for modal datetime fields
+      flatpickr('.datetimepicker', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i:S',
+        time_24hr: true,
+        minuteIncrement: 30,
+        allowInput: true,
+        clickOpens: true,
+        locale: {
+          firstDayOfWeek: 1
+        }
+      });
+      
+      // Initialize Flatpickr for modal NCD fields
+      flatpickr('.datetimepickerncd_modal', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i:S',
+        time_24hr: true,
+        minuteIncrement: 30,
+        minDate: today,
+        allowInput: true,
+        clickOpens: true,
+        locale: {
+          firstDayOfWeek: 1
+        }
+      });
+      
+      // Initialize Flatpickr for modal date fields
+      flatpickr('.dateFormat', {
+        enableTime: false,
+        dateFormat: 'd/m/Y',
+        allowInput: true,
+        clickOpens: true,
+        locale: {
+          firstDayOfWeek: 1
+        }
       });
     }
   });
@@ -186,9 +253,15 @@ $(document).ready(function() {
       modal.hide();
     }
   });
-  $('.dateFormat').datetimepicker({
-    timepicker: false,
-    format:'d/m/Y'
+  // Initialize Flatpickr for date-only fields
+  flatpickr('.dateFormat', {
+    enableTime: false,
+    dateFormat: 'd/m/Y',
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
   });
 
 

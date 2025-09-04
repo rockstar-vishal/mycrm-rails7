@@ -770,14 +770,41 @@ body:not(.layout-fixed).layout-navbar-fixed .wrapper .main-sidebar .sidebar {
   margin-left: 5px;
 }
 
-.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
-  background: #00cdac!important;
-  color: #fff;
-  box-shadow: none;
+// Flatpickr styling
+.flatpickr-calendar {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px 0 rgba(0, 0, 0, 0.16);
 }
-.xdsoft_datetimepicker.xdsoft_.xdsoft_noselect .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div:hover{
-  background: #00cdac!important;
-  color: #fff;
+
+.flatpickr-day.selected {
+  background: #00cdac !important;
+  border-color: #00cdac !important;
+}
+
+.flatpickr-day:hover {
+  background: #00cdac !important;
+  color: #fff !important;
+}
+
+.flatpickr-current-month {
+  font-weight: 600;
+}
+
+.flatpickr-monthDropdown-months {
+  font-weight: 600;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 4px !important;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+  background-color: #f0f0f0 !important;
 }
 .xdsoft_time_box{
       border: 1px solid #fff;
