@@ -264,7 +264,7 @@ class Leads::CallLog < ActiveRecord::Base
     end
 
     def call_logs_csv(options = {}, user)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ["Lead Name", "Executive", "From", "To", "Start Time", "End Time", "Lead Status", "Lead Source", "CP", "Project", "Direction", "OverAll Call Duration", "Call Status", "Call Type"]
         csv << exportable_fields
 

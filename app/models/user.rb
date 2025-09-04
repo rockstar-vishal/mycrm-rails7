@@ -237,7 +237,7 @@ class User < ActiveRecord::Base
   class << self
     def to_csv(options = {}, exporting_user, ip_address, users_count)
       exporting_user.company.export_logs.create(user_id: exporting_user.id, ip_address: ip_address, count: users_count)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['Name', 'Mobile', 'Email','Role','Can Import?','Can Export?', 'Can Delete Lead?','Can Access Project?','Lead Creation Disabled?','Lead Edit Disabled?','Managers', 'Added On']
         csv << exportable_fields
         all.each do |user|

@@ -37,7 +37,7 @@ class CompaniesController < ApplicationController
       file = params[:lead_file].tempfile
       @success=[]
       @errors=[]
-      CSV.foreach(file, {:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+      CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
         arr_row = row.to_a
         token = arr_row.first.last
         title = row["name"]

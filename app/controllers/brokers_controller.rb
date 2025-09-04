@@ -69,7 +69,7 @@ class BrokersController < ApplicationController
       file = params[:broker_file].tempfile
       @success=[]
       @errors=[]
-      CSV.foreach(file, {:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+      CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
         begin
           name=row["Name"]
           mobile=row["Mobile"].strip rescue nil
@@ -116,7 +116,7 @@ class BrokersController < ApplicationController
     @success = []
     @errors = []
     if params[:brokers_update_file].present?
-      CSV.foreach(params[:brokers_update_file].tempfile, {:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+      CSV.foreach(params[:brokers_update_file].tempfile, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
         uuid=row["CP Uuid"].strip rescue nil
         mobile = row["Mobile"].strip rescue nil
         email = row["Email"].strip rescue nil

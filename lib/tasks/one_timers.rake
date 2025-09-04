@@ -52,7 +52,7 @@ namespace :one_timers do
   task :seed_leads => :environment do
     @errors = []
     file = "#{Rails.root}/public/leads-jee-vee.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
       begin
         company_id = 11
         company = Company.find(11)
@@ -96,7 +96,7 @@ namespace :one_timers do
   task :seed_projects => :environment do
     @errors = []
     file = "#{Rails.root}/public/grd_reality.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
       begin
         company_id = 17
         company = Company.find(company_id)
@@ -266,7 +266,7 @@ namespace :one_timers do
     @errors = []
     company = Company.find_by_id(49)
     file = "#{Rails.root}/public/cp_palkhi_sheet.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       begin
         name = row["CP NAME"]&.strip
         firm_name = row["CP FIRM NAME"]&.strip
@@ -347,7 +347,7 @@ namespace :one_timers do
     @errors=[]
     company = Company.find(71)
     file = "#{Rails.root}/public/edgebrokerlist.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       begin
         name = row["CP Name"]&.strip
         firm_name = row["CP Firm Name"]&.strip
@@ -381,7 +381,7 @@ namespace :one_timers do
     files = ["minal_cp", "pavan_cp", "sanket_cp", "akshay_cp", "sanjana_cp"]
     files.each do |f|
       file = "#{Rails.root}/public/#{f}.csv"
-      CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+      CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
         begin
           name = row["CP Name"].strip
           email=  "#{f}#{index}@sample.com"
@@ -443,7 +443,7 @@ namespace :one_timers do
     @errors=[]
     company = Company.find(220)
     file = "#{Rails.root}/public/site_visit_data.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       lead_no = row["Lead Number"]&.strip
       lead = company.leads.find_by(lead_no: lead_no)
       date = row["Visited Date"]&.strip
@@ -494,7 +494,7 @@ namespace :one_timers do
     company = Company.find(10)
     cp_ids=[]
     file = "#{Rails.root}/public/golden-abode-del-brokers.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       cp_ids << row["CP Uuid"]&.strip
     end
     company.brokers.where(uuid: cp_ids).destroy_all
@@ -552,7 +552,7 @@ namespace :one_timers do
   task populate_visit: :environment do
     file="#{Rails.root}/public/sv-data.csv"
     company=Company.find(164)
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       lead_no=row["Lead Number"].strip
       visit_date=Date.parse(row["Created at"].strip)
       lead=company.leads.find_by(lead_no: lead_no)
@@ -686,7 +686,7 @@ namespace :one_timers do
   task update_leads_from_partner_data: :environment do
     company=Company.find(164)
     file = "#{Rails.root}/public/partners_visit_data.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       lead_id = row["Lead Id"]&.strip
       lead = company.leads.find(lead_id)
       comment=row["Comment"]
@@ -806,7 +806,7 @@ namespace :one_timers do
     @errors=[]
     company = Company.find(19)
     file = "#{Rails.root}/public/propangel-additional-dids.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
       did_number= row["DID Numbers"]&.strip
       sid = CloudTelephonySid.find_or_initialize_by(
         number: did_number,

@@ -59,7 +59,7 @@ class Broker < ActiveRecord::Base
 
     def to_csv(options = {}, exporting_user, ip_address, brokers_count)
       exporting_user.company.export_logs.create(user_id: exporting_user.id, ip_address: ip_address, count: brokers_count)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['CP Uuid','Name', 'Mobile', 'Email', 'Firm Name', 'Rera Number', 'RM','Locality', 'Address', 'Other Contacts','Rera Status', 'CP Code']
         csv << exportable_fields
         all.includes(:rm).each do |broker|

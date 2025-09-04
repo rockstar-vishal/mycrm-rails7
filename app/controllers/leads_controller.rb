@@ -270,7 +270,7 @@ class LeadsController < ApplicationController
       @success=[]
       @errors=[]
       mf_names = @company.magic_fields.pluck(:name)
-      CSV.foreach(file, {:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+      CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
         begin
           name=row["Name"]
           mobile=row["Phone"]

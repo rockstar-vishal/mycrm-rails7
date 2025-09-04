@@ -1,3 +1,5 @@
+require 'csv'
+
 module ReportCsv
 
   extend ActiveSupport::Concern
@@ -10,7 +12,7 @@ module ReportCsv
         @data = data.as_json
         users = user.manageables.where(:id=>data.map(&:user_id).uniq)
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User Name', 'User Role', 'Total Count' ]
           statuses.each do |status|
             exportable_fields << status.name
@@ -34,7 +36,7 @@ module ReportCsv
       def svp_tracker_to_csv(options={}, user)
         data = all.site_visit_scheduled
         users = user.manageables.where(:id=>data.map(&:user_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User','Site Visit Planned','Site visit done','Site Visit Postponed','Site visit cancel','Revisit','Booked Percentage','Token Percentage']
           csv << exportable_fields
           users.each do |user|
@@ -63,7 +65,7 @@ module ReportCsv
         @leads = all.where(:user_id=>user.manageable_ids)
         campaigns = user.company.campaigns
 
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['Title', 'Start Date', 'End Date', 'Budget', 'Source', 'project', 'Leads', 'Booked Leads', 'Cost per Lead', 'Visits', 'Cost Per Visit', 'Cost Per Booking' ]
           csv << exportable_fields
           campaigns.each do |campaign|
@@ -108,7 +110,7 @@ module ReportCsv
         @manageable_ids = user.manageables.ids
         @data = data.as_json.group_by{ |t| t["user_id"] }
 
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -135,7 +137,7 @@ module ReportCsv
         @source_ids=@sources.ids
         @data = data.as_json.group_by{ |t| t["source_id"] }
 
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['Source', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -169,7 +171,7 @@ module ReportCsv
         users = user.manageables.where(:id=>(status_edits.map(&:user_id).uniq | comment_edits.map(&:user_id).uniq))
         status_edits = status_edits.as_json
         comment_edits = comment_edits.as_json
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User', 'Total Edits', 'Status Edits', 'Comment Edits', 'Unique Leads Edits']
           csv << exportable_fields
           users.each do |user|
@@ -215,7 +217,7 @@ module ReportCsv
         @data = data.as_json(except: [:id])
         sources = user.company.sources.where(:id=>data.map(&:source_id).uniq)
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['Source', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -243,7 +245,7 @@ module ReportCsv
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
         users = user.manageables.where(:id=>data.map(&:user_id).uniq)
         @data = data.as_json
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -270,7 +272,7 @@ module ReportCsv
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
         users = user.manageables.where(:id=>data.map(&:user_id).uniq)
         @data = data.as_json
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -296,7 +298,7 @@ module ReportCsv
         projects = user.company.projects.where(:id=>uniq_projects)
         statuses = user.company.statuses.where(:id=>uniq_statuses)
         @data = data.as_json(except: [:id])
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['Project', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -321,7 +323,7 @@ module ReportCsv
         leads = all.where(:status_id=>user.company.dead_status_ids)
         reasons = user.company.reasons.where(:id=>leads.map(&:dead_reason_id).uniq)
         @sources=user.company.sources.where(id: leads.map(&:source_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User', 'Total']
           reasons.each do |reason|
             exportable_fields << reason.reason
@@ -344,7 +346,7 @@ module ReportCsv
         leads = all.where(:status_id=>user.company.dead_status_ids)
         reasons = user.company.reasons.where(:id=>leads.map(&:dead_reason_id).uniq)
         users = user.manageables.where(:id=>leads.map(&:user_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User', 'Total']
           reasons.each do |reason|
             exportable_fields << reason.reason
@@ -394,7 +396,7 @@ module ReportCsv
         @data = data.as_json(except: [:id])
         sources = user.company.sources.where(:id=>data.map(&:source_id).uniq)
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['Source', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
@@ -420,7 +422,7 @@ module ReportCsv
         @data = data.as_json
         users = user.manageables.where(:id=>data.map(&:closing_executive).uniq)
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ['User Name', 'User Role', 'Total Count' ]
           statuses.each do |status|
             exportable_fields << status.name
@@ -445,7 +447,7 @@ module ReportCsv
         data = all.includes(:user).where("user_id IN (?) AND created_at BETWEEN ? AND ?", user.manageables.ids, start_date, end_date)
         users = user.manageables.where(id: data.map(&:user_id))
 
-        CSV.generate(options) do |csv|
+        CSV.generate do |csv|
           exportable_fields = ["User", "Total Calls", "Completed", "Missed", "Abondoned", "Avg. Talk Time", "Total Talk Time"]
           csv << exportable_fields
           users.each do |user|

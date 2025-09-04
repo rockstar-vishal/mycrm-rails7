@@ -194,7 +194,7 @@ class Company < ActiveRecord::Base
 
   class << self
     def to_csv(options = {})
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['Company Name', 'Domain', 'On-Boarding Date', 'Last Updated At', 'No of Users']
         exportable_fields = exportable_fields
         csv << exportable_fields

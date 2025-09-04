@@ -1049,7 +1049,7 @@ class Lead < ActiveRecord::Base
     end
 
     def to_csv(options = {}, exporting_user)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['Customer Name', 'Lead Number', 'Project', 'Assigned To', 'Lead Status', 'Presale Stage', 'Next Call Date', 'Comment', 'Source','Broker', 'Broker Number', 'Broker CreatedAt','Visited', 'Visited Date', 'Visit Counts', 'Visit Comments','Dead Reason', 'Dead Sub Reason', 'City', 'Created At',  'Last Updated At', 'Sub Source', 'Last User Assigned Date' ,'Last Modified By']
         if exporting_user.is_super? || exporting_user.is_sl_admin? || exporting_user.is_marketing_manager?
           exportable_fields << 'Mobile'
