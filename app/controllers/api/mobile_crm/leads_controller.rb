@@ -1,6 +1,7 @@
 module Api
   module MobileCrm
     class LeadsController < ::Api::MobileCrmController
+      include MagicFieldsPermittable
 
       before_action :find_accessible_leads
 
@@ -148,29 +149,7 @@ module Api
       end
 
       def lead_params
-        magic_fields = (@current_app_user.company.magic_fields.map{|field| field.name.to_sym} rescue [])
-        params.require(:lead).permit(
-          *magic_fields,
-          :name,
-          :email,
-          :mobile,
-          :other_phones,
-          :project_id,
-          :source_id,
-          :ncd,
-          :user_id,
-          :closing_executive,
-          :comment,
-          :status_id,
-          :presale_stage_id,
-          :is_deactivated,
-          :dead_reason_id, :address, :dead_sub_reason,
-          :tentative_visit_planned,
-          :broker_id, :booking_date, :booking_form, :token_date, :bank_person_name, :bank_person_contact, :bank_sales_person, :booked_flat_no, :bank_loan_name, :city_id, :locality_id, :referal_name, :referal_mobile,
-          :enquiry_sub_source_id, :lease_expiry_date,
-          secondary_source_ids: [],
-          :visits_attributes=>[:id, :date, :status_id, :is_visit_executed, :is_postponed, :is_canceled, :comment, :location, :site_visit_form, :surronding, :finalization_period, :loan_sanctioned, :bank_name, :loan_amount, :eligibility, :own_contribution_minimum, :own_contribution_maximum, :loan_requirements, project_ids: []]
-        )
+        standard_lead_params(@current_app_user.company)
       end
 
       def current_user
@@ -178,7 +157,7 @@ module Api
       end
 
       def search_params
-        params.permit(:as, :bs, :comment, :created_at_from, :created_at_upto, :email, :lead_no, :name, :ncd_from, :ncd_upto, :mobile, :visited_date_from, :visited_date_upto, :booking_date_to, :booking_date_from, :token_date_from, :token_date_to, :other_phones, :todays_call_only, :backlogs_only, :manager_id, :deactivated, :expired_from, :expired_upto, :lead_statuses=>[], :project_ids=>[], :assigned_to=>[], closing_executive: [], stage_ids: [], :source_ids=>[], country_ids: [], dead_reasons: [], broker_ids: [], city_ids: [], locality_ids: [])
+        search_params_with_magic_fields(@current_app_user.company)
       end
     end
   end

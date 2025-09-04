@@ -1,6 +1,7 @@
 module Api
   module MobileCrm
     class SiteVisitInformationsController < ::Api::MobileCrmController
+      include MagicFieldsPermittable
       before_action :authenticate, except: [:settings, :create_lead, :fetch_broker, :create_broker, :fetch_lead, :get_users, :get_cp_ids, :get_executives, :get_projects, :get_sources, :get_sub_sources, :get_brokers, :get_cities, :get_locality, :get_visit_status, :get_brokers_by_firm_name, :get_brokers_firm_name]
       before_action :find_company, :set_api_key, only: [:create_lead, :settings, :fetch_broker, :create_broker, :fetch_lead, :get_users, :get_projects, :get_sources, :get_sub_sources, :get_brokers, :get_cities, :get_executives,  :get_locality, :get_cp_ids, :get_visit_status, :get_brokers_by_firm_name, :get_brokers_firm_name]
       before_action :set_leads, only: [:create_lead, :fetch_lead]
@@ -27,7 +28,31 @@ module Api
         @lead = @leads.where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(REPLACE(mobile,' ',''), 10) LIKE ?)", email, "#{phone.strip.last(10) if phone.present?}").last
         @lead = @leads.new unless @lead.present?
         is_new_record = @lead.new_record?
-        @lead.assign_attributes(lead_params.merge(:status_id=>status_id))
+        
+        # Get the parameters and separate magic fields from regular attributes
+        params_data = lead_params.merge(:status_id=>status_id)
+        magic_field_names = magic_field_names_for_company(@company)
+        
+        # Filter out magic fields from regular attributes
+        regular_params = params_data.except(*magic_field_names)
+        
+        # Update existing lead with regular attributes
+        @lead.assign_attributes(regular_params)
+        
+        # Handle magic fields by creating/updating MagicAttribute records
+        magic_field_names.each do |field_name|
+          if params_data[field_name].present?
+            magic_field = @company.magic_fields.find_by(name: field_name.to_s)
+            if magic_field
+              if is_new_record
+                @lead.magic_attributes.build(magic_field: magic_field, value: params_data[field_name])
+              else
+                magic_attribute = @lead.magic_attributes.find_or_initialize_by(magic_field: magic_field)
+                magic_attribute.value = params_data[field_name]
+              end
+            end
+          end
+        end
         @lead.source_id = @company.sources.first.id if @lead.source_id.blank?
         # @lead.closing_executive = closing_executive_user.id if closing_executive_user.present?
         @lead.closing_executive = @company.enable_meeting_executives && closing_executive_user.present? ? closing_executive_user.id : nil
@@ -442,21 +467,7 @@ module Api
       end
 
       def lead_params
-        magic_fields = (@company.magic_fields.map{|field| field.name.to_sym} rescue [])
-        params.require(:lead).permit(
-          *magic_fields,
-          :name,
-          :email,
-          :mobile,
-          :comment,
-          :address,
-          :locality_id,
-          :city_id,
-          :project_id, :closing_executive, :budget, :enable_admin_assign,
-          :enquiry_sub_source_id, :ncd, :other_emails, :other_phones, :signature,
-          :source_id, :broker_id, :user_id, :image, :referal_name, :referal_mobile, :presale_user_id, :status_id, :lead_visit_status_id,
-          :visits_attributes=>[:date, :comment]
-        )
+        standard_lead_params(@company, [:closing_executive, :budget, :enable_admin_assign, :enquiry_sub_source_id, :ncd, :other_emails, :other_phones, :signature, :source_id, :broker_id, :user_id, :image, :referal_name, :referal_mobile, :presale_user_id, :status_id, :lead_visit_status_id])
       end
 
       def broker_params

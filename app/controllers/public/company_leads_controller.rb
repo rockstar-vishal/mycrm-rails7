@@ -1,5 +1,6 @@
 module Public
   class CompanyLeadsController < ::PublicApiController
+    include MagicFieldsPermittable
     include ActionController::HttpAuthentication::Token::ControllerMethods
     before_action :find_company
     before_action :set_api_key, only: :create_lead
@@ -307,7 +308,7 @@ module Public
     private
 
     def lead_params
-      params.permit(:name, :email, :mobile, :comment, :visit_date, :visit_comments)
+      standard_lead_params(@company, [:visit_date, :visit_comments])
     end
 
     def lead_update_params
@@ -315,7 +316,7 @@ module Public
     end
 
     def external_lead_params
-      params.permit(:name, :email, :mobile, :project_id, :source_id, :city_id, :comment, :tentative_visit_planned, :broker_id)
+      standard_lead_params(@company, [:project_id, :source_id, :city_id])
     end
 
     def find_company

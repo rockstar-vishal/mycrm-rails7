@@ -88,16 +88,10 @@ class CompaniesController < ApplicationController
   end
 
   def update
-    if @company.update(company_params)
-      flash[:notice] = "Company Updated Successfully"
-      redirect_to companies_path
-    else
-      render 'edit'
-    end
-  end
-
-  def update
-    if @company.update(company_params)
+    # Filter out unwanted magic_fields updates
+    filtered_params = filter_magic_fields_params(company_params)
+    
+    if @company.update(filtered_params)
       flash[:notice] = "Company Updated Successfully"
       redirect_to companies_path
     else
@@ -190,6 +184,50 @@ class CompaniesController < ApplicationController
 
     def set_company
       @company = Company.find(params[:id])
+    end
+    
+    def filter_magic_fields_params(params)
+      # Only allow items to be updated if is_select_list is true
+      if params[:magic_fields_attributes].present?
+        params[:magic_fields_attributes].each do |index, magic_field_params|
+          if magic_field_params[:is_select_list] != '1' && magic_field_params[:is_select_list] != true
+            # Remove items from params if is_select_list is not checked
+            Rails.logger.info "Filtering out items for magic_field #{magic_field_params[:id]} - is_select_list is #{magic_field_params[:is_select_list]}"
+            magic_field_params.delete(:items)
+          else
+            # Convert items string to proper array format
+            if magic_field_params[:items].is_a?(String) && magic_field_params[:items].present?
+              Rails.logger.info "Converting items string: #{magic_field_params[:items]}"
+              # Split by comma, strip whitespace, and filter out empty values
+              items_array = magic_field_params[:items].split(',').map(&:strip).reject(&:blank?)
+              Rails.logger.info "Converted to array: #{items_array.inspect}"
+              magic_field_params[:items] = items_array
+            end
+          end
+        end
+      end
+      
+      # Also filter structure_fields_attributes
+      if params[:sv_form_attributes] && params[:sv_form_attributes][:structure_fields_attributes].present?
+        params[:sv_form_attributes][:structure_fields_attributes].each do |index, structure_field_params|
+          if structure_field_params[:is_select_list] != '1' && structure_field_params[:is_select_list] != true
+            # Remove items from params if is_select_list is not checked
+            Rails.logger.info "Filtering out items for structure_field #{structure_field_params[:id]} - is_select_list is #{structure_field_params[:is_select_list]}"
+            structure_field_params.delete(:items)
+          else
+            # Convert items string to proper array format
+            if structure_field_params[:items].is_a?(String) && structure_field_params[:items].present?
+              Rails.logger.info "Converting structure items string: #{structure_field_params[:items]}"
+              # Split by comma, strip whitespace, and filter out empty values
+              items_array = structure_field_params[:items].split(',').map(&:strip).reject(&:blank?)
+              Rails.logger.info "Converted to array: #{items_array.inspect}"
+              structure_field_params[:items] = items_array
+            end
+          end
+        end
+      end
+      
+      params
     end
 
     def company_params

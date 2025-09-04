@@ -1,0 +1,81 @@
+module Public
+  class OnSiteController < ::PublicApiController
+    include MagicFieldsPermittable
+    
+    before_action :find_broker, only: [:settings, :submit_cp_lead]
+    before_action :find_lead, only: [:schedule_client_visit, :client_settings]
+    def settings
+      render json: {broker_uuid: @broker.uuid, projects: @company.projects.as_api_response(:details)}
+    end
+
+    def client_settings
+      render json: {message: "Success", data: {lead: @lead.as_api_response(:sv_form_page), projects: @company.projects.as_api_response(:details), units: (@company.magic_fields.find_by(name: "unit_type").items rescue [])}}
+    end
+
+    def submit_cp_lead
+      render json: {message: "Invalid Data"}, status: 400 and return if @broker.uuid != params[:broker_uuid]
+      lead = create_new_lead lead_params.merge(broker_id: @broker.id)
+      if lead.save
+        render json: {message: "Lead Saved", data: {lead_no: lead.reload.lead_no}}, status: 200 and return
+      else
+        render json: {message: lead.errors.full_messages.join(', ')}, status: 422 and return
+      end
+    end
+
+    def schedule_client_visit
+      render json: {message: "Invalid Data"}, status: 400 and return if params[:lead].blank? || params[:lead][:uuid].blank? || @lead.uuid != params[:lead][:uuid]
+      
+      # Get the parameters
+      visit_params = lead_visit_params
+      
+      if @lead.project.uuid == visit_params[:project_uuid]
+        # Use the MagicFieldsService for consistent handling
+        service = MagicFieldsService.new(@company, @lead)
+        service.update_lead_with_magic_fields(@lead, visit_params)
+      else
+        # Create new lead with the same magic field handling
+        @lead = create_new_lead visit_params
+      end
+      
+      if @lead.save
+        render json: {message: "Visit Scheduled", data: {lead_no: @lead.reload.lead_no}}, status: 200 and return
+      else
+        render json: {message: "#{@lead.errors.full_messages.join(', ')}"}, status: 422 and return
+      end
+    end
+
+    private
+
+    def find_broker
+      render json: {message: "Invalid CP Code"}, status: 400 and return if params[:cp_code].blank?
+      @broker = Broker.find_by_cp_code params[:cp_code]
+      @company = @broker.company
+    end
+
+    def find_lead
+      render json: {message: "Lead No"}, status: 400 and return if params[:lead_no].blank?
+      @lead = ::Lead.find_by_lead_no params[:lead_no]
+      @company = @lead.company
+    end
+
+    def lead_params
+      standard_lead_params(@broker.company)
+    end
+
+    def lead_visit_params
+      standard_lead_params(@company)
+    end
+
+    def create_new_lead input_params
+      # Use the MagicFieldsService for consistent handling
+      lead = MagicFieldsService.new(@company).create_lead_with_magic_fields(input_params)
+      lead.mobile = @lead.mobile
+      lead.email = @lead.email
+      # Set additional attributes that are specific to this context
+      lead.status_id = @company.expected_site_visit_id if lead.tentative_visit_planned.present?
+      lead.source_id = ::Source.cp_sources.first.id if lead.source_id.blank?
+      
+      lead
+    end
+  end
+end

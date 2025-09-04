@@ -123,7 +123,7 @@ class Companies::Setting < ActiveRecord::Base
   SETTING_BOOLEAN_FIELDS.each do |method|
     define_method("#{method}=") do |val|
       if ["true", "false", "t", "f", "0", "1"].include?(val)
-        val = ActiveRecord::ConnectionAdapters::Column.value_to_boolean(val)
+        val = ActiveModel::Type::Boolean.new.cast(val)
       end
       self.setting_data_will_change!
       self.setting_data = (self.setting_data || {}).merge!({"#{method}" => val})

@@ -21,12 +21,13 @@
           = f.check_box :is_popup_field
       .col-md-3
         .form-group
-          = f.check_box :is_select_list, class: 'custom-checkbox'
+          = f.check_box :is_select_list, class: 'is-select-list-checkbox'
           .item-list{:style => ("display:none;" unless f.object.is_select_list?)}
-            = f.text_field :items, value: f.object.items.join(',') || ''
+            = f.text_field :items, value: f.object.items.join(',') || '', class: 'items-field'
+          = f.hidden_field :items, value: '', class: 'items-hidden-field'
       .col-md-3
         .form-group
-          = f.check_box :fb_form_field, class: 'custom-checkbox', label: 'Enable Form Field'
+          = f.check_box :fb_form_field, class: 'fb-form-field-checkbox', label: 'Enable Form Field'
           .item-list{:style => ("display:none;" unless f.object.fb_form_field?)}
             = f.text_field :fb_field_name, class: 'form-control', label: 'Fb Field Name'
           = f.hidden_field :type_scoped, value: 'Lead'
@@ -34,12 +35,3 @@
       .col-md-12
         %center
           = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"
-:javascript
-  $(".custom-checkbox").change(function () {
-    var isChecked = $(this).closest('[type=checkbox]').is(':checked')
-    if(isChecked) {
-      $(this).parent().parent().next().first().show();
-    } else {
-      $(this).parent().parent().next().first().hide();
-    }
-  });

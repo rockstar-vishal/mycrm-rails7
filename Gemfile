@@ -31,7 +31,7 @@ gem 'jquery-datetimepicker-rails', '~> 2.4.1'
 gem 'devise', '~> 4.9'
 
 # File uploads
-gem 'paperclip', '~> 6.1'
+gem 'kt-paperclip', '~> 7.2.2'
 gem 'image_processing', '~> 1.2'
 gem 'has_magic_fields', '~> 0.1'
 
