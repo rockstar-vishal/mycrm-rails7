@@ -28,6 +28,7 @@
 //= require adminlte.min
 //= require jquery-tablesorter
 //= require jquery.datetimepicker
+//= require custom_field_toggles
 //= require_tree .
 
 

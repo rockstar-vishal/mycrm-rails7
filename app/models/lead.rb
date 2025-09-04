@@ -15,7 +15,7 @@ class Lead < ActiveRecord::Base
 
   audited associated_with: :company, only: [:status_id, :user_id, :comment, :tentative_visit_planned, :closing_executive, :project_id, :ncd, :source_id, :broker_id]
 
-  attr_accessor :should_delete, :actual_comment, :cannot_send_notification, :enable_admin_assign, :lead_visit_status_id
+  attr_accessor :should_delete, :actual_comment, :cannot_send_notification, :enable_admin_assign, :lead_visit_status_id, :project_uuid
 
   belongs_to :company
   has_magic_fields :through => :company
@@ -98,6 +98,7 @@ class Lead < ActiveRecord::Base
   before_create :set_executive
   before_update :set_closing_excutive
   after_create :set_presale_user, if: :presale_user_site_visit_enabled?
+  after_save :apply_pending_magic_field_updates
   after_commit :notify_lead_create_event, :send_lead_create_brower_notification, on: :create
   before_save :set_site_visit_scheduled
   after_save :set_visit, if: :is_advance_visit_enabled?
@@ -178,6 +179,14 @@ class Lead < ActiveRecord::Base
       es=ExternalService.new(self.company, request)
       es.update_partners_lead
     end
+  end
+
+  def project_uuid=(default_value)
+    self.project_id = (Project.find_by_uuid(default_value).id rescue nil)
+  end
+
+  def project_uuid
+    return self.project.uuid
   end
 
   def set_user_details
@@ -1640,5 +1649,19 @@ class Lead < ActiveRecord::Base
           self.closing_executive = closing_executive_ids[0]
         end
       end
+    end
+
+    def apply_pending_magic_field_updates
+      pending_updates = instance_variable_get(:@pending_magic_field_updates)
+      return unless pending_updates
+      
+      pending_updates.each do |field_name, update_data|
+        magic_attribute = magic_attributes.find_or_initialize_by(magic_field: update_data[:magic_field])
+        magic_attribute.value = update_data[:value]
+        magic_attribute.save!
+      end
+      
+      # Clear the pending updates
+      instance_variable_set(:@pending_magic_field_updates, nil)
     end
 end

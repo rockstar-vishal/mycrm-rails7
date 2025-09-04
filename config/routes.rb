@@ -386,6 +386,12 @@ Rails.application.routes.draw do
       get "call_in/sarva/create", action: :sarva_create
       post "partner/create", action: :partner_create
     end
+    namespace :on_site do
+      get :settings
+      post :submit_cp_lead
+      get :client_settings
+      post :schedule_client_visit
+    end
     namespace :companies do
       get ':uuid/external_api/projects', controller: "external_api", action: "projects"
     end

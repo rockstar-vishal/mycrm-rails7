@@ -96,6 +96,15 @@ module LeadApiAttributes
       self.broker.as_json(only: [:id, :name, :rera_number, :locality, :firm_name, :email, :mobile, :cp_code])
     end
 
+    api_accessible :sv_form_page do |template|
+      template.add :uuid
+      template.add :lead_no
+      template.add :mobile
+      template.add :email
+      template.add :project_uuid
+      template.add :name
+    end
+
     api_accessible :lead_event do |template|
       template.add :id
       template.add lambda{|lead| lead.name }, as: :title

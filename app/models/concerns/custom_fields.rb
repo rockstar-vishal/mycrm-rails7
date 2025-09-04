@@ -12,7 +12,7 @@ module CustomFields
     validates_attachment  :favicon, :content_type => { :content_type => %w(image/jpeg image/jpg image/png) }, :size => { :in => 0..1.megabytes }
 
     ['dead_status', 'new_status', 'expected_site_visit', 'booking_done', 'hot_status', 'site_visit_done','token_status'].each do |status|
-      belongs_to "#{status}".to_sym, class_name: 'Status', foreign_key: "#{status}_id"
+      belongs_to "#{status}".to_sym, class_name: 'Status', foreign_key: "#{status}_id", optional: true
       delegate :name, to: "#{status}", allow_nil: true, prefix: true
     end
 
