@@ -89,7 +89,7 @@ module MagicFieldsPermittable
       :booked_leads, :token_leads, :visit_cancel, :postponed, :budget_upto,
       :visit_counts, :visit_counts_num, :sub_source, :customer_type,
       :deactivated, :site_visit_from, :site_visit_upto, :reinquired_from,
-      :reinquired_upto, :is_qualified, :source_id,
+      :reinquired_upto, :is_qualified,
       # Additional search parameters used in mobile CRM and other controllers
       :as, :bs, :ss_id, :key, :sort, :page, :per_page, :display_from,
       :start_date, :end_date, :call_direction, :first_call_attempt,
@@ -98,20 +98,25 @@ module MagicFieldsPermittable
       :incoming, :site_visit_cancel,
       # Additional parameters from call logs and other search methods
       :search_query, :is_advanced_search, :search_string, :calender_view,
-      :visit_status_ids, :renewal_from, :renewal_upto
+      :renewal_from, :renewal_upto,
+      # Additional parameters from the URL
+      :save_search_id, :button, :people, :desired_property, :purchase_reason,
+      :current_stay, :occupation, :own_contribution, :loan_requirement,
+      :preferred_bank, :age, :budget
     ]
     
     array_params = [
       :dead_reason_ids, :project_ids, :assigned_to, :lead_statuses,
-      :city_ids, :locality_ids, :source_id, :lead_stages, :presale_user_id,
+      :city_ids, :locality_ids, :lead_stages, :presale_user_id,
       :sub_source_ids, :lead_ids, :broker_ids, :country_ids,
       :closing_executive, :dead_reasons, :sv_user, :manager_ids,
       # Additional array parameters
-      :source_ids, :user_ids, :call_status, :abandoned_calls_status,
-      :role_ids, :lead_statuses, :project_ids, :broker_ids
+      :source_id, :source_ids, :user_ids, :call_status, :abandoned_calls_status,
+      :role_ids, :visit_status_ids
     ]
     
-    all_params = base_search_params + magic_fields + array_params
-    params.permit(*all_params)
+    all_params = base_search_params + magic_fields
+    array_params_hash = array_params.map { |param| { param => [] } }.reduce({}, :merge)
+    params.permit(*all_params, array_params_hash)
   end
 end
