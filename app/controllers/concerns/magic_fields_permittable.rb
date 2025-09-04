@@ -14,14 +14,14 @@ module MagicFieldsPermittable
     Rails.cache.delete("magic_fields_#{company.id}")
   end
 
-  # Helper method to build permitted parameters including magic fields
+  # Helper method to build permitted parameters for regular Lead attributes only
   def build_lead_params_with_magic_fields(company, additional_params = [])
     magic_fields = magic_field_names_for_company(company)
     Rails.logger.info "Magic fields for company #{company.id}: #{magic_fields.inspect}"
     
     base_params = [
       :date, :name, :email, :mobile, :other_phones, :other_emails, :address,
-      :is_qualified, :city, :state, :country, :budget, :source_id, :sub_source,
+      :is_qualified, :city, :state, :country, :source_id, :sub_source,
       :broker_id, :project_id, :user_id, :closing_executive, :ncd, :comment,
       :status_id, :lead_no, :call_in_id, :dead_reason_id, :dead_sub_reason,
       :city_id, :locality_id, :tentative_visit_planned, :enable_admin_assign,
@@ -33,8 +33,20 @@ module MagicFieldsPermittable
       :uuid
     ]
     
-    # Add magic fields and additional params
-    all_params = base_params + magic_fields + additional_params
+    # Handle conflicts between regular Lead attributes and magic fields
+    # If a field is both a regular attribute and a magic field, exclude it from base_params
+    # and let the MagicFieldsService handle it as a magic field
+    conflicting_fields = [:budget] # Add other conflicting fields here if needed
+    magic_fields.each do |field|
+      if conflicting_fields.include?(field)
+        base_params.delete(field)
+        Rails.logger.info "Excluded conflicting field '#{field}' from base_params (handled as magic field)"
+      end
+    end
+    
+    # Only include regular Lead attributes, NOT magic fields
+    # Magic fields will be handled separately by MagicFieldsService
+    all_params = base_params + additional_params
     
     # Add nested attributes if needed
     nested_attrs = {
