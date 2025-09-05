@@ -114,6 +114,10 @@ class Lead < ActiveRecord::Base
     :fb_ads_id
   ]
 
+  def gbk_group_qr_generation(new_lead)
+    Resque.enqueue(::ProcessGbkgroupQrGenerationTrigger, self.id, new_lead)
+  end
+
   def default_fields_values
     self.other_data || {}
   end
