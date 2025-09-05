@@ -14,7 +14,7 @@ module MagicFieldsPermittable
     Rails.cache.delete("magic_fields_#{company.id}")
   end
 
-  # Helper method to build permitted parameters for regular Lead attributes only
+  # Helper method to build permitted parameters for regular Lead attributes and magic fields
   def build_lead_params_with_magic_fields(company, additional_params = [])
     magic_fields = magic_field_names_for_company(company)
     Rails.logger.info "Magic fields for company #{company.id}: #{magic_fields.inspect}"
@@ -35,7 +35,7 @@ module MagicFieldsPermittable
     
     # Handle conflicts between regular Lead attributes and magic fields
     # If a field is both a regular attribute and a magic field, exclude it from base_params
-    # and let the MagicFieldsService handle it as a magic field
+    # and let the dynamic setters handle it as a magic field
     conflicting_fields = [:budget] # Add other conflicting fields here if needed
     magic_fields.each do |field|
       if conflicting_fields.include?(field)
@@ -44,9 +44,9 @@ module MagicFieldsPermittable
       end
     end
     
-    # Only include regular Lead attributes, NOT magic fields
-    # Magic fields will be handled separately by MagicFieldsService
-    all_params = base_params + additional_params
+    # Include both regular Lead attributes AND magic fields
+    # Magic fields will be handled automatically by the _assign_attribute override
+    all_params = base_params + magic_fields + additional_params
     
     # Add nested attributes if needed
     nested_attrs = {
@@ -100,9 +100,7 @@ module MagicFieldsPermittable
       :search_query, :is_advanced_search, :search_string, :calender_view,
       :renewal_from, :renewal_upto,
       # Additional parameters from the URL
-      :save_search_id, :button, :people, :desired_property, :purchase_reason,
-      :current_stay, :occupation, :own_contribution, :loan_requirement,
-      :preferred_bank, :age, :budget
+      :save_search_id, :button
     ]
     
     array_params = [

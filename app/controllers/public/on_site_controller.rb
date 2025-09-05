@@ -29,9 +29,8 @@ module Public
       visit_params = lead_visit_params
       
       if @lead.project.uuid == visit_params[:project_uuid]
-        # Use the MagicFieldsService for consistent handling
-        service = MagicFieldsService.new(@company, @lead)
-        service.update_lead_with_magic_fields(@lead, visit_params)
+        # Update existing lead with magic fields (handled automatically by dynamic setters)
+        @lead.assign_attributes(visit_params)
       else
         # Create new lead with the same magic field handling
         @lead = create_new_lead visit_params
@@ -67,8 +66,8 @@ module Public
     end
 
     def create_new_lead input_params
-      # Use the MagicFieldsService for consistent handling
-      lead = MagicFieldsService.new(@company).create_lead_with_magic_fields(input_params)
+      # Create new lead with magic fields (handled automatically by dynamic setters)
+      lead = @company.leads.build(input_params)
       lead.mobile = @lead.mobile
       lead.email = @lead.email
       # Set additional attributes that are specific to this context

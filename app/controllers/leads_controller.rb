@@ -272,7 +272,7 @@ class LeadsController < ApplicationController
       file = params[:lead_file].tempfile
       @success=[]
       @errors=[]
-      mf_names = @company.magic_fields.pluck(:name)
+      mf_names = @company&.magic_fields&.pluck(:name) || []
       CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
         begin
           name=row["Name"]
@@ -372,7 +372,7 @@ class LeadsController < ApplicationController
   def import_bulk_update
     @success = []
     @errors = []
-    mf_names = @company.magic_fields.pluck(:name)
+    mf_names = @company&.magic_fields&.pluck(:name) || []
     if params[:leads_file].present?
       csv_data = CSV.read(params[:leads_file].tempfile, headers: :first_row, encoding: "iso-8859-1:utf-8")
       if csv_data.count > 1000

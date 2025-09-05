@@ -89,7 +89,7 @@
       - if @company.is_pop_fields?('presale_stage_id')
         .col-md-3{class: ("required" if @company.is_required_fields?("presale_stage_id"))}
           = f.select :presale_stage_id, options_from_collection_for_select(f.object.selectable_company_stages, :stage_id, :stage_name, f.object.presale_stage_id), {include_blank: "Select Lead Stage"}, {required: @company.is_required_fields?("presale_stage_id")}
-      = render partial: 'custom_field', locals: {f: f, custom_fields: @company.magic_fields.where(is_popup_field: true)}
+      = render partial: 'custom_field', locals: {f: f, custom_fields: @company&.magic_fields&.where(is_popup_field: true) || []}
       - if @company.is_pop_fields?('ncd')
         .col-md-6#ncd_{:style => ("display:none;" if @company.setting&.hide_next_call_date && @company.dead_status_ids.include?(f.object.status_id.to_s)), class: ("required" if f.object.is_ncd_required?)}
           .form-group
@@ -297,13 +297,22 @@
       var form = $(this);
       var formData = new FormData(this);
       
+      // Add CSRF token to FormData
+      var csrfToken = $('meta[name="csrf-token"]').attr('content');
+      if (csrfToken) {
+        formData.append('authenticity_token', csrfToken);
+      }
+      
       $.ajax({
         url: form.attr('action'),
         type: form.attr('method'),
         data: formData,
         processData: false,
         contentType: false,
-        dataType: 'script'
+        dataType: 'script',
+        headers: {
+          'X-CSRF-Token': csrfToken
+        }
       });
       
       e.preventDefault();

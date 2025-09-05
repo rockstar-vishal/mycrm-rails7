@@ -95,13 +95,22 @@
       var form = $(this);
       var formData = new FormData(this);
       
+      // Add CSRF token to FormData
+      var csrfToken = $('meta[name="csrf-token"]').attr('content');
+      if (csrfToken) {
+        formData.append('authenticity_token', csrfToken);
+      }
+      
       $.ajax({
         url: form.attr('action'),
         type: form.attr('method'),
         data: formData,
         processData: false,
         contentType: false,
-        dataType: 'script'
+        dataType: 'script',
+        headers: {
+          'X-CSRF-Token': csrfToken
+        }
       });
       
       e.preventDefault();

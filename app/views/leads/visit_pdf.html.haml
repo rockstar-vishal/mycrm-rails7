@@ -24,7 +24,7 @@
   %h2 Client Additional Details
   %table{style: "border: 2px solid #dfdfdf; border-collapse: collapse; width: 100%"}
     %tbody
-      - @company.magic_fields.each do |magic_field|
+      - (@company&.magic_fields || []).each do |magic_field|
         - value = @lead.send(magic_field.name)
         %tr
           %td{style: "font-weight:800; border-right:none; padding:15px;width:30%"}= magic_field.pretty_name

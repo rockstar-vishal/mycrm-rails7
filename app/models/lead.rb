@@ -98,7 +98,7 @@ class Lead < ActiveRecord::Base
   before_create :set_executive
   before_update :set_closing_excutive
   after_create :set_presale_user, if: :presale_user_site_visit_enabled?
-  after_save :apply_pending_magic_field_updates
+
   after_commit :notify_lead_create_event, :send_lead_create_brower_notification, on: :create
   before_save :set_site_visit_scheduled
   after_save :set_visit, if: :is_advance_visit_enabled?
@@ -971,7 +971,7 @@ class Lead < ActiveRecord::Base
       end
       conditions = []
       values = []
-      user.company.magic_fields.each do |field|
+      user.company&.magic_fields&.each do |field|
         search_value = search_params[field.name]
         if search_value.present?
           if field.datatype == 'string' || field.datatype == 'date'
@@ -1079,7 +1079,7 @@ class Lead < ActiveRecord::Base
         if exporting_user.company.fb_ads_ids.present?
           exportable_fields << 'Facebook Ads Id'
         end
-        magic_fields = exporting_user.company.magic_fields.order(:id).pluck(:id, :pretty_name).to_h
+        magic_fields = exporting_user.company&.magic_fields&.order(:id)&.pluck(:id, :pretty_name)&.to_h || {}
         exportable_fields = exportable_fields | magic_fields.values
         csv << exportable_fields
 
@@ -1510,7 +1510,7 @@ class Lead < ActiveRecord::Base
 
   def magic_field_values
     field_attributes = []
-    self.company.magic_fields.each do |field|
+    self.company&.magic_fields&.each do |field|
       field_attributes.push({
         key: "#{field.name}",
         value: self.send("#{field.name}"),
@@ -1651,22 +1651,69 @@ class Lead < ActiveRecord::Base
       end
     end
 
-    def apply_pending_magic_field_updates
-      pending_updates = instance_variable_get(:@pending_magic_field_updates)
-      return unless pending_updates
-      
-      pending_updates.each do |field_name, update_data|
-        begin
-          magic_attribute = magic_attributes.find_or_initialize_by(magic_field: update_data[:magic_field])
-          magic_attribute.value = update_data[:value]
-          magic_attribute.save!
-        rescue => e
-          Rails.logger.error "Failed to update magic field #{field_name}: #{e.message}"
-          # Don't fail the entire save if magic field update fails
+  # Dynamic magic field setter/getter generation
+  after_initialize :define_magic_field_methods, if: :should_define_magic_fields?
+
+  private
+
+  def should_define_magic_fields?
+    # Only define magic fields if we have a company_id
+    self.respond_to?(:company_id)
+  end
+
+  def define_magic_field_methods
+    return unless company.present?
+    return unless company.respond_to?(:magic_fields)
+    
+    company.magic_fields.each do |magic_field|
+      # Define setter
+      define_singleton_method("#{magic_field.name}=") do |value|
+        return value unless company.present? && company.respond_to?(:magic_fields)
+        
+        magic_attribute = magic_attributes.find_or_initialize_by(magic_field: magic_field)
+        
+        # If it's a persisted record, update it directly
+        if magic_attribute.persisted?
+          magic_attribute.update_column(:value, value)
+        else
+          magic_attribute.value = value
         end
+        
+        # Ensure the magic attribute is in the collection
+        magic_attributes << magic_attribute unless magic_attributes.include?(magic_attribute)
+        
+        value
       end
       
-      # Clear the pending updates
-      instance_variable_set(:@pending_magic_field_updates, nil)
+      # Define getter
+      define_singleton_method(magic_field.name) do
+        return nil unless company.present? && company.respond_to?(:magic_fields)
+        
+        magic_attribute = magic_attributes.find_by(magic_field: magic_field)
+        magic_attribute&.value
+      end
     end
+  end
+
+  # Cleanup orphaned magic field values for failed saves
+  def cleanup_orphaned_magic_fields
+    return if persisted? # Only cleanup for failed saves
+    return unless respond_to?(:magic_attributes)
+    
+    magic_attributes.destroy_all
+  end
+
+  # Save magic attributes when lead is saved
+  after_save :save_magic_attributes
+
+  private
+
+  def save_magic_attributes
+    return unless respond_to?(:magic_attributes)
+    
+    magic_attributes.each do |magic_attribute|
+      magic_attribute.save! if magic_attribute.new_record? || magic_attribute.changed?
+    end
+  end
+
 end

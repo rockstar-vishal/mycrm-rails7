@@ -64,7 +64,7 @@
                     = link_to new_lead_path, class: "btn-new #{current_user.disable_create_lead ? ' disabled' : ''}" do
                       
                       Add Lead
-              - magic_fields = @company.magic_fields
+              - magic_fields = @company&.magic_fields || []
               - magic_field_names = magic_fields.pluck(:name)
               = render partial: "advance_search_form", locals: {magic_fields: magic_fields}
             = render partial: 'dailing_modal'
