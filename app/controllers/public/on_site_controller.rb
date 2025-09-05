@@ -32,10 +32,15 @@ module Public
         # Update existing lead with magic fields (handled automatically by model)
         @lead.assign_attributes(visit_params)
       else
+        origin_lead = @lead
         # Create new lead with the same magic field handling
         @lead = create_new_lead visit_params
+        @lead.name = origin_lead.name
+        @lead.email = origin_lead.email
+        @lead.mobile = origin_lead.mobile
       end
-      
+      @lead.status_id = @company.expected_site_visit_id if lead.tentative_visit_planned.present?
+      @lead.source_id = ::Source.cp_sources.first.id if lead.source_id.blank?
       if @lead.save
         render json: {message: "Visit Scheduled", data: {lead_no: @lead.reload.lead_no}}, status: 200 and return
       else
@@ -68,10 +73,6 @@ module Public
     def create_new_lead input_params
       # Create new lead with magic fields using helper method
       lead = Lead.build_with_magic_fields(@company, input_params)
-      # Set additional attributes that are specific to this context
-      lead.status_id = @company.expected_site_visit_id if lead.tentative_visit_planned.present?
-      lead.source_id = ::Source.cp_sources.first.id if lead.source_id.blank?
-      
       lead
     end
   end
