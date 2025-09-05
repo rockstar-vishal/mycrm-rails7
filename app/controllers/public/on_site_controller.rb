@@ -35,9 +35,9 @@ module Public
         origin_lead = @lead
         # Create new lead with the same magic field handling
         @lead = create_new_lead visit_params
-        @lead.name = origin_lead.name
-        @lead.email = origin_lead.email
-        @lead.mobile = origin_lead.mobile
+        @lead.name = origin_lead.name if @lead.name.blank?
+        @lead.email = origin_lead.email if @lead.email.blank?
+        @lead.mobile = origin_lead.mobile if @lead.mobile.blank?
       end
       @lead.status_id = @company.expected_site_visit_id if lead.tentative_visit_planned.present?
       @lead.source_id = ::Source.cp_sources.first.id if lead.source_id.blank?
