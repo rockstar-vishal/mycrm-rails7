@@ -39,8 +39,8 @@ module Public
         @lead.email = origin_lead.email if @lead.email.blank?
         @lead.mobile = origin_lead.mobile if @lead.mobile.blank?
       end
-      @lead.status_id = @company.expected_site_visit_id if lead.tentative_visit_planned.present?
-      @lead.source_id = ::Source.cp_sources.first.id if lead.source_id.blank?
+      @lead.status_id = @company.expected_site_visit_id if @lead.tentative_visit_planned.present?
+      @lead.source_id = ::Source.cp_sources.first.id if @lead.source_id.blank?
       if @lead.save
         render json: {message: "Visit Scheduled", data: {lead_no: @lead.reload.lead_no}}, status: 200 and return
       else
