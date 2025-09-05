@@ -1654,6 +1654,36 @@ class Lead < ActiveRecord::Base
   # Dynamic magic field setter/getter generation
   after_initialize :define_magic_field_methods, if: :should_define_magic_fields?
 
+  # Helper method to separate magic fields from regular attributes
+  def self.separate_magic_fields(company, attributes)
+    return attributes, {} unless company.present? && company.respond_to?(:magic_fields)
+    
+    magic_field_names = company.magic_fields.pluck(:name).map(&:to_sym)
+    regular_attributes = attributes.except(*magic_field_names)
+    magic_attributes = attributes.slice(*magic_field_names)
+    
+    [regular_attributes, magic_attributes]
+  end
+
+  # Helper method to build leads with magic fields
+  def self.build_with_magic_fields(company, attributes = {})
+    return build(attributes) unless company.present? && company.respond_to?(:magic_fields)
+    
+    magic_field_names = company.magic_fields.pluck(:name).map(&:to_sym)
+    regular_attributes = attributes.except(*magic_field_names)
+    magic_attributes = attributes.slice(*magic_field_names)
+    
+    # Build with only regular attributes
+    lead = company.leads.build(regular_attributes)
+    
+    # Set magic fields using dynamic setters
+    magic_attributes.each do |key, value|
+      lead.send("#{key}=", value) if lead.respond_to?("#{key}=")
+    end
+    
+    lead
+  end
+
   private
 
   def should_define_magic_fields?

@@ -6,7 +6,8 @@ module Public
     before_action :set_api_key, only: :create_lead
 
     def create_lead
-      lead = @company.leads.build(lead_params.merge(:source_id=>@api_obj.source_id, :user_id=>@api_obj.user_id, :project_id=>@api_obj.project_id))
+      params_data = lead_params.merge(:source_id=>@api_obj.source_id, :user_id=>@api_obj.user_id, :project_id=>@api_obj.project_id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -57,7 +58,8 @@ module Public
           render json: {message: "Failed", errors: lead.errors.full_messages.join(', ')}, status: 422 and return
         end
       else
-        lead = @company.leads.build(external_lead_params.merge(status_id: @company.expected_site_visit&.id))
+        params_data = external_lead_params.merge(status_id: @company.expected_site_visit&.id)
+        lead = Lead.build_with_magic_fields(@company, params_data)
         if lead.save
           render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
         else
@@ -75,11 +77,8 @@ module Public
       end
       project_id = @company.projects.find_id_from_name(params[:project]) || @company.default_project&.id
       user = @company.users.find_by_email params[:user_email]
-      lead = @company.leads.build(lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source, enquiry_sub_source_id: enquiry_sub_source_id))
-      mf_names = @company.magic_fields.pluck(:name)
-      mf_names.each do |mf_name|
-        lead.send("#{mf_name}=", params[mf_name.to_sym])
-      end
+      params_data = lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source, enquiry_sub_source_id: enquiry_sub_source_id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       lead.user_id = user.id if user.present?
       if lead.save
         if @company.secondary_source_enabled
@@ -186,7 +185,8 @@ module Public
       sub_source = params[:sub_source]
       project_id = @company.projects.find_id_from_name(params[:project]) || @company.default_project&.id
       user = @company.users.find_by_email params[:user_email]
-      lead = @company.leads.build(lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source))
+      params_data = lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       lead.user_id = user.id if user.present?
       if lead.save
         render json: {message: "SUCCESS", data: {lead_no: lead.reload.lead_no}}, status: 200 and return
@@ -253,7 +253,8 @@ module Public
         project = @company.default_project
       end
       render json: {message: "Project ID Invalid"}, status: 400 and return if project.blank?
-      lead = @company.leads.build(lead_params.merge(:source_id=>::Source::MAGICBRICKS, :project_id=>project.id))
+      params_data = lead_params.merge(:source_id=>::Source::MAGICBRICKS, :project_id=>project.id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -271,7 +272,8 @@ module Public
         project = @company.default_project
       end
       render json: {message: "Project ID Invalid"}, status: 400 and return if project.blank?
-      lead = @company.leads.build(lead_params.merge(:source_id=>::Source::NINE_NINE_ACRES, :project_id=>project.id))
+      params_data = lead_params.merge(:source_id=>::Source::NINE_NINE_ACRES, :project_id=>project.id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -288,7 +290,8 @@ module Public
         project = @company.default_project
       end
       render json: {message: "Project ID Invalid"}, status: 400 and return if project.blank?
-      lead = @company.leads.build(lead_params.merge(:source_id=>::Source::HOUSING, :status_id=>@company.new_status_id, :project_id=>project.id))
+      params_data = lead_params.merge(:source_id=>::Source::HOUSING, :status_id=>@company.new_status_id, :project_id=>project.id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else

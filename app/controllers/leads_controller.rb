@@ -206,8 +206,17 @@ class LeadsController < ApplicationController
   end
 
   def create
+    # Separate magic fields from regular attributes
+    regular_params, magic_params = Lead.separate_magic_fields(@company, lead_params)
+    
     @lead = @leads.new
-    @lead.assign_attributes(lead_params)
+    @lead.assign_attributes(regular_params)
+    
+    # Set magic fields using dynamic setters
+    magic_params.each do |key, value|
+      @lead.send("#{key}=", value) if @lead.respond_to?("#{key}=")
+    end
+    
     unless @lead.company.round_robin_enabled?
       @lead.user_id = current_user.id if @lead.user_id.blank?
     end

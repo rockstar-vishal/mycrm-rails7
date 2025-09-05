@@ -29,7 +29,7 @@ module Public
       visit_params = lead_visit_params
       
       if @lead.project.uuid == visit_params[:project_uuid]
-        # Update existing lead with magic fields (handled automatically by dynamic setters)
+        # Update existing lead with magic fields (handled automatically by model)
         @lead.assign_attributes(visit_params)
       else
         # Create new lead with the same magic field handling
@@ -66,10 +66,8 @@ module Public
     end
 
     def create_new_lead input_params
-      # Create new lead with magic fields (handled automatically by dynamic setters)
-      lead = @company.leads.build(input_params)
-      lead.mobile = @lead.mobile
-      lead.email = @lead.email
+      # Create new lead with magic fields using helper method
+      lead = Lead.build_with_magic_fields(@company, input_params)
       # Set additional attributes that are specific to this context
       lead.status_id = @company.expected_site_visit_id if lead.tentative_visit_planned.present?
       lead.source_id = ::Source.cp_sources.first.id if lead.source_id.blank?
