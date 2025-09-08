@@ -4,16 +4,21 @@ class Api::ThirdPartyService::McubesController < PublicApiController
 
   def callback
     @call_log = Leads::CallLog.find_by(sid: mcube_params[:callid])
-    if @call_log.update(
-      start_time: Time.zone.parse(mcube_params[:starttime]),
-      end_time: (Time.zone.parse(mcube_params[:endtime]) rescue nil),
-      recording_url: mcube_params[:filename],
-      duration: mcube_params[:answeredtime],
-      status: mcube_params[:status]
-    )
-      render :json=>{:status=>"Success"}
+    
+    if @call_log.present?
+      if @call_log.update(
+        start_time: Time.zone.parse(mcube_params[:starttime]),
+        end_time: (Time.zone.parse(mcube_params[:endtime]) rescue nil),
+        recording_url: mcube_params[:filename],
+        duration: mcube_params[:answeredtime],
+        status: mcube_params[:status]
+      )
+        render :json=>{:status=>"Success"}
+      else
+        render :json=>{:status=>"Failure"}
+      end
     else
-      render :json=>{:status=>"Failure"}
+      render :json=>{:status=>"Call log not found"}, status: 404
     end
   end
 
