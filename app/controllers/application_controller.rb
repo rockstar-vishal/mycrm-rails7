@@ -22,6 +22,10 @@ class ApplicationController < ActionController::Base
   end
 
   def xhr_redirect_to(args)
+    # Decode HTML entities in redirect URL to fix &amp; -> & conversion
+    if args[:redirect_to].present?
+      args[:redirect_to] = CGI.unescapeHTML(args[:redirect_to].to_s)
+    end
     @args = args
     flash.keep
     render 'shared/xhr_redirect_to'
