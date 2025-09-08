@@ -189,7 +189,7 @@ class Api::ThirdPartyService::McubesController < PublicApiController
   private
 
   def find_company
-    @company = Company.joins(:mcube_groups).where("mcubegroups.number ILIKE ?", "%#{mcube_params[:landingnumber]&.last(10)}").where(mcube_groups: { is_active: true }).first ||
+    @company = Company.joins(:mcube_groups).where("mcube_groups.number ILIKE ?", "%#{mcube_params[:landingnumber]&.last(10)}").where(mcube_groups: { is_active: true }).first ||
   Company.joins(:mcube_groups).where(mcube_groups: { number: mcube_params[:landingnumber], is_active: true }).first
     render json: {status: false, message: "Invalid"}, status: 404 and return if @company.blank?
   end
