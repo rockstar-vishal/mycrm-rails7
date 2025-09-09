@@ -42,6 +42,7 @@ module Public
         @lead.name = origin_lead.name if @lead.name.blank?
         @lead.email = origin_lead.email if @lead.email.blank?
         @lead.mobile = origin_lead.mobile if @lead.mobile.blank?
+        @lead.broker_id = origin_lead.broker_id if @lead.broker_id.blank?
       end
       if @lead.save
         render json: {message: "Visit Scheduled", data: {lead_no: @lead.reload.lead_no}}, status: 200 and return
