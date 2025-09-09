@@ -391,6 +391,7 @@ Rails.application.routes.draw do
       post :submit_cp_lead
       get :client_settings
       post :schedule_client_visit
+      get "lead-details/:lead_no", action: "lead_details"
     end
     namespace :companies do
       get ':uuid/external_api/projects', controller: "external_api", action: "projects"
