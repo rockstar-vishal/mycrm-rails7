@@ -284,7 +284,7 @@
             .form-group.col-md-4
               %span.lead-title Proposed Visit Date
               %span.lead-info
-                = @lead.tentative_visit_planned.strftime("%d-%m-%Y %I:%M %p")
+                = @lead.tentative_visit_planned..strftime("%d %B %Y")
           .form-group.col-md-4
             %span.lead-title Follow up 
             %span.lead-info
@@ -327,10 +327,10 @@
             .form-group.col-md-4
               %span.lead-title Status
               %span.lead-info
-                = @lead&.whatsapp_message_logs&.pluck(:status).join(",")
+                = @lead&.whatsapp_message_logs&.pluck(:status).join(" ,")
             .form-group.col-md-4
-              %span.lead-title
-              %span.lead-info
+              %span.lead-title Action
+              %span.lead-info{style: "margin-top: 10px"}
                 = link_to "Resend", cp_lead_form_whatsapp_lead_path(@lead), method: :post, class: "btn-new", data: { turbo: false }
       %h4.lead-heading Notes
       .lead-body
