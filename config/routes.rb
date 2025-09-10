@@ -27,6 +27,7 @@ Rails.application.routes.draw do
       get :fetch_source_subsource
       put :deactivate
       put :activate
+      post :cp_lead_form_whatsapp
       get "visits/:visit_id/print", action: :print_visit, as: :print_visit
     end
     collection do
