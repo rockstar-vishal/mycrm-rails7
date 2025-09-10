@@ -370,7 +370,7 @@ module ReportCsv
         @data = data.as_json(except: [:id])
         brokers = user.company.brokers.where(:id=>data.map(&:broker_id).uniq)
         statuses = user.company.statuses.where(:id=>data.map(&:status_id).uniq)
-        CSV.generate(options) do |csv|
+        CSV.generate(**options) do |csv|
           exportable_fields = ['Source', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
