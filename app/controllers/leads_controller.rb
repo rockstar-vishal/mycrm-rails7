@@ -560,7 +560,7 @@ class LeadsController < ApplicationController
   end
 
   def cp_lead_form_whatsapp
-    if @company.cp_lead_qr_enable
+    if @company.client_visit_qr
       Resque.enqueue(::AutoMessageWhenLeadStatusIsMarked, @lead.id)
       redirect_to leads_path, notice: "Whatsapp message sent"
     else
