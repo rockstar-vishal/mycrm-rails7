@@ -27,6 +27,7 @@ Rails.application.routes.draw do
       get :fetch_source_subsource
       put :deactivate
       put :activate
+      post :cp_lead_form_whatsapp
       get "visits/:visit_id/print", action: :print_visit, as: :print_visit
     end
     collection do
@@ -391,6 +392,7 @@ Rails.application.routes.draw do
       post :submit_cp_lead
       get :client_settings
       post :schedule_client_visit
+      get "lead-details/:lead_no", action: "lead_details"
     end
     namespace :companies do
       get ':uuid/external_api/projects', controller: "external_api", action: "projects"

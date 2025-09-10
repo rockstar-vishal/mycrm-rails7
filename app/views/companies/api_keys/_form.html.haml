@@ -10,7 +10,7 @@
   .row
     .col-md-3.required
       .form-group
-        = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), prompt: "Lead Source", class: "form-control tomselect-checkbox", multiple: true
+        = f.select :source_id, options_from_collection_for_select(current_user.company.sources, :id, :name, f.object.source_id), { prompt: "Lead Source" }, { class: "form-control" }
   
     .col-md-3.required
       .form-group

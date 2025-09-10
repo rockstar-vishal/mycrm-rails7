@@ -45,6 +45,7 @@ class Lead < ActiveRecord::Base
   has_many :secondary_sources, through: :leads_secondary_sources, source: :source
   has_many :call_logs, class_name: "Leads::CallLog", dependent: :destroy
   has_many :push_notification_logs, class_name: 'PushNotificationLog', dependent: :destroy
+  has_many :whatsapp_message_logs, dependent: :destroy
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, :allow_blank => true
 
   validate :mobile_validation, if: :mobile_number_present?
@@ -251,9 +252,9 @@ class Lead < ActiveRecord::Base
       combined_ids = dead_status_ids + [booking_done_id]
       if self.company.setting.present? && self.company.setting.global_validation.present?
         if self.company.setting.open_closed_lead_enabled
-          leads = ::Lead.where.not(:id=>self.id, status_id: dead_status_ids).where(:company_id=>self.company_id)
+          leads = ::Lead.where.not(:id=>self.id).where.not(status_id: dead_status_ids).where(:company_id=>self.company_id)
         else
-          leads = ::Lead.where.not(:id=>self.id, status_id: [dead_status_ids, booking_done_id].flatten).where(:company_id=>self.company_id)
+          leads = ::Lead.where.not(:id=>self.id).where.not(status_id: [dead_status_ids, booking_done_id].flatten).where(:company_id=>self.company_id)
         end
       else
         leads = ::Lead.where.not(:id=>self.id).where.not(:status_id=>combined_ids).where(:company_id=>self.company_id, :project_id=>project_id)

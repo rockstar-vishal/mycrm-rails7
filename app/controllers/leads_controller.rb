@@ -1,7 +1,7 @@
 class LeadsController < ApplicationController
   include MagicFieldsPermittable
   before_action :set_leads
-  before_action :set_lead, only: [:show, :delete_visit, :make_call,:new_visit, :create_visit, :edit, :update, :destroy, :histories, :edit_visit, :deactivate, :print_visit]
+  before_action :set_lead, only: [:show, :delete_visit, :make_call,:new_visit, :create_visit, :edit, :update, :destroy, :histories, :edit_visit, :deactivate, :print_visit, :cp_lead_form_whatsapp]
 
   respond_to :html
   PER_PAGE = 20
@@ -558,6 +558,16 @@ class LeadsController < ApplicationController
     @lead.activate
     redirect_to leads_path and return
   end
+
+  def cp_lead_form_whatsapp
+    if @company.cp_lead_qr_enable
+      Resque.enqueue(::AutoMessageWhenLeadStatusIsMarked, @lead.id)
+      redirect_to leads_path, notice: "Whatsapp message sent"
+    else
+      redirect_to leads_path, alert: "CP Lead QR not enabled"
+    end
+  end
+
 
   def stages
     @status = @company.statuses.find_by(id: params[:status_id])

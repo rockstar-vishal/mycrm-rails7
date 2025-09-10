@@ -105,6 +105,13 @@ module LeadApiAttributes
       template.add :name
     end
 
+    api_accessible :qr_verification do |template|
+      template.add :name
+      template.add :lead_no
+      template.add lambda {|lead| (lead.project&.name rescue "")}, as: :project
+      template.add lambda {|lead| (lead.broker&.name rescue "")}, as: :broker
+    end
+
     api_accessible :lead_event do |template|
       template.add :id
       template.add lambda{|lead| lead.name }, as: :title

@@ -284,7 +284,7 @@
             .form-group.col-md-4
               %span.lead-title Proposed Visit Date
               %span.lead-info
-                = @lead.tentative_visit_planned.strftime("%d-%m-%Y %I:%M %p")
+                = @lead.tentative_visit_planned..strftime("%d %B %Y")
           .form-group.col-md-4
             %span.lead-title Follow up 
             %span.lead-info
@@ -316,6 +316,22 @@
                 %span.lead-title Signature
                 %span.lead-info
                   = image_tag @lead.signature, class: "border signature_pad_body"
+      - if @company.client_visit_qr && [6,5,14].include?(@lead.status_id)
+        %h4.lead-heading SV Scheduling WA Sent?
+        .lead-body
+          .row
+            .form-group.col-md-4
+              %span.lead-title Campaign Name
+              %span.lead-info
+                = @lead&.whatsapp_message_logs&.last&.campaign_name
+            .form-group.col-md-4
+              %span.lead-title Status
+              %span.lead-info
+                = @lead&.whatsapp_message_logs&.pluck(:status).join(" ,")
+            .form-group.col-md-4
+              %span.lead-title Action
+              %span.lead-info{style: "margin-top: 10px"}
+                = link_to "Resend", cp_lead_form_whatsapp_lead_path(@lead), method: :post, class: "btn-new", data: { turbo: false }
       %h4.lead-heading Notes
       .lead-body
         .row
