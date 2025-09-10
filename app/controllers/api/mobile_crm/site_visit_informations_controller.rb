@@ -2,6 +2,7 @@ module Api
   module MobileCrm
     class SiteVisitInformationsController < ::Api::MobileCrmController
       include MagicFieldsPermittable
+      include Base64ImageHandler
       before_action :authenticate, except: [:settings, :create_lead, :fetch_broker, :create_broker, :fetch_lead, :get_users, :get_cp_ids, :get_executives, :get_projects, :get_sources, :get_sub_sources, :get_brokers, :get_cities, :get_locality, :get_visit_status, :get_brokers_by_firm_name, :get_brokers_firm_name]
       before_action :find_company, :set_api_key, only: [:create_lead, :settings, :fetch_broker, :create_broker, :fetch_lead, :get_users, :get_projects, :get_sources, :get_sub_sources, :get_brokers, :get_cities, :get_executives,  :get_locality, :get_cp_ids, :get_visit_status, :get_brokers_by_firm_name, :get_brokers_firm_name]
       before_action :set_leads, only: [:create_lead, :fetch_lead]
@@ -32,6 +33,9 @@ module Api
         # Get the parameters and separate magic fields from regular attributes
         params_data = lead_params.merge(:status_id=>status_id)
         magic_field_names = magic_field_names_for_company(@company)
+        
+        # Process image parameter if it's a base64 data URI
+        params_data = process_base64_image_param(params_data)
         
         # Filter out magic fields from regular attributes
         regular_params = params_data.except(*magic_field_names)
@@ -412,6 +416,7 @@ module Api
       end
 
       private
+
 
       def inactive_partner_lead
         request = {"phone" => @lead.mobile.last(10), "project_name"=>@lead.project.name, "lead_no"=>@lead.lead_no}
