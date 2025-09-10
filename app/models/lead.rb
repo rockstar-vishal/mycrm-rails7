@@ -247,9 +247,9 @@ class Lead < ActiveRecord::Base
       combined_ids = dead_status_ids + [booking_done_id]
       if self.company.setting.present? && self.company.setting.global_validation.present?
         if self.company.setting.open_closed_lead_enabled
-          leads = ::Lead.where.not(:id=>self.id, status_id: dead_status_ids).where(:company_id=>self.company_id)
+          leads = ::Lead.where.not(:id=>self.id).where.not(status_id: dead_status_ids).where(:company_id=>self.company_id)
         else
-          leads = ::Lead.where.not(:id=>self.id, status_id: [dead_status_ids, booking_done_id].flatten).where(:company_id=>self.company_id)
+          leads = ::Lead.where.not(:id=>self.id).where.not(status_id: [dead_status_ids, booking_done_id].flatten).where(:company_id=>self.company_id)
         end
       else
         leads = ::Lead.where.not(:id=>self.id).where.not(:status_id=>combined_ids).where(:company_id=>self.company_id, :project_id=>project_id)

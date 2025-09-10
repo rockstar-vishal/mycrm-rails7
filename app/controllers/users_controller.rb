@@ -130,7 +130,7 @@ class UsersController < ApplicationController
         flash[:alert] = "Atleast one user should have round robin enabled"
         respond_to do |format|
           format.js do
-            render js: "window.location.href = '#{request.referer}';"
+            xhr_redirect_to redirect_to: request.referer
           end
           format.html do
             redirect_to request.referer
@@ -156,7 +156,7 @@ class UsersController < ApplicationController
     
     respond_to do |format|
       format.js do
-        render js: "window.location.href = '#{request.referer}';"
+        xhr_redirect_to redirect_to: request.referer
       end
       format.html do
         redirect_to request.referer

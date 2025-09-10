@@ -2,9 +2,9 @@ class Otp < ActiveRecord::Base
 
   TYPES = ["PHONE", "EMAIL"]
 
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :company
-  belongs_to :resource, polymorphic: true
+  belongs_to :resource, polymorphic: true, optional: true
   validates :validation_type, :validatable_data, :code, presence: true
   validates :code, uniqueness: true
 

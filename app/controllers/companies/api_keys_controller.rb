@@ -58,6 +58,6 @@ class Companies::ApiKeysController < ApplicationController
     end
 
     def key_params
-      params.require(:companies_api_key).permit(:source_id, :user_id, :project_id)
+      params.require(:companies_api_key).permit(:user_id, :project_id, :source_id)
     end
 end

@@ -15,7 +15,7 @@
           = f.select :datatype, options_for_select(MagicField.datatypes, f.object.datatype), {include_blank: "Select DataType"}, class: 'form-control'
       .col-md-6
         .form-group.required
-          = f.select :is_sv_required, options_for_select([["No", false], ["Yes", true]], f.object.is_sv_required), required: true, label: "Is Required", prompt: "Please select"
+          = f.select :is_sv_required, options_for_select([["No", false], ["Yes", true]], f.object.is_sv_required), label: "Is Required", prompt: "Please select"
       .col-md-12
         .form-group.required
           = f.check_box :is_select_list, class: 'is-select-list-checkbox'

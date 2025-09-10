@@ -129,7 +129,7 @@ module Public
 
     def whatspp_lead_update
       project_id = @company.projects.find_id_from_name(params[:project]) || @company.default_project&.id
-      lead = @company.leads.where("project_id = ? AND ((email IS NOT NULL AND email != '' AND email = ?) OR (mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = ?))", project_id, lead_params[:email].to_s.strip, lead_params[:mobile].last(10)).last
+      lead = @company.leads.where("project_id = ? AND ((email IS NOT NULL AND email != '' AND email = ?) OR (mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = ?))", project_id, params[:email].to_s.strip, lead_params[:mobile].last(10)).last
 
       if lead.present?
         if lead.update(lead_params.slice(:comment))
@@ -311,7 +311,16 @@ module Public
     private
 
     def lead_params
-      standard_lead_params(@company, [:visit_date, :visit_comments])
+      # Get magic field names for this company
+      magic_fields = @company.magic_fields.pluck(:name).map(&:to_sym)
+      
+      # Base parameters that are always allowed
+      base_params = [:name, :email, :mobile, :comment, :visit_date, :visit_comments]
+      
+      # Combine base params with magic fields
+      all_params = base_params + magic_fields
+      
+      params.permit(*all_params)
     end
 
     def lead_update_params
@@ -319,7 +328,16 @@ module Public
     end
 
     def external_lead_params
-      standard_lead_params(@company, [:project_id, :source_id, :city_id])
+      # Get magic field names for this company
+      magic_fields = @company.magic_fields.pluck(:name).map(&:to_sym)
+      
+      # Base parameters that are always allowed
+      base_params = [:name, :email, :mobile, :project_id, :source_id, :city_id, :comment, :tentative_visit_planned, :broker_id]
+      
+      # Combine base params with magic fields
+      all_params = base_params + magic_fields
+      
+      params.permit(*all_params)
     end
 
     def find_company

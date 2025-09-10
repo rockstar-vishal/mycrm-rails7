@@ -1,4 +1,4 @@
-module MagicFieldExtension
+module StructureFieldExtension
   extend ActiveSupport::Concern
 
   included do
@@ -8,7 +8,7 @@ module MagicFieldExtension
   end
 
   def items=(value)
-    Rails.logger.info "MagicFieldExtension#items= called with: #{value.inspect} (class: #{value.class})"
+    Rails.logger.info "StructureFieldExtension#items= called with: #{value.inspect} (class: #{value.class})"
     
     if value.is_a?(String) && value.present?
       # Split by comma and strip whitespace from each item

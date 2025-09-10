@@ -3,5 +3,5 @@ $(document).ajaxStop(function() {
 });
 validNavigation = true;
 var redirectUrl;
-redirectUrl = '<%= @args[:redirect_to] %>';
+redirectUrl = '<%= raw @args[:redirect_to] %>';
 window.location.href = redirectUrl.length ? redirectUrl : window.location.href;

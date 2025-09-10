@@ -1,6 +1,7 @@
 class StructureField < ActiveRecord::Base
+  include StructureFieldExtension
+  
   belongs_to :structure
-  belongs_to :sv_form
   before_save :check_lead_field
   default_scope { order(created_at: :asc) }
 
