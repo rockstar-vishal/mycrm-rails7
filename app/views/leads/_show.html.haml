@@ -316,8 +316,8 @@
                 %span.lead-title Signature
                 %span.lead-info
                   = image_tag @lead.signature, class: "border signature_pad_body"
-      - if @company.cp_lead_qr_enable && @company.cp_lead_qr_enable && [6,5,14].include?(@lead.status_id)
-        %h4.lead-heading CP Lead Form Whatsapp
+      - if @company.cp_lead_qr_enable && [6,5,14].include?(@lead.status_id)
+        %h4.lead-heading SV Scheduling WA Sent?
         .lead-body
           .row
             .form-group.col-md-4
@@ -327,13 +327,11 @@
             .form-group.col-md-4
               %span.lead-title Status
               %span.lead-info
-                = @lead&.whatsapp_message_logs&.last&.status
-
-            - if @lead&.whatsapp_message_logs&.last&.status == "failed"
-              .form-group.col-md-4
-                %span.lead-title
-                %span.lead-info
-                  = link_to "Add Lead", cp_lead_form_whatsapp_lead_path(@lead), method: :post, class: "btn-new", data: { turbo: false }
+                = @lead&.whatsapp_message_logs&.pluck(:status).join(",")
+            .form-group.col-md-4
+              %span.lead-title
+              %span.lead-info
+                = link_to "Resend", cp_lead_form_whatsapp_lead_path(@lead), method: :post, class: "btn-new", data: { turbo: false }
       %h4.lead-heading Notes
       .lead-body
         .row
