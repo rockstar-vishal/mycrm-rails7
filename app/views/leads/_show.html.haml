@@ -284,7 +284,7 @@
             .form-group.col-md-4
               %span.lead-title Proposed Visit Date
               %span.lead-info
-                = @lead.tentative_visit_planned..strftime("%d %B %Y")
+                = @lead.tentative_visit_planned.strftime("%d %B %Y")
           .form-group.col-md-4
             %span.lead-title Follow up 
             %span.lead-info
