@@ -316,7 +316,7 @@
                 %span.lead-title Signature
                 %span.lead-info
                   = image_tag @lead.signature, class: "border signature_pad_body"
-      - if @company.cp_lead_qr_enable && [6,5,14].include?(@lead.status_id)
+      - if @company.client_visit_qr && [6,5,14].include?(@lead.status_id)
         %h4.lead-heading SV Scheduling WA Sent?
         .lead-body
           .row
