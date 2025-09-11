@@ -16,13 +16,56 @@
             .action-bar
               %div
                 .group-link
-                  = render 'report_search'
+                  %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
                   = link_to search_params.merge!(format: :csv), class: "btn btn-action" do
                     = render 'icons/export'
                     Export
               %div
                 .group-link
                   = render 'reports_button', locals: {report_name: :dead}
+              #adv-searchbox.box-body
+                = form_tag nil, method: :get, class: "filter-search-menu" do
+                  .p-2
+                    .custom-search
+                      .row
+                        .col-12
+                          %h5.mt-0 Search By Date
+                        .col-md-6
+                          = render partial: 'shared/date_range_display'
+                        .col-md-6
+                          = render partial: 'shared/updated_at_filter'
+                        .col-12
+                          %h5.mt-0 Search By Projects
+                        .col-md-6
+                          = render partial: 'shared/projects_filter'
+                        .col-md-6
+                          = render partial: 'shared/users_filter'
+                        .col-12
+                          %h5.mt-0 Search By Visit Date
+                        .col-md-6
+                          = render partial: 'shared/visited_date_filter'
+                        - if current_user.company.setting.present? && current_user.company.setting.visit_filter_enable
+                          .col-md-3
+                            .form-group
+                              %label Select visit counts
+                              = select_tag :visit_counts, options_for_select(["Fresh Visit", "Revisit"], params[:visit_counts]), prompt: 'Select visit counts', class: "form-control"
+                        - if current_user.company.is_allowed_field?("enquiry_sub_source_id") || current_user.company.is_allowed_field?("sub_source")
+                          .col-md-6
+                            = render partial: 'shared/sub_source_filter'
+                        .col-md-6
+                          = render partial: 'shared/managers_filter'
+                        - if current_user.company.is_allowed_field?("customer_type")
+                          .col-md-6
+                            = render partial: 'shared/customer_type_filter'
+                        - if current_user.company.is_allowed_field?("booking_date")
+                          .col-md-6
+                            = render partial: 'shared/booking_date_filter'
+                        .col-md-12
+                          
+                          = button_tag type: "submit", class: "btn btn-primary" do
+                            Search
           .table-body
             - plottable = {}
             .table-responsive
