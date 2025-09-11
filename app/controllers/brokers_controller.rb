@@ -16,10 +16,10 @@ class BrokersController < ApplicationController
         @brokers = @brokers.paginate(:page => params[:page], :per_page => PER_PAGE)
       end
       format.csv do
-        if @brokers_count <= 6000
+        if @brokers_count <= 5000
           send_data @brokers.to_csv({}, current_user, request.remote_ip, @brokers.count), filename: "brokers_#{Date.today.to_s}.csv"
         else
-          render json: {message: "Export of more than 4000 brokers is not allowed in one single attempt. Please contact management for more details"}, status: 403
+          render json: {message: "Export of more than 5000 brokers is not allowed in one single attempt. Please contact management for more details"}, status: 422
         end
       end
     end
