@@ -89,31 +89,19 @@
           
           Cancel
 :javascript
-  // Ensure form submits as AJAX even with file uploads
+  // Prevent double form submission by disabling submit button after first click
   $(document).ready(function() {
     $('form[data-remote]').on('submit', function(e) {
-      var form = $(this);
-      var formData = new FormData(this);
+      var submitBtn = $(this).find('button[type="submit"]');
+      var originalText = submitBtn.text();
       
-      // Add CSRF token to FormData
-      var csrfToken = $('meta[name="csrf-token"]').attr('content');
-      if (csrfToken) {
-        formData.append('authenticity_token', csrfToken);
-      }
+      // Disable button and show loading state
+      submitBtn.prop('disabled', true).text('Please Wait...');
       
-      $.ajax({
-        url: form.attr('action'),
-        type: form.attr('method'),
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: 'script',
-        headers: {
-          'X-CSRF-Token': csrfToken
-        }
-      });
-      
-      e.preventDefault();
+      // Re-enable button after 3 seconds as fallback
+      setTimeout(function() {
+        submitBtn.prop('disabled', false).text(originalText);
+      }, 3000);
     });
   });
   
