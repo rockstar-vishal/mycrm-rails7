@@ -36,6 +36,8 @@
                         = render partial: 'shared/date_range_display'
                       .col-md-6
                         = render partial: 'shared/updated_at_filter'
+                      .col-md-6
+                        = render partial: 'shared/visited_date_filter'
                       - if current_user.check_source_presence
                         .col-md-6
                           = render partial: 'shared/sources_filter'
