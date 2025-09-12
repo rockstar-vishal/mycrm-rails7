@@ -4,22 +4,62 @@ class BrokersController < ApplicationController
 
   respond_to :html
   PER_PAGE = 20
-  # GET /brokers
-  # GET /brokers.json
+
   def index
-    if params[:search_query].present?
-      @brokers = @brokers.basic_search(params[:search_query])
+    @brokers = apply_smart_search_filters(@brokers)
+    @total_brokers_count = @brokers.size
+    
+    @selected_batch = params[:batch].presence || "all"
+    @view_all = (@selected_batch == "all")
+    
+    if @view_all
+      @total_batches = 1
+      @batch_start_record = 1
+      @batch_end_record = @total_brokers_count
+      @batch_record_count = @total_brokers_count
+      @batch_brokers = @brokers
+      @display_brokers = @brokers
+    else
+      @selected_batch = @selected_batch.to_i
+      @selected_batch = 1 if @selected_batch < 1
+      
+      @total_batches = (@total_brokers_count.to_f / Broker::EXPORT_LIMIT).ceil
+      @total_batches = 1 if @total_batches < 1
+      
+      @selected_batch = @total_batches if @selected_batch > @total_batches
+      
+      @batch_offset = (@selected_batch - 1) * Broker::EXPORT_LIMIT
+      @batch_start_record = @batch_offset + 1
+      @batch_end_record = [@batch_offset + Broker::EXPORT_LIMIT, @total_brokers_count].min
+      @batch_record_count = @batch_end_record - @batch_start_record + 1
+      
+      @batch_brokers = @brokers.offset(@batch_offset).limit(Broker::EXPORT_LIMIT)
+      @display_brokers = @brokers.where(id: @batch_brokers.pluck(:id))
     end
-    @brokers_count = @brokers.size
+    
     respond_to do |format|
       format.html do
-        @brokers = @brokers.paginate(:page => params[:page], :per_page => PER_PAGE)
+        per_page = params[:per_page].present? ? params[:per_page].to_i : Broker::PER_PAGE
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        
+        @brokers = @display_brokers.paginate(
+          page: current_page,
+          per_page: per_page,
+          total_entries: @batch_record_count
+        )
       end
+      
       format.csv do
-        if @brokers_count <= 6000
-          send_data @brokers.to_csv({}, current_user, request.remote_ip, @brokers.count), filename: "brokers_#{Date.today.to_s}.csv"
+        if @display_brokers.count > Broker::EXPORT_LIMIT
+          flash[:alert] = "Cannot export #{@total_brokers_count} brokers at once (limit: #{Broker::EXPORT_LIMIT} records). Please export records batch wise"
+          redirect_to brokers_path and return
+        end
+        if @view_all && @brokers.count <= Broker::EXPORT_LIMIT
+          send_data @brokers.to_csv({}, current_user, request.remote_ip, @total_brokers_count), 
+                   filename: "brokers_all_records_#{Date.today.to_s}.csv"
         else
-          render json: {message: "Export of more than 4000 brokers is not allowed in one single attempt. Please contact management for more details"}, status: 403
+          send_data @batch_brokers.to_csv({}, current_user, request.remote_ip, @batch_record_count), 
+                   filename: "brokers_batch_#{@selected_batch}_records_#{@batch_start_record}_to_#{@batch_end_record}_#{Date.today.to_s}.csv"
         end
       end
     end
@@ -194,7 +234,19 @@ class BrokersController < ApplicationController
   end
 
   def brokers_params
-    params.permit(:search_query, :page)
+    params.permit(:name, :firm_name, :button, :mobile, :phone, :email, :rera_number, :rm_id, :per_page, :search_query, :page, :batch)
   end
+
+  def apply_smart_search_filters(brokers)
+    brokers = brokers.where("name ILIKE ?", "%#{params[:name]}%") if params[:name].present?
+    brokers = brokers.where("firm_name ILIKE ?", "%#{params[:firm_name]}%") if params[:firm_name].present?
+    brokers = brokers.where("mobile ILIKE ?", "%#{params[:mobile]}%") if params[:mobile].present?
+    brokers = brokers.where("phone ILIKE ?", "%#{params[:phone]}%") if params[:phone].present?
+    brokers = brokers.where("email ILIKE ?", "%#{params[:email]}%") if params[:email].present?
+    brokers = brokers.where("rera_number ILIKE ?", "%#{params[:rera_number]}%") if params[:rera_number].present?
+    
+    brokers
+  end
+
   helper_method :brokers_params
 end

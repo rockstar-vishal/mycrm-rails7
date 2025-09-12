@@ -1,4 +1,8 @@
+require 'csv'
+
 class Broker < ActiveRecord::Base
+  EXPORT_LIMIT = 5000
+  PER_PAGE = 20
   include AppSharable
   include PostsaleIntegrationApi
 
