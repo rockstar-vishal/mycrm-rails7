@@ -67,7 +67,7 @@ module Api
 
       def find_company
         @cloud_telephonysid = CloudTelephonySid.active.callerdesk.where(number: params["CloudTelephonySid"]).last
-        @company = @cloud_telephonysid.company
+        @company = @cloud_telephonysid.try(:company)
         if @company.blank?
           render json: {status: false, message: "Invalid IVR"}, status: 400 and return
         end
