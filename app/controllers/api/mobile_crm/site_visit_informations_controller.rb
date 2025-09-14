@@ -50,6 +50,22 @@ module Api
           Rails.logger.info "Removed conflicting field '#{field}' from regular_params (handled as magic field)"
         end
         
+        # Handle city field specifically - if it's a string, convert it to city_id or remove it
+        if regular_params[:city].present? && regular_params[:city].is_a?(String)
+          city_name = regular_params[:city]
+          # Try to find the city by name in the global City model
+          city = City.find_by(name: city_name)
+          if city
+            regular_params[:city_id] = city.id
+            regular_params.delete(:city)
+            Rails.logger.info "Converted city string '#{city_name}' to city_id: #{city.id}"
+          else
+            # If city not found, remove it to prevent AssociationTypeMismatch
+            regular_params.delete(:city)
+            Rails.logger.info "Removed city string '#{city_name}' - city not found"
+          end
+        end
+        
         # Update existing lead with regular attributes
         @lead.assign_attributes(regular_params)
         
