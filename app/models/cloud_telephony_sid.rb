@@ -8,6 +8,8 @@ class CloudTelephonySid < ActiveRecord::Base
     "teleteemtech": 6
   }
 
+  DEFAULT_SOURCE = 2
+
   validates :number, presence: true, uniqueness: true
 
   belongs_to :company

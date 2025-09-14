@@ -957,4 +957,39 @@ namespace :one_timers do
       end
     end
   end
+
+  task seed_callerdesk: :environment do
+    DATA_HASH = {
+      "8884898765"  => '0714749d-e8b6-45cf-989b-b402c34eb574',
+      "9212222900"  => '0714749d-e8b6-45cf-989b-b402c34eb574',
+      "7838737374"  => '32f6c7af-842b-4a60-81aa-de00186ef4dc',
+      "08069247832" => 'bab52de2-8cda-4aff-b9c2-1940c3d59e12',
+      "8929676861"  => 'bab52de2-8cda-4aff-b9c2-1940c3d59e12'
+    }
+
+    SETTING_HASH = {
+      "7838737374" => { source_id: 536 }
+    }
+
+    DATA_HASH.each do |number, uuid|
+      company = Company.find_by(uuid: uuid)
+      unless company
+        puts "No company found for UUID #{uuid} (number: #{number}), skipping..."
+        next
+      end
+      source_id = SETTING_HASH.dig(number, :source_id)
+      telephony_sid = CloudTelephonySid.find_or_initialize_by(number: number)
+      telephony_sid.assign_attributes(
+        description: "Cloud telephony number #{number}",
+        is_active: true,
+        company_id: company.id,
+        vendor: 4,
+        caller_id: number,
+        source_id: source_id
+      )
+      telephony_sid.save
+      puts "Created CloudTelephonySid for #{number} (Company: #{company.id})"
+    end
+  end
+
 end
