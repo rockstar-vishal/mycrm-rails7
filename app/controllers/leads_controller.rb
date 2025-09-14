@@ -146,12 +146,18 @@ class LeadsController < ApplicationController
 
   def show
     @default_tab = params[:tab] || 'leads-detail' 
-    render_modal('show', {:class=>'right'})
+    respond_to do |format|
+      format.js { render_modal('show', {:class=>'right'}) }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def new_visit
     @visits = @lead.visits.build
-    render_modal('site_visit_form')
+    respond_to do |format|
+      format.js { render_modal('site_visit_form') }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def create_visit
@@ -266,7 +272,10 @@ class LeadsController < ApplicationController
 
   def edit_visit
     @visits=@lead.visits.find(params[:visit_id])
-    render_modal('site_visit_form')
+    respond_to do |format|
+      format.js { render_modal('site_visit_form') }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def print_visit
