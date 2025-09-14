@@ -37,8 +37,18 @@ module Api
         # Process image parameter if it's a base64 data URI
         params_data = process_base64_image_param(params_data)
         
-        # Filter out magic fields from regular attributes
+        # Handle conflicting fields (fields that are both regular attributes and magic fields)
+        conflicting_fields = [:city, :budget] # Add other conflicting fields here if needed
+        conflicting_magic_fields = magic_field_names & conflicting_fields
+        
+        # Filter out magic fields from regular attributes, including conflicting ones
         regular_params = params_data.except(*magic_field_names)
+        
+        # Remove conflicting fields from regular_params to prevent AssociationTypeMismatch
+        conflicting_magic_fields.each do |field|
+          regular_params.delete(field)
+          Rails.logger.info "Removed conflicting field '#{field}' from regular_params (handled as magic field)"
+        end
         
         # Update existing lead with regular attributes
         @lead.assign_attributes(regular_params)
