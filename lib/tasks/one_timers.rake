@@ -992,4 +992,41 @@ namespace :one_timers do
     end
   end
 
+  task seed_ivr_manager: :environment do
+    DATA_HASH = {
+      "8238087100" => "52f7cad2-c299-4a51-b33c-c10cf8fab5ef",
+      "8238084445" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799",
+      "9998881927" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799"
+    }
+
+    SETTING_HASH = {
+      "8238084445" => { project_id: 6395 },
+      "9998881927" => { project_id: 6396 }
+    }
+
+    DATA_HASH.each do |number, uuid|
+      company = Company.find_by(uuid: uuid)
+      unless company
+        puts "No company found for UUID #{uuid} (number: #{number}), skipping..."
+        next
+      end
+      project_id = SETTING_HASH.dig(number, :project_id)
+      unless company.projects.find_by(id: project_id).present?
+        project_id = company.default_project&.id
+      end
+      telephony_sid = CloudTelephonySid.find_or_initialize_by(number: number)
+      telephony_sid.assign_attributes(
+        description: "Cloud telephony number #{number}",
+        is_active: true,
+        company_id: company.id,
+        vendor: 7,
+        caller_id: number,
+        project_id: project_id
+      )
+      telephony_sid.save
+      puts "Created CloudTelephonySid for #{number} (Company: #{company.id})"
+    end
+
+  end
+
 end
