@@ -5,7 +5,8 @@ class CloudTelephonySid < ActiveRecord::Base
     "slashrtc": 3,
     "callerdesk": 4,
     "twispire": 5,
-    "teleteemtech": 6
+    "teleteemtech": 6,
+    "ivrmanager": 7
   }
 
   DEFAULT_SOURCE = 2
