@@ -26,9 +26,15 @@ module Public
 
     def partner_create
       render json: {status: false, message: "Broker / Company / Project UUID not sent"}, status: 400 and return if params[:company_uuid].blank? || params[:broker_uuid].blank? || params[:project_uuid].blank?
+      
       company = Company.find_by_uuid params[:company_uuid]
+      render json: {status: false, message: "Company not found"}, status: 404 and return unless company
+      
       broker = company.brokers.find_by_partner_broker_uuid params[:broker_uuid]
+      render json: {status: false, message: "Broker not found"}, status: 404 and return unless broker
+      
       project = company.projects.find_by_uuid params[:project_uuid]
+      render json: {status: false, message: "Project not found"}, status: 404 and return unless project
       
       # Get the parameters and separate magic fields from regular attributes
       params_data = lead_params.merge(project_id: project.id, source_id: ::Source::CHANNEL_PARTNER, status_id: company.booking_done_id, company_id: company.id)
