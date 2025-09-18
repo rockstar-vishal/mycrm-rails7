@@ -37,7 +37,7 @@ module Public
       render json: {status: false, message: "Project not found"}, status: 400 and return unless project
       
       # Get the parameters and separate magic fields from regular attributes
-      params_data = lead_params.merge(project_id: project.id, source_id: ::Source::CHANNEL_PARTNER, status_id: company.booking_done_id, company_id: company.id)
+      params_data = lead_params.merge(project_id: project.id, source_id: ::Source::CHANNEL_PARTNER, status_id: company.booking_done_id, company_id: company.id, partner_lead_no: params[:partner_lead_no])
       magic_field_names = magic_field_names_for_company(company)
       
       # Filter out magic fields from regular attributes
