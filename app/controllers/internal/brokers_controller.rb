@@ -108,7 +108,7 @@ class Internal::BrokersController < InternalController
       :email,
       :firm_name,
       :rera_number,
-      :company_id
+      :partner_broker_uuid
     )
   end
 
