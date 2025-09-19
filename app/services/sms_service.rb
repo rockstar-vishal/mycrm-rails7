@@ -12,12 +12,12 @@ class SmsService
         variables = prepare_variables(sv.other_data, otp.validatable_data, otp.code)
         rendered_template = render_template(url, variables)
         if sv.request_method=="post"
-          if encoded_url.include?("headers")
-            base_url, payload, headers = parse_msg91_url(encoded_url, otp)
+          if rendered_template.include?("headers")
+            base_url, payload, headers = parse_msg91_url(rendered_template, otp)
             response = RestClient.post(base_url, payload.to_json, headers)
             return true, response
           else
-            response = ExotelSao.secure_post("#{encoded_url}", {})
+            response = ExotelSao.secure_post("#{rendered_template}", {})
             sent = true
             message= response["message"]["message-id"] rescue nil
           end
@@ -39,9 +39,8 @@ class SmsService
       end
     end
 
-    def parse_msg91_url(encoded_url, otp)
-      decoded_raw = CGI.unescape(encoded_url)
-
+    def parse_msg91_url(otp_form_url, otp)
+      decoded_raw = CGI.unescape(otp_form_url)
       base_url    = decoded_raw[/^https:\/\/control\.msg91\.com\/api\/v5\/flow/]
       payload_str = decoded_raw[/payload\s*=\s*\{.*\}\]/].to_s.sub("payload =", "").strip
       headers_str = decoded_raw[/headers\s*=\s*\{.*\}/].to_s.sub("headers =", "").strip
