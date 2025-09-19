@@ -1,4 +1,4 @@
-class CreateCompanyStages < ActiveRecord::Migration
+class CreateCompanyStages < ActiveRecord::Migration[7.1]
   def change
     create_table :company_stages do |t|
       t.integer :stage_id, index: true

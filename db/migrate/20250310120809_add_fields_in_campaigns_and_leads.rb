@@ -1,4 +1,4 @@
-class AddFieldsInCampaignsAndLeads < ActiveRecord::Migration
+class AddFieldsInCampaignsAndLeads < ActiveRecord::Migration[7.1]
   def change
     add_column :campaigns, :targeted_leads, :integer
     add_column :campaigns, :targeted_ql, :integer

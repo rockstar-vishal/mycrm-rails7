@@ -5,7 +5,7 @@
         .col-md-12
           %ol.breadcrumb
             %li.breadcrumb-item
-              %a{:href => "/"} Home
+              %a{href: "/"} Home
             %li.breadcrumb-item.active Broker Setup
           %h1.m-0 Broker Setup
   .content
@@ -13,33 +13,105 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-7
-                .search-outer
-                  = form_tag brokers_path, method: :get do
-                    .search-group
-                      = text_field_tag :search_query, params[:search_query], class: "form-control", placeholder: "Search Broker."
-                      .search-group-btn
-                        = button_tag type: "submit", class: "btn btn-default search-btn" do
-                          = fa_icon "search"
-                        = link_to brokers_path, class: "btn btn-default search-btn refresh" do
-                          = fa_icon "refresh"
-              .col-md-5
+            .action-bar
+              %div
                 .group-link
+                  %a#adv-search{href: "javascript:void(0);", class: "btn btn-filter"}
+                    = render 'icons/filters'
+                    Smart Search
+                  
+                  .batch-selector.mx-2
+                    %label.mr-2{style: "margin-bottom: 0; line-height: 38px;"} View:
+                    = form_tag nil, method: :get, local: true, class: "d-inline-block" do
+                      = hidden_field_tag :name, params[:name]
+                      = hidden_field_tag :firm_name, params[:firm_name] 
+                      = hidden_field_tag :mobile, params[:mobile]
+                      = hidden_field_tag :phone, params[:phone]
+                      = hidden_field_tag :email, params[:email]
+                      = hidden_field_tag :rera_number, params[:rera_number]
+                      = hidden_field_tag :per_page, params[:per_page]
+                      = hidden_field_tag :page, params[:page]
+
+                      - batch_options = [["All Records", "all"]]
+                      - total_batches_calculated = (@total_brokers_count.to_f / Broker::EXPORT_LIMIT).ceil
+                      - total_batches_calculated = 1 if total_batches_calculated < 1
+                      - if total_batches_calculated > 0
+                        - (1..total_batches_calculated).each do |i|
+                          - start_rec = ((i-1) * Broker::EXPORT_LIMIT) + 1
+                          - end_rec = [i * Broker::EXPORT_LIMIT, @total_brokers_count].min
+                          - batch_options << ["Batch #{i} (#{start_rec}-#{end_rec})", i]
+                      
+                      = select_tag :batch, options_for_select(batch_options, @selected_batch), class: "form-control", onchange: "this.form.submit();", style: "min-width: 200px; max-width: 250px; width: auto;"
+                  
                   - if current_user.company.setting.present? && current_user.company.enable_broker_bulk_update
                     .input-group-btn
                       = link_to 'Bulk Update', bulk_update_brokers_path, class: 'btn btn-primary ', target: "_blank"
                   - if current_user.company.setting.present? && current_user.company.enable_import_brokers
                     .input-group-btn
-                      = link_to import_brokers_path, :class=>"btn btn-primary", target: "_blank" do
+                      = link_to import_brokers_path, class: "btn btn-primary", target: "_blank" do
                         = fa_icon "upload"
                         Import
                   - if current_user.company.setting.present? && current_user.company.enable_export_brokers
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary" do
-                      = fa_icon "download"
-                      Export
+                    .export-options
+                      - if @view_all
+                        = link_to brokers_params.merge!(format: :csv, batch: "all"), class: "btn btn-success" do
+                          = fa_icon "download"
+                          Export All (#{@total_brokers_count} records)
+                      - else
+                        = link_to brokers_params.merge!(format: :csv, batch: @selected_batch), class: "btn btn-success" do
+                          = fa_icon "download"
+                          Export Current Batch (#{@batch_record_count} records)
                  
                   = link_to 'Add New Broker', new_broker_path, remote: true, class: 'btn btn-new ml-auto'
+              #adv-searchbox.box-body
+                = form_tag nil, method: :get, class: "filter-search-menu" do
+                  .p-2
+                    .custom-search
+                      .row
+                        .col-12
+                          %h5.mt-0 Search Brokers
+                        .col-md-4
+                          .form-group
+                            %label Name
+                            = text_field_tag :name, params[:name], class: "form-control", placeholder: "Search by name"
+                        .col-md-4
+                          .form-group
+                            %label Firm Name
+                            = text_field_tag :firm_name, params[:firm_name], class: "form-control", placeholder: "Search by firm name"
+                        .col-md-4
+                          .form-group
+                            %label Mobile
+                            = text_field_tag :mobile, params[:mobile], class: "form-control", placeholder: "Search by mobile"
+                        .col-md-4
+                          .form-group
+                            %label Phone
+                            = text_field_tag :phone, params[:phone], class: "form-control", placeholder: "Search by phone"
+                        .col-md-4
+                          .form-group
+                            %label Email
+                            = text_field_tag :email, params[:email], class: "form-control", placeholder: "Search by email"
+                        .col-md-4
+                          .form-group
+                            %label Rera Number
+                            = text_field_tag :rera_number, params[:rera_number], class: "form-control", placeholder: "Search by RERA number"
+                        .col-md-12
+                          = button_tag type: "submit", class: "btn btn-primary" do
+                            Search
+
+          - if !@view_all
+            .alert.alert-info
+              %strong Currently Viewing: 
+              Batch #{@selected_batch} of #{@total_batches} 
+              (Records #{@batch_start_record} - #{@batch_end_record} of #{@total_brokers_count} total)
+              %br
+              %small Click "Export Current Batch" to download exactly these #{@batch_record_count} records.
+          - elsif @total_brokers_count > Broker::EXPORT_LIMIT
+            .alert.alert-warning
+              %strong Currently Viewing: 
+              All #{@total_brokers_count} records (no batching)
+              %br
+              %small Performance may be slower with large datasets. Use batches for better performance.
+
           .table-body
             .table-responsive
               %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
@@ -69,13 +141,35 @@
                       %td= broker.locality
                       %td= broker.cp_code
                       %td= broker.rm.name rescue nil
-                      %td= link_to (fa_icon("external-link", class: 'text-light')), broker.rera_document.url(:original, false), target: '_blank', class: "btn btn-action" if broker.rera_document.present?
+                      %td= link_to (fa_icon("external-link", class: 'text-light')), broker.rera_document.url, target: '_blank', class: "btn btn-action" if broker.rera_document.present?
                       %td
                         = link_to edit_broker_path(broker.uuid), remote: true, class: "btn btn-action btn-edit" do
                           = render partial: 'icons/edit'
                         = link_to broker_path(broker.uuid), class: "btn btn-action btn-remove", method: :delete,
-                          data: {:confirm => "Would you like to permanently delete this CP?", "commit-class" => "btn btn-action btn-remove", "cancel-class" => "btn btn-action"} do
+                          data: {confirm: "Would you like to permanently delete this CP?", "commit-class": "btn btn-action btn-remove", "cancel-class": "btn btn-action"} do
                           = fa_icon "trash-o"
-        .pagination-custom-holder
-          %strong{style: "margin-left: 0;"} Brokers Count - #{@brokers.count}
-          = will_paginate @brokers, :class  =>  "ct-pag"
+            .pagination-custom-holder
+              %label{style: "margin-left: 0;"} 
+                - if @view_all
+                  - current_page = params[:page].to_i > 0 ? params[:page].to_i : 1
+                  - per_page = params[:per_page].present? ? params[:per_page].to_i : Broker::PER_PAGE
+                  - start_record = 1 + ((current_page - 1) * per_page)
+                  - end_record = [current_page * per_page, @total_brokers_count].min
+                  Showing records #{start_record}-#{end_record} of #{@total_brokers_count} total brokers
+                  %br
+                  %small.text-success Export will download all #{@total_brokers_count} records.
+                - else
+                  - current_page = params[:page].to_i > 0 ? params[:page].to_i : 1
+                  - per_page = params[:per_page].present? ? params[:per_page].to_i : Broker::PER_PAGE
+                  - page_start_in_batch = 1 + ((current_page - 1) * per_page)
+                  - page_end_in_batch = [current_page * per_page, @batch_record_count].min
+                  - actual_start = @batch_start_record + page_start_in_batch - 1
+                  - actual_end = @batch_start_record + page_end_in_batch - 1
+                  Showing #{page_start_in_batch}-#{page_end_in_batch} of #{@batch_record_count} records in current batch
+                  %br
+                  %small.text-muted (Overall records #{actual_start}-#{actual_end} of #{@total_brokers_count})
+                  %br
+                  %small.text-success Export will download all #{@batch_record_count} records from current batch.
+
+              - if @brokers.total_pages > 1
+                = will_paginate @brokers, params: { batch: @selected_batch }, class: "ct-pag"

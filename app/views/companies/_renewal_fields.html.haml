@@ -18,4 +18,15 @@
           = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"
 
 :javascript
-  $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
+  // Initialize Flatpickr for datetime fields
+  flatpickr('.datetimepicker', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });

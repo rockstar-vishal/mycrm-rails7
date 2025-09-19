@@ -1,4 +1,4 @@
-class CreateCampaignsSpends < ActiveRecord::Migration
+class CreateCampaignsSpends < ActiveRecord::Migration[7.1]
   def change
     create_table :campaigns_spends do |t|
       t.references :company

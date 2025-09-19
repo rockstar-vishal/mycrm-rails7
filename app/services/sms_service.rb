@@ -11,7 +11,6 @@ class SmsService
         url = sv.otp_url
         variables = prepare_variables(sv.other_data, otp.validatable_data, otp.code)
         rendered_template = render_template(url, variables)
-        encoded_url = URI.encode("#{rendered_template}")
         if sv.request_method=="post"
           if encoded_url.include?("headers")
             base_url, payload, headers = parse_msg91_url(encoded_url, otp)
@@ -24,7 +23,7 @@ class SmsService
           end
           return true, response
         else
-          url = URI encoded_url
+          url = URI(rendered_template)
           http = Net::HTTP.new(url.host, url.port)
           request = Net::HTTP::Get.new(url)
           unless url.scheme == "http"
@@ -92,7 +91,7 @@ class SmsService
         otp_code=otp.code
         url=otp.company.sms_integration.url
         site_link="https://sonamgroup.com"
-        url_encoded_sms_text = URI.encode(site_link)
+        url_encoded_sms_text = URI.encode_www_form_component(site_link)
         response=ExotelSao.secure_post("#{url}/websms/api/http/index.php?username=sonam&apikey=BE72C-D2A55&apirequest=Template&route=ServiceExplicit&sender=SONAMB&mobile=#{otp.validatable_data}&TemplateID=1207168024429525769&Values=#{otp_code},#{url_encoded_sms_text}", {})
         sent = true
         message= response["message"]["message-id"] rescue nil

@@ -1,4 +1,4 @@
-class CreateCompaniesFbPages < ActiveRecord::Migration
+class CreateCompaniesFbPages < ActiveRecord::Migration[7.1]
   def change
     remove_column :companies, :fb_access_token, :text
     add_column :companies_fb_forms, :fb_page_id, :integer

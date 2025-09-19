@@ -44,7 +44,7 @@ class PaymentPlansController < ApplicationController
   end
 
   def update
-    if @payment_plan.update_attributes(payment_plan_params)
+    if @payment_plan.update(payment_plan_params)
       flash[:notice] = "payment plan updated successfully"
       redirect_to payment_plans_path
     else

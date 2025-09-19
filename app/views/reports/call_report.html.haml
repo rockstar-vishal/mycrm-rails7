@@ -21,10 +21,10 @@
                     = render 'icons/filters'
                     Smart Search
                   - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present? && current_user.company.enable_call_center_dashboard)
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                    = link_to call_log_report_params.merge!(format: :csv), class: "btn btn-action" do
                       = render 'icons/export'
                       Export
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                    = link_to call_log_report_params.merge!(format: :csv), class: "btn btn-action" do
                       = render 'icons/export'
                       Export
               .col-md-7
@@ -121,16 +121,16 @@
                         - total_count = @data.where(user_id: user.id).count
                         - plottable[user.name] = total_count
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
                             = total_count
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, completed: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, completed: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
                             = @data.completed_calls.where(user_id: user.id).count
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, missed_calls: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, missed_calls: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
                             = @data.missed.where(user_id: user.id).count
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, abandoned_calls: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, abandoned_calls: true, start_date: @start_date, end_date: @end_date, user_ids: [user.id])), target: "_blank" do
                             = @data.abandoned_calls.where(user_id: user.id).count
                         - duration = @data.where(user_id: user.id).collect{|c| c.duration}
                         - avg_duration = duration.map(&:to_i)
@@ -144,16 +144,16 @@
                       %tr
                         %td Total
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
                             = @data.where(user_id: @users.ids).count rescue 0
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, completed: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, completed: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
                             = @data.completed_calls.where(user_id: @users.ids).count
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, missed_calls: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, missed_calls: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
                             = @data.missed.where(user_id: @users.ids).count
                         %td
-                          = link_to call_logs_leads_path(params.merge(call_log_report: true, is_advanced_search: true, abandoned_calls: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
+                          = link_to call_logs_leads_path(params.to_unsafe_h.merge(call_log_report: true, is_advanced_search: true, abandoned_calls: true, start_date: @start_date, end_date: @end_date, user_ids: @users.ids)), target: "_blank" do
                             = @data.abandoned_calls.where(user_id: @users.ids).count
                         %td= total_avg_talk_time
                         %td= total_avg_duration
@@ -169,7 +169,7 @@
     } else {
       $('#abandoned-call-status-container').addClass('d-none');
       $('select[name="abandoned_calls_status[]"]').val([]);
-      $('select[name="abandoned_calls_status[]"]').multiselect('refresh');
+      $('select[name="abandoned_calls_status[]"]').multiSelect('refresh');
     }
   }
 

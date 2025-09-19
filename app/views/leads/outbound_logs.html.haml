@@ -1,16 +1,15 @@
 .content-wrapper
   .content-header
-    .container-fluid
-      .row.mb-2
+    .row.mb-2
+      .col-md-12
+        %ol.breadcrumb
+          %li.breadcrumb-item
+            %a{:href => "/"} Home
+          %li.breadcrumb-item.active
+            %a{:href => "call_logs"} Outbound Calls
+        %h1.m-0 Outbound Calls
+      - unless params[:is_advanced_search].present? || params[:search_query].present?
         .col-md-12
-          %ol.breadcrumb
-            %li.breadcrumb-item
-              %a{:href => "/"} Home
-            %li.breadcrumb-item.active
-              %a{:href => "call_logs"} Outbound Calls
-          %h1.m-0 Outbound Calls
-        - unless params[:is_advanced_search].present? || params[:search_query].present?
-          .col-md-12
           .lead-card.lead-backlog
             = link_to outbound_logs_leads_path(missed_calls: true, is_advanced_search: true), class: "lead-card-link" do
               .lead-card-icon= @call_logs.missed.count
@@ -44,8 +43,8 @@
               .col-md-5
                 .group-link
                   - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && current_user.company.setting.present?)
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action ml-auto" do
-                      = render 'icons/export'
+                    = link_to outbound_search_params.merge!(format: :csv), class: "btn btn-primary ml-auto" do
+                      = fa_icon "download"
                       Export
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
@@ -91,36 +90,36 @@
                           = text_field_tag :lead_name, params[:lead_name], class: "form-control", placeholder: "Lead Name"
                       .col-xs-6.col-md-4
                         .form-group
-                          %label User
-                          = select_tag "user_ids[]", options_from_collection_for_select(current_user.company.users, :id, :name, params[:user_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Executive'}
-                      .col-xs-6.col-md-4
-                        .form-group
                           %label Call From
                           = text_field_tag :call_from, params[:call_from], class: "form-control", placeholder: "Call From"
                       .col-xs-6.col-md-4
                         .form-group
                           %label Call To
                           = text_field_tag :call_to, params[:call_to], class: "form-control", placeholder: "Call To"
-                      .col-xs-6.col-md-4
+                      .col-xs-6.col-md-6
+                        .form-group
+                          %label User
+                          = select_tag "user_ids[]", options_from_collection_for_select(current_user.company.users, :id, :name, params[:user_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Executive'}
+                      .col-xs-6.col-md-6
                         .form-group
                           %label Call Status
                           -# call status select convert string to array
                           = select_tag :call_status, options_for_select(["Answered", "Missed", "Completed", "Abandoned"], params[:call_status]), class: "form-control multi-select-list", prompt: 'Call Status', multiple: true, data: {prompt_name: 'Call Status'}
                       .col-12
                         %h5.mt-0 Search By Project Details
-                      .col-xs-6.col-md-4
+                      .col-xs-6.col-md-6
                         .form-group
                           %label Project
                           = select_tag :project_ids, options_from_collection_for_select(current_user.company.projects, :id, :name, params[:project_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Project'}
-                      .col-xs-6.col-md-4
+                      .col-xs-6.col-md-6
                         .form-group
                           %label Status
                           = select_tag "lead_statuses", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Lead Status'}
-                      .col-xs-6.col-md-4
+                      .col-xs-6.col-md-6
                         .form-group
                           %label Source
                           = select_tag :source_ids, options_from_collection_for_select(current_user.company.sources, :id, :name, params[:source_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Source'}
-                      .col-xs-6.col-md-4
+                      .col-xs-6.col-md-6
                         .form-group
                           %label Channel Partner
                           = select_tag :broker_ids, options_from_collection_for_select(current_user.company.brokers, :id, :name, params[:broker_ids]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Channel Partner'}
@@ -132,7 +131,7 @@
             = render partial: 'leads/dailing_modal'
           .table-body
             .table-responsive
-              %table.table.table-bordered.table-condensed.table-striped.tablesorter
+              %table.table.table-hover.tablesorter
                 %thead
                   %tr
                     %th Lead Name

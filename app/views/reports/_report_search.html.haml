@@ -1,4 +1,7 @@
-
+.pull-right
+  %a#adv-search{:href => "javascript:void(0);", :style => "margin-left:-2px;", :class=>"btn btn-primary btn-sm"}
+    Smart Search
+    %i.fa.fa-angle-down
   
 #adv-searchbox.box-body
   = form_tag nil, method: :get, class: "filter-search-menu" do
@@ -24,22 +27,22 @@
                   = select_tag :visit_counts, options_for_select(["Fresh Visit", "Revisit", "New Clients"], params[:visit_counts]), prompt: 'Select visit counts', class: "form-control"
           .col-12
             %h5.mt-0 Search By Projects details
-          .col-md-3
+          .col-md-6
             = render partial: 'shared/projects_filter'
           - if current_user.check_source_presence
-            .col-md-3
+            .col-md-6
               = render partial: 'shared/sources_filter'
           - if params[:action] == 'leads'
-            .col-md-3
+            .col-md-6
               = render partial: 'shared/users_filter'
             -if current_user.company.open_closed_lead_enabled
-              .col-md-3
+              .col-md-6
                 = render partial: 'shared/date_filter', locals: {label1: 'Re-Enquired From', label2: 'Re-Enquired Upto', field1_name: :reinquired_from, field2_name: :reinquired_upto}
-          .col-md-3
+          .col-md-6
             = render partial: 'shared/managers_filter'
           - if current_user.company.is_allowed_field?("customer_type")
-            .col-md-3
+            .col-md-6
               = render partial: 'shared/customer_type_filter'
-          .col-md-3
+          .col-md-12
             = button_tag type: "submit", class: "btn btn-new" do
               Search

@@ -4,6 +4,7 @@ class ReportsController < ApplicationController
   before_action :set_start_end_date
   before_action :set_base_leads, except: [:campaigns, :campaigns_report, :campaign_detail, :activity, :activity_details, :visits, :source_wise_visits, :trends, :site_visit_planned, :customized_status_dashboard, :scheduled_site_visits, :scheduled_site_visits_detail, :presale_visits, :gre_source_report]
   helper_method :ld_path, :bl_path, :dld_path, :ad_path, :comment_edit_text, :status_edit_html, :vd_path, :user_edit_html, :source_edit_html
+  helper_method :activity_search_params, :visit_params, :site_visit_tracker_params, :call_log_report_params, :status_dashboard_params, :user_call_reponse_search, :channel_partner_params, :campaigns_params
 
   def source
     data = @leads.group("source_id, status_id").select("COUNT(*), source_id, status_id, json_agg(id) as lead_ids")
@@ -33,7 +34,7 @@ class ReportsController < ApplicationController
     dates_range.map{|k| @lead_gen.select{|a| a['created_date'] == k}.present? ? true : @lead_gen << {"created_date"=>k, "count"=>0}}
     @conversions = @leads.where(:conversion_date=>@start_date.to_date..@end_date.to_date).booked_for(current_user.company).group("conversion_date").select("conversion_date, COUNT(*)").as_json(except: [:id])
     dates_range.map{|k| @conversions.select{|a| a['conversion_date'] == k}.present? ? true : @conversions << {"conversion_date"=>k, "count"=>0}}
-    @visits = @leads.joins{visits}.where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date).group("leads_visits.date").select("COUNT(*), leads_visits.date as visit_date").as_json(except: [:id])
+    @visits = @leads.joins(:visits).where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date).group("leads_visits.date").select("COUNT(*), leads_visits.date as visit_date").as_json(except: [:id])
     dates_range.map{|k| @visits.select{|a| a['visit_date'] == k}.present? ? true : @visits << {"visit_date"=>k, "count"=>0}}
   end
 
@@ -106,7 +107,7 @@ class ReportsController < ApplicationController
   end
 
   def presale_visits
-    @leads = @leads.joins{visits}.where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date)
+    @leads = @leads.joins(:visits).where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date)
     @presale_users = current_user.manageables.where(:id=>@leads.map(&:presale_user_id))
     @statuses = @statuses.where(:id=>@leads.map(&:status_id))
   end
@@ -144,7 +145,7 @@ class ReportsController < ApplicationController
     @campaign = current_user.company.campaigns.find_by(uuid: params[:campaign_uuid])
     @leads = @leads.where(:user_id=>current_user.manageable_ids)
     @campaign_leads = @leads.where(created_at: @campaign.start_date.beginning_of_day..@campaign.end_date.end_of_day, source_id: @campaign.source_id)
-    @campaign_visited_leads = @campaign_leads.joins{visits}.uniq
+    @campaign_visited_leads = @campaign_leads.joins(:visits).uniq
     @campaign_date_range = @campaign_leads.order(created_at: :desc).pluck(:created_at).map(&:to_date).uniq
   end
 
@@ -263,7 +264,7 @@ class ReportsController < ApplicationController
     end
     respond_to do |format|
       format.html do
-        @leads = @leads.includes{visits}.paginate(:page => params[:page], :per_page => 50)
+        @leads = @leads.includes(:visits).paginate(:page => params[:page], :per_page => 50)
       end
     end
   end
@@ -281,7 +282,7 @@ class ReportsController < ApplicationController
       @leads=@leads.filter_leads_for_reports(params, current_user)
     end
     if params["visited"].present? && params["visited"] == "true"
-      @leads = @leads.joins{visits}
+      @leads = @leads.joins(:visits)
     end
     @leads_count = @leads.size
     if params["key"].present? && params["sort"].present?
@@ -295,7 +296,7 @@ class ReportsController < ApplicationController
     else
       respond_to do |format|
         format.html do
-          @leads = @leads.includes{visits}.order("leads.tentative_visit_planned ASC").paginate(:page => params[:page], :per_page => 50)
+          @leads = @leads.includes(:visits).order("leads.tentative_visit_planned ASC").paginate(:page => params[:page], :per_page => 50)
         end
         format.csv do
           if @leads_count <= 4000
@@ -335,7 +336,7 @@ class ReportsController < ApplicationController
 
   def activity_details
     @user = current_user.manageables.find(params[:user_id])
-    @activities = ::CustomAudit.joins{lead}.where(associated_id: current_user.company_id,auditable_type: "Lead").where(:created_at=>@start_date..@end_date, :user_id=>@user.id, :user_type=>"User")
+    @activities = ::CustomAudit.joins(:lead).where(associated_id: current_user.company_id,auditable_type: "Lead").where(:created_at=>@start_date..@end_date, :user_id=>@user.id, :user_type=>"User")
     if params[:source_id].present?
       @activities = @activities.where("leads.source_id IN (?)", params[:source_id])
     end
@@ -381,7 +382,7 @@ class ReportsController < ApplicationController
 
   def gre_source_report
     @leads = @leads.where(:created_at=>@start_date..@end_date)
-    data = @leads.joins{visits}.group("leads.source_id, leads.status_id").select("COUNT(*), leads.source_id, leads.status_id, json_agg(leads.id) as lead_ids")
+    data = @leads.joins(:visits).group("leads.source_id, leads.status_id").select("COUNT(*), leads.source_id, leads.status_id, json_agg(leads.id) as lead_ids")
     @statuses = @statuses.where(:id=>data.map(&:status_id).uniq)
     @sources = @sources.where(:id=>data.map(&:source_id).uniq)
     @data = data.as_json(except: [:id])
@@ -427,7 +428,7 @@ class ReportsController < ApplicationController
   end
 
   def site_visit_userwise
-    @data = @leads.joins{visits}.where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date).group("leads_visits.user_id").select("COUNT(*),leads_visits.user_id, json_agg(leads_visits.id) as visit_count, json_agg(leads.id) as lead_ids").as_json
+    @data = @leads.joins(:visits).where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date).group("leads_visits.user_id").select("COUNT(*),leads_visits.user_id, json_agg(leads_visits.id) as visit_count, json_agg(leads.id) as lead_ids").as_json
     @data = @data.select{|data| data["user_id"].present?}
     @users = current_user.manageables.calling_executives.where(id: @data.collect{|d| d["user_id"]})
     @statuses = @statuses.where(:id=>@data.collect{|d| d["status_id"]})
@@ -671,10 +672,84 @@ class ReportsController < ApplicationController
 
   def user_call_reponse_search
     params.permit(
+      :project_ids,
+      :user_ids,
       :start_date,
       :end_date,
-      project_ids: []
+      project_ids: [],
+      user_ids: []
     )
   end
+
+  def channel_partner_params
+    params.permit(
+      :firm_names,
+      :broker_name,
+      :customer_type,
+      :manager_id,
+      :project_ids,
+      :source_ids,
+      :user_ids,
+      :manager_ids,
+      :broker_ids,
+      :visit_counts,
+      :site_visit_done,
+      :site_visit_planned,
+      :site_visit_cancel,
+      :revisit,
+      :booked_leads,
+      :token_leads,
+      :postponed,
+      :visit_cancel,
+      :site_visit_from,
+      :site_visit_upto,
+      :booking_date_from,
+      :booking_date_to,
+      :visited_date_from,
+      :visited_date_upto,
+      :sub_source_ids,
+      :sub_source,
+      :reinquired_from,
+      :reinquired_upto,
+      :updated_from,
+      :updated_upto,
+      :ncd_from,
+      :ncd_upto,
+      :closing_executive,
+      :backlogs_only,
+      :lead_statuses,
+      :lead_ids,
+      :visit_counts_num,
+      :presale_user_id,
+      :sv_user,
+      firm_names: [],
+      project_ids: [],
+      source_ids: [],
+      user_ids: [],
+      manager_ids: [],
+      broker_ids: [],
+      lead_statuses: [],
+      lead_ids: [],
+      presale_user_id: [],
+      sv_user: []
+    )
+  end
+
+  def campaigns_params
+    params.permit(:sub_source_ids, sub_source_ids: [])
+  end
+
+  def site_visit_planned_params
+    params.permit(:sort, :key, :visited, :calender_view, :start_date, :end_date, visit_status_ids: [])
+  end
+  helper_method :site_visit_planned_params
+
+  def search_params
+    magic_fields = (@company.magic_fields.map{|field| field.name.to_sym} rescue [])
+    params.permit(
+      *magic_fields,
+      :name, :visited, :visit_expiring, :backlogs_only, :todays_call_only, :visit_form, :merged, :ncd_from,:exact_ncd_upto, :exact_ncd_from, :created_at_from, :updated_at_from, :updated_at_upto, :expired_from, :expired_upto, :created_at_upto, :visited_date_from, :booking_date_from, :booking_date_to, :token_date_to, :token_date_from, :start_date, :end_date, :log_updated_from, :log_updated_upto, :button, :visited_date_upto, :ncd_upto, :agreement_date_from, :agreement_date_upto, :booking_cancelled_date_from, :booking_cancelled_date_upto, :email,:state, :mobile, :other_phones, :comment, :lead_no, :manager_id, :budget_from, :site_visit_done, :site_visit_planned, :revisit, :booked_leads, :token_leads, :visit_cancel, :postponed, :budget_upto, :visit_counts, :visit_counts_num, :sub_source, :customer_type, :deactivated, :site_visit_from, :site_visit_upto,:reinquired_from, :reinquired_upto, :is_qualified, :source_id, dead_reason_ids: [], project_ids: [], :assigned_to => [], :lead_statuses => [], city_ids: [], locality_ids: [],  :source_id=>[],lead_stages: [], :presale_user_id=>[], :sub_source_ids=>[], :lead_ids=>[], broker_ids: [], country_ids: [], closing_executive: [], dead_reasons: [], sv_user: [], :project_ids=>[], manager_ids: [])
+  end
+  helper_method :search_params
 
 end

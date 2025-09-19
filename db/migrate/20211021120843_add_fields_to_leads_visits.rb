@@ -1,4 +1,4 @@
-class AddFieldsToLeadsVisits < ActiveRecord::Migration
+class AddFieldsToLeadsVisits < ActiveRecord::Migration[7.1]
   def change
     add_column :leads_visits, :location, :string
     add_column :leads_visits, :surronding, :string

@@ -1,4 +1,4 @@
-class CreateCompaniesApiKeys < ActiveRecord::Migration
+class CreateCompaniesApiKeys < ActiveRecord::Migration[7.1]
   def change
     create_table :companies_api_keys do |t|
       t.integer :company_id

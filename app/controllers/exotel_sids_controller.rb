@@ -31,7 +31,7 @@ class ExotelSidsController < ApplicationController
   end
 
   def update
-    if @exotel_sid.update_attributes(exotel_params)
+    if @exotel_sid.update(exotel_params)
       flash[:notice] = 'ExoPhone Updated Successfully'
       xhr_redirect_to redirect_to: exotel_sids_path
     else
@@ -40,7 +40,7 @@ class ExotelSidsController < ApplicationController
   end
 
   def statistics
-    @call_logs = current_user.company.call_logs.joins{lead}.where(leads: {user_id: current_user.manageables.ids})
+    @call_logs = current_user.company.call_logs.joins(:lead).where(leads: {user_id: current_user.manageables.ids})
     # @call_logs = Leads::CallLog.none
   end
 

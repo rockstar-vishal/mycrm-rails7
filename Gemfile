@@ -1,94 +1,106 @@
 source 'https://rubygems.org'
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.6'
-# Use mysql as the database for Active Record
-gem 'pg', '0.21.0'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'pushpad', '1.3.0'
-gem 'gon'
+ruby '3.4.1'
 
-source 'https://rails-assets.org' do
-  gem 'rails-assets-datetimepicker'
-end
-gem 'sass-rails', '5.0.6'
-# Use Uglifier as compressor for JavaScript assets
+# Rails 7.1
+gem 'rails', '~> 7.1.0'
+gem 'bootsnap', require: false
+gem 'puma', '~> 6.0'
+
+# Database
+gem 'pg', '~> 1.5'
+
+# Asset pipeline for Rails 7
+gem 'sprockets-rails'
+gem 'importmap-rails'
+gem 'turbo-rails'
+gem 'stimulus-rails'
+
+# JavaScript and CSS
+gem 'sassc-rails'
 gem 'uglifier', '>= 1.3.0'
-# Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails', '~> 4.0.0'
-# Use jquery as the JavaScript library
+
+# jQuery and Bootstrap
 gem 'jquery-rails'
-gem 'signature-pad-rails'
-gem 'time_difference'
-gem 'has_magic_fields', '0.2.1'
-gem 'bootstrap-tooltip-rails'
-gem 'bootstrap-multiselect-rails'
-gem 'bootstrap-datepicker-rails'
-gem 'multi-select-rails'
-gem 'remotipart', '~> 1.2'
-gem 'request_store', '1.4.1'
-gem 'plyr-rails'
-gem 'koala', '3.0.0'
-gem 'toastr-rails'
-gem "audited", '4.8.0'
-gem 'jquery-datatables', '1.10.20'
-gem 'telephone_number', '1.3.4'
-# See https://github.com/sstephenson/execjs#readme for more supported runtimes
-gem 'mini_racer'
-gem 'acts_as_api', '1.0.1'
-gem 'clipboard-rails'
-gem 'bson_ext'
-gem 'squeel'
-gem 'workflow'
-gem 'devise'
-gem 'rack-cors', :require => 'rack/cors'
-gem 'rest-client', '~> 1.7.2'
-gem 'tilt', '2.4.0'
-gem 'httpclient'
-gem 'will_paginate', '~> 3.1.0'
-gem 'rails-api'
-gem 'bootstrap', '~> 4.4.1'
-gem 'bootstrap_form', '2.7.0'
-gem "cocoon"
-gem 'chartkick', '2.2.4'
-gem 'redis-rails'
-gem 'redis-namespace', "1.5.3"
-gem "font-awesome-rails"
-gem 'chosen-rails'
-gem "cancan", "1.6.10"
-gem "figaro"
-gem 'jquery-tablesorter'
-gem 'geocoder', '1.8.3'
-gem 'pusher'
-gem 'icheck-rails', '1.0.2.2'
-gem 'bootstrap-slider-rails', '9.2.0'
-gem 'haml', '4.0.7'
-gem 'data-confirm-modal', "1.2.0"
-gem "momentjs-rails", "2.15.1"
-gem "bootstrap-daterangepicker-rails", "0.1.5"
-gem 'mimemagic', git: 'https://github.com/mimemagicrb/mimemagic', ref: 'a4b038c6c1b9d76dac33d5711d28aaa9b4c42c66'
-gem "paperclip", "~> 4.3.2"
-gem "underscore-rails"
-gem "gmaps4rails"
-gem "jquery-datatables-rails", "~> 3.3.0"
-gem 'carrierwave'
-gem 'resque'
-gem 'resque-scheduler'
-gem 'liquid_markdown', '~> 0.2.2'
-gem 'aws-sdk', '< 2.0'
-gem 'fullcalendar-rails', '2.1.1'
-gem 'wicked_pdf', '2.8.1'
-gem 'wkhtmltopdf-binary'
-gem 'with_advisory_lock', '~> 3.2'
+gem 'bootstrap', '~> 5.3'
+gem 'bootstrap_form', '~> 5.2'
+gem 'jquery-datetimepicker-rails', '~> 2.4.1'
+
+# Authentication
+gem 'devise', '~> 4.9'
+
+# File uploads
+gem 'kt-paperclip', '~> 7.2.2'
+gem 'image_processing', '~> 1.2'
+gem 'has_magic_fields', '~> 0.1'
+
+# Background jobs
+gem 'resque', '~> 2.7.0'
+gem 'resque-scheduler', '~> 4.11.0'
+
+# Search
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 
+# Core utilities
+gem 'gon'
+gem 'time_difference'
+gem 'audited', '~> 5.0'
+gem 'telephone_number', '~> 1.4'
+gem 'acts_as_api', '~> 1.0'
+gem 'workflow'
+gem 'rack-cors'
+gem 'rest-client', '~> 2.1'
+gem 'will_paginate', '~> 3.1'
+gem 'chartkick', '~> 5.0'
+gem 'redis', '~> 5.0'
+gem 'redis-namespace', '~> 1.8'
+gem 'geocoder', '~> 1.8'
+gem 'pusher'
+gem 'haml', '~> 6.0'
+gem 'momentjs-rails', '~> 2.29'
+gem 'wicked_pdf', '~> 2.8'
+gem 'wkhtmltopdf-binary'
+gem 'with_advisory_lock', '~> 4.0'
+gem 'liquid_markdown', '~> 0.2'
+
+# AWS SDK v3 (replacing v1)
+gem 'aws-sdk-s3', require: false
+
+# Additional gems (simplified)
+gem 'pushpad', '~> 1.3'
+gem 'request_store', '~> 1.5'
+gem 'koala', '~> 3.0'
+gem 'mini_racer'
+gem 'clipboard-rails'
+gem 'bson_ext'
+gem 'tilt', '~> 2.0'
+gem 'httpclient'
+gem 'cocoon'
+gem 'font-awesome-rails'
+gem 'chosen-rails'
+gem 'cancan', '~> 1.6'
+gem 'figaro'
+gem 'jquery-tablesorter'
+gem 'icheck-rails', '~> 1.0'
+gem 'data-confirm-modal', '~> 1.2'
+gem 'underscore-rails'
+gem 'gmaps4rails'
+gem 'jquery-datatables-rails', '~> 3.3'
+gem 'carrierwave'
+gem 'fullcalendar-rails', '~> 2.1'
+
+group :development do
+  gem 'listen', '~> 3.3'
+end
+
 group :production do
   gem 'zip'
-  gem "sentry-raven", "2.6.0"
-  gem "resque-sentry"
+  gem 'sentry-ruby', '~> 5.0'
 end
 
 group :test, :development do
   gem 'bullet'
-  gem 'byebug', '11.0.1'
+  gem 'byebug', '~> 11.0'
 end

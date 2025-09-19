@@ -1,4 +1,4 @@
-class CreateFileExports < ActiveRecord::Migration
+class CreateFileExports < ActiveRecord::Migration[7.1]
   def change
     create_table :file_exports do |t|
       t.binary :data

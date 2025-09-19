@@ -32,4 +32,4 @@
                 %p.mb-1
                   MagicFields To Update:
                 .magic-feild-text
-                  = current_user.company.magic_fields.map{|x| x.name.camelize}.join(", ")
+                  = current_user.company&.magic_fields&.map{|x| x.name.camelize}&.join(", ") || ""

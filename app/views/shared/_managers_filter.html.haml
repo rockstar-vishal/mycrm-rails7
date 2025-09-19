@@ -4,4 +4,4 @@
       %label Select Manager
       - is_managerwise_enabled = ((current_user.company.setting.present? && current_user.company.enable_managerwise_report) ? true : false)
       - key_text = is_managerwise_enabled ? "manager_ids" : "manager_id"
-      = select_tag key_text, options_from_collection_for_select(current_user.manageables.managers, :id, :name, (params[key_text])), multiple: is_managerwise_enabled, class: "form-control multi-select-list", prompt: is_managerwise_enabled ? nil : "Please Select"
+      = select_tag key_text, options_from_collection_for_select(current_user.manageables.managers, :id, :name, (params[key_text])), multiple: is_managerwise_enabled, class: "tomselect-checkbox", prompt: is_managerwise_enabled ? nil : "Please Select"

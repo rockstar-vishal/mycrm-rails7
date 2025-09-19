@@ -1,4 +1,5 @@
 class LeadsController < ApplicationController
+  include MagicFieldsPermittable
   before_action :set_leads
   before_action :set_lead, only: [:show, :delete_visit, :make_call,:new_visit, :create_visit, :edit, :update, :destroy, :histories, :edit_visit, :deactivate, :print_visit]
 
@@ -39,9 +40,9 @@ class LeadsController < ApplicationController
     end
     if params["key"].present? && params["sort"].present?
       if params["key"] == 'project_id'
-        @leads = @leads.includes{project}.order("projects.name #{params['sort']} NULLS FIRST")
+        @leads = @leads.includes(:project).order("projects.name #{params['sort']} NULLS FIRST")
       elsif params["key"] == 'status_id'
-        @leads = @leads.includes{status}.order("statuses.name #{params['sort']} NULLS FIRST")
+        @leads = @leads.includes(:status).order("statuses.name #{params['sort']} NULLS FIRST")
       else
         if @company.setting.present? && @company.enable_ncd_sort_nulls_last && params['sort'] == "desc"
           @leads = @leads.order("leads.#{params['key']} #{params['sort']} NULLS LAST")
@@ -52,7 +53,6 @@ class LeadsController < ApplicationController
     else
       @leads = @leads.order("leads.ncd asc NULLS FIRST, leads.created_at DESC")
     end
-    # @leads = @leads.includes{status}.includes{property_type}.includes{transaction_type}.includes{user}.includes{project}.includes{enquiry_source}.includes{outlet_location}
     @leads_count = @leads.size
     respond_to do |format|
       format.html do
@@ -146,17 +146,23 @@ class LeadsController < ApplicationController
 
   def show
     @default_tab = params[:tab] || 'leads-detail' 
-    render_modal('show', {:class=>'right'})
+    respond_to do |format|
+      format.js { render_modal('show', {:class=>'right'}) }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def new_visit
     @visits = @lead.visits.build
-    render_modal('site_visit_form')
+    respond_to do |format|
+      format.js { render_modal('site_visit_form') }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def create_visit
     @default_tab = 'site-visit-detail'
-    if @lead.update_attributes(lead_params)
+    if @lead.update(lead_params)
       flash[:notice] = 'Visit Detail Updated Successfully'
       if current_user.is_supervisor?
         render_modal("onsite_leads/visit_detail", {class: 'right'})
@@ -164,6 +170,9 @@ class LeadsController < ApplicationController
         render_modal('show', {:class=>'right'})
       end
     else
+      # Only show the visit that was being added, not all visits
+      # Find the visit that was being added (the one with validation errors)
+      @visits = @lead.visits.select { |v| v.new_record? || v.errors.any? }.first || @lead.visits.build
       render_modal('site_visit_form')
     end
   end
@@ -172,11 +181,16 @@ class LeadsController < ApplicationController
     @default_tab = "site-visit-detail"
     @visit = @lead.visits.find(params[:visit_id])
     if @visit.destroy
-      flash[:notice] = "Visit Deleted Successfully"
+      respond_to do |format|
+        format.js { render js: "// Visit deleted successfully" }
+        format.html { redirect_to leads_path, notice: "Visit Deleted Successfully" }
+      end
     else
-      flash[:alert] = "Error!"
+      respond_to do |format|
+        format.js { render js: "alert('Error deleting visit');" }
+        format.html { redirect_to leads_path, alert: "Error deleting visit" }
+      end
     end
-    render_modal('show', {:class=>'right'})
   end
 
   def new
@@ -203,8 +217,17 @@ class LeadsController < ApplicationController
   end
 
   def create
+    # Separate magic fields from regular attributes
+    regular_params, magic_params = Lead.separate_magic_fields(@company, lead_params)
+    
     @lead = @leads.new
-    @lead.assign_attributes(lead_params)
+    @lead.assign_attributes(regular_params)
+    
+    # Set magic fields using dynamic setters
+    magic_params.each do |key, value|
+      @lead.send("#{key}=", value) if @lead.respond_to?("#{key}=")
+    end
+    
     unless @lead.company.round_robin_enabled?
       @lead.user_id = current_user.id if @lead.user_id.blank?
     end
@@ -217,7 +240,7 @@ class LeadsController < ApplicationController
   end
 
   def update
-    is_save = @lead.update_attributes(lead_params)
+    is_save = @lead.update(lead_params)
     respond_to do |format|
       format.js do
         if is_save
@@ -249,7 +272,10 @@ class LeadsController < ApplicationController
 
   def edit_visit
     @visits=@lead.visits.find(params[:visit_id])
-    render_modal('site_visit_form')
+    respond_to do |format|
+      format.js { render_modal('site_visit_form') }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def print_visit
@@ -269,8 +295,8 @@ class LeadsController < ApplicationController
       file = params[:lead_file].tempfile
       @success=[]
       @errors=[]
-      mf_names = @company.magic_fields.pluck(:name)
-      CSV.foreach(file, {:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+      mf_names = @company&.magic_fields&.pluck(:name) || []
+      CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
         begin
           name=row["Name"]
           mobile=row["Phone"]
@@ -369,7 +395,7 @@ class LeadsController < ApplicationController
   def import_bulk_update
     @success = []
     @errors = []
-    mf_names = @company.magic_fields.pluck(:name)
+    mf_names = @company&.magic_fields&.pluck(:name) || []
     if params[:leads_file].present?
       csv_data = CSV.read(params[:leads_file].tempfile, headers: :first_row, encoding: "iso-8859-1:utf-8")
       if csv_data.count > 1000
@@ -455,7 +481,7 @@ class LeadsController < ApplicationController
   end
 
   def call_logs
-    @call_logs = @company.call_logs.joins{lead}.where(leads: {user_id: current_user.manageables.ids})
+    @call_logs = @company.call_logs.joins(:lead).where(leads: {user_id: current_user.manageables.ids})
     if params[:is_external].present?
       @call_logs = @call_logs.advance_search(call_logs_search_params)
     elsif params[:is_advanced_search].present?
@@ -508,7 +534,7 @@ class LeadsController < ApplicationController
   end
 
   def dead_or_recycle
-    @leads = @leads.joins{audits}.where("((audits.audited_changes -> 'status_id')::jsonb->>1)::INT IN (?)", @company.dead_status_ids.map(&:to_i)).select("DISTINCT ON (audits.associated_id) leads.*")
+    @leads = @leads.joins(:audits).where("((audits.audited_changes -> 'status_id')::jsonb->>1)::INT IN (?)", @company.dead_status_ids.map(&:to_i)).select("DISTINCT ON (audits.associated_id) leads.*")
     if params[:is_advanced_search].present?
       @leads = @leads.advance_search(search_params, current_user)
     end
@@ -523,9 +549,9 @@ class LeadsController < ApplicationController
     new_status_count = @leads.where(status_id: @company.new_status_id).count
     booking_done_count = @leads.where(status_id: @company.booking_done_id).count
     dead_lead_count = @leads.where(status_id: @company.dead_status_ids).count
-    visit_counter = @leads.joins{visits}.thru_visit_form(current_user.company).uniq.count
+    visit_counter = @leads.joins(:visits).thru_visit_form(current_user.company).uniq.count
     deactivate_leads_count=@leads.unscoped.where(is_deactivated: true).count
-    merge_lead_count=@leads.joins{leads_secondary_sources}.pluck(:id).uniq.count
+    merge_lead_count=@leads.joins(:leads_secondary_sources).pluck(:id).uniq.count
     visit_expiration_count=@leads.visit_expiration.size
     respond_to do |format|
       format.json do
@@ -566,7 +592,6 @@ class LeadsController < ApplicationController
     render json: sub_sources, status: 200 and return
   end
 
-  private
     def set_lead
       @lead = @leads.find(params[:id])
     end
@@ -578,56 +603,13 @@ class LeadsController < ApplicationController
     end
 
     def lead_params
-      magic_fields = (@company.magic_fields.map{|field| field.name.to_sym} rescue [])
-      params.require(:lead).permit(
-        *magic_fields,
-        :date,
-        :name,
-        :email,
-        :mobile,
-        :other_phones,
-        :other_emails,
-        :address,
-        :is_qualified,
-        :city,
-        :state,
-        :country,
-        :budget,
-        :source_id,
-        :sub_source,
-        :broker_id,
-        :project_id,
-        :user_id,
-        :closing_executive,
-        :ncd,
-        :comment,
-        :status_id,
-        :lead_no,
-        :call_in_id,
-        :dead_reason_id,
-        :dead_sub_reason,
-        :city_id,
-        :locality_id,
-        :tentative_visit_planned,
-        :enable_admin_assign,
-        :property_type,
-        :is_deactivated,
-        :stage, :referal_name, :referal_mobile,
-        :presale_stage_id, :booking_date, :booking_form, :token_date, :bank_person_name, :bank_person_contact, :bank_sales_person, :booked_flat_no, :bank_loan_name,
-        :enquiry_sub_source_id, :customer_type, :lease_expiry_date,
-        secondary_source_ids: [],
-        :visits_attributes=>[:id, :date, :status_id, :source_id, :is_visit_executed, :is_postponed, :is_canceled, :comment, :site_visit_form, :location, :surronding, :finalization_period, :loan_sanctioned, :bank_name, :loan_amount, :eligibility, :own_contribution_minimum, :own_contribution_maximum, :loan_requirements, :_destroy, project_ids: []],
-        :residential_type_attributes=>[:id, :property_type, :purpose, :plot_area_from, :plot_area_to, :area_config, :area_unit],
-        :commercial_type_attributes=>[:id, :property_type, :area_unit, :plot_area_from, :plot_area_to, :is_attached_toilet, :purpose_comment, :purpose]
-      )
+      standard_lead_params(@company)
     end
 
     def search_params
-      magic_fields = (@company.magic_fields.map{|field| field.name.to_sym} rescue [])
-      params.permit(
-        *magic_fields,
-        :name, :visited, :visit_expiring, :backlogs_only, :todays_call_only, :visit_form, :merged, :ncd_from,:exact_ncd_upto, :exact_ncd_from, :created_at_from, :updated_at_from, :updated_at_upto, :expired_from, :expired_upto, :created_at_upto, :visited_date_from, :booking_date_from, :booking_date_to, :token_date_to, :token_date_from, :visited_date_upto, :ncd_upto, :agreement_date_from, :agreement_date_upto, :booking_cancelled_date_from, :booking_cancelled_date_upto, :email,:state, :mobile, :other_phones, :comment, :lead_no, :manager_id, :budget_from, :site_visit_done, :site_visit_planned, :revisit, :booked_leads, :token_leads, :visit_cancel, :postponed, :budget_upto, :visit_counts, :visit_counts_num, :sub_source, :customer_type, :deactivated, :site_visit_from, :site_visit_upto,:reinquired_from, :reinquired_upto, :is_qualified, :source_id, dead_reason_ids: [], project_ids: [], :assigned_to => [], :lead_statuses => [], city_ids: [], locality_ids: [],  :source_id=>[],lead_stages: [], :presale_user_id=>[], :sub_source_ids=>[], :lead_ids=>[], broker_ids: [], country_ids: [], closing_executive: [], dead_reasons: [], sv_user: [], :project_ids=>[], manager_ids: [])
+      search_params_with_magic_fields(@company)
     end
+    helper_method :search_params
 
     def call_logs_search_params
       params.permit(
@@ -656,6 +638,7 @@ class LeadsController < ApplicationController
         abandoned_calls_status: []
       )
     end
+    helper_method :call_logs_search_params
 
     def outbound_search_params
       params.permit(
@@ -677,4 +660,10 @@ class LeadsController < ApplicationController
         call_status: [] # convert string to array
       )
     end
+    helper_method :outbound_search_params
+
+    def histories_params
+      params.permit(:sort, :key, :incoming)
+    end
+    helper_method :histories_params
 end

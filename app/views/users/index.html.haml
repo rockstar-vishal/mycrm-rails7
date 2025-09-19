@@ -18,8 +18,8 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-7
+            .action-bar
+              %div
                 .search-outer
                   = form_tag users_path, method: :get do
                     .search-group 
@@ -32,10 +32,10 @@
                   %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                     = render 'icons/filters'
                     Smart Search
-              .col-md-5
+              %div
                 .group-link
                   - if current_user.is_super?
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-primary ml-auto" do
+                    = link_to users_params.merge!(format: :csv), class: "btn btn-primary ml-auto" do
                       = render 'icons/export'
                       Export
                 
@@ -60,10 +60,12 @@
                           = label_tag :display_from, 'Mobile', class: 'control-label'
                           .form-group
                             = text_field_tag :mobile, params[:mobile], class: "form-control", placeholder: "Mobile No."
-                        .col-xs-6.col-md-3
+                        .col-12
+                          %h5 Search By User Role
+                        .col-xs-6.col-md-6
                           = label_tag :display_from, 'Role', class: 'control-label'
                           .form-group
-                            = select_tag "role_ids", options_from_collection_for_select(current_user.accessible_roles, :id, :name, params[:role_ids]), class: "form-control multi-select-list", multiple: true, data: { prompt: 'Select Role' }
+                            = select_tag "role_ids", options_from_collection_for_select(current_user.accessible_roles, :id, :name, params[:role_ids]), class: " tomselect-checkbox", multiple: true, data: { prompt: 'Select Role' }
                         .col-12
                           %h5 Search By Dates
                         .col-xs-6.col-md-3
@@ -102,7 +104,7 @@
                 %tbody
                   - @users.each do |user|
                     %tr
-                      %td= link_to user.name, user_path(user.uuid), remote: true, class: "show-detail-btn"
+                      %td= link_to user.name, user_path(user.uuid), class: "show-detail-btn", remote: true
                       %td= user.email
                       %td= user.mobile
                       %td= user.role.name rescue nil
@@ -114,8 +116,8 @@
                         = link_to edit_user_path(user.uuid), class: "btn btn-action btn-edit" do
                           = render partial: 'icons/edit'
                         - if current_user.is_super? && user.id != current_user.id && current_user.company.setting.present? && current_user.company.can_delete_users
-                          = link_to user_path(user.uuid), class: "btn btn-danger", method: :delete,
-                            data: {:confirm => "Would you like to permanently delete this user?", "commit-class" => "btn btn-success", "cancel-class" => "btn btn-danger"}, style: "padding: 0px; width: 20px;" do
+                          = link_to user_path(user.uuid), class: "btn btn-action", method: :delete,
+                            data: {:confirm => "Would you like to permanently delete this user?", "commit-class" => "btn btn-success", "cancel-class" => "btn btn-danger"} do
                             = fa_icon "trash-o"
             - if @users.present?
               .pagination-custom-holder

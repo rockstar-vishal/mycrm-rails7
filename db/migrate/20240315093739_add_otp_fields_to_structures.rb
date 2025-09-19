@@ -1,4 +1,4 @@
-class AddOtpFieldsToStructures < ActiveRecord::Migration
+class AddOtpFieldsToStructures < ActiveRecord::Migration[7.1]
   def change
     add_column :structures, :enable_otp, :boolean, default: false
     add_column :structures, :otp_url, :text

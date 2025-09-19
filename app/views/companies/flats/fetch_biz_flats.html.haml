@@ -15,7 +15,7 @@
             .card-body
               %ul.nav.nav-tabs.title-tab{:role => "tablist"}
                 %li.nav-item
-                  %a#manageFlats-tab.btn-outline-white.rounded-top{"aria-controls" => "manageFlats", "aria-selected" => "true", "data-toggle" => "pill", :href => "#manageFlats", :role => "tab"} Manage Flats
+                  %a#manageFlats-tab.btn-outline-white.rounded-top{"aria-controls" => "manageFlats", "aria-selected" => "true", "data-bs-toggle" => "pill", :href => "#manageFlats", :role => "tab"} Manage Flats
               .form-group
                 = form_tag nil, method: :get, class: "filter-search-menu" do
                   .row
@@ -32,14 +32,14 @@
                   .col-12
                     %ul.nav.nav-tabs.small-tabs{:role => "tablist"}
                       %li.nav-item
-                        %a#bldga-tab.d-flex.align-items-center.btn-outline-white.rounded.all-flats{"aria-controls" => "bldga", "aria-selected" => "true", "data-toggle" => "pill", :href => "#bldga", :role => "tab", data: {flats: @flats, building_id: (@flats.present? ? @flats.first["building_id"] : nil)}}
+                        %a#bldga-tab.d-flex.align-items-center.btn-outline-white.rounded.all-flats{"aria-controls" => "bldga", "aria-selected" => "true", "data-bs-toggle" => "pill", :href => "#bldga", :role => "tab", data: {flats: @flats, building_id: (@flats.present? ? @flats.first["building_id"] : nil)}}
                           All
                       - if current_user.company.setting.present? && current_user.company.enable_expire_block_flat_details
                         %li.nav-item
-                          %a#bldga-tab.d-flex.align-items-center.btn-outline-white.rounded.expiring{"aria-controls" => "bldga", "aria-selected" => "true", "data-toggle" => "pill", :href => "#bldga", :role => "tab", data: {flats: @flats, building_id: (@flats.present? ? @flats.first["building_id"] : nil)}}
+                          %a#bldga-tab.d-flex.align-items-center.btn-outline-white.rounded.expiring{"aria-controls" => "bldga", "aria-selected" => "true", "data-bs-toggle" => "pill", :href => "#bldga", :role => "tab", data: {flats: @flats, building_id: (@flats.present? ? @flats.first["building_id"] : nil)}}
                             Expiring Blocked Flats
                         %li.nav-item
-                          %a#bldga-tab.d-flex.align-items-center.btn-outline-white.rounded.expired{"aria-controls" => "bldga", "aria-selected" => "true", "data-toggle" => "pill", :href => "#bldga", :role => "tab", data: {flats: @flats, building_id: (@flats.present? ? @flats.first["building_id"] : nil)}}
+                          %a#bldga-tab.d-flex.align-items-center.btn-outline-white.rounded.expired{"aria-controls" => "bldga", "aria-selected" => "true", "data-bs-toggle" => "pill", :href => "#bldga", :role => "tab", data: {flats: @flats, building_id: (@flats.present? ? @flats.first["building_id"] : nil)}}
                             Expired Blocked Flats
                     #flat_details
 

@@ -13,16 +13,16 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-5
+            .action-bar
+              %div
                 .group-link
                   %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                     = render 'icons/filters'
                     Smart Search
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                  = link_to search_params.merge!(format: :csv), class: "btn btn-action" do
                     = render 'icons/export'
                     Export
-              .col-md-7
+              %div
                 .group-link
                   = render 'reports_button', locals: {report_name: :leads}
               = render 'report_search'

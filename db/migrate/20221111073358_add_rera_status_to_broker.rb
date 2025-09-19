@@ -1,4 +1,4 @@
-class AddReraStatusToBroker < ActiveRecord::Migration
+class AddReraStatusToBroker < ActiveRecord::Migration[7.1]
   def change
     add_column :brokers, :rera_status, :string
   end

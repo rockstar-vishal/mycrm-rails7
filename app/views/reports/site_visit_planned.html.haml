@@ -8,13 +8,13 @@
               %a{:href => "/"} Home
             %li.breadcrumb-item.active Scheduled Visit Planned Report
           %h1.m-0 Scheduled Visit Planned Report
-        .w-100
-        .lead-card.lead-visit
-          = link_to leads_path({visited: true, site_visit_from: @start_date.to_date, site_visit_upto: @end_date.to_date, is_advanced_search: true}.merge!(params)), target: "_blank", class: "lead-card-link" do
-            .lead-card-icon= @leads.joins{visits}.uniq.count
-            .lead-card-body
-              %span.title Lead Visited
-              %span.subtitle Visited
+        .col-md-12
+          .lead-card.lead-visit
+            = link_to leads_path({visited: true, site_visit_from: @start_date.to_date, site_visit_upto: @end_date.to_date, is_advanced_search: true}.merge!(search_params)), target: "_blank", class: "lead-card-link" do
+              .lead-card-icon= @leads.joins(:visits).uniq.count
+              .lead-card-body
+                %span.title Lead Visited
+                %span.subtitle Visited
           
   .content
     .container-fluid
@@ -30,10 +30,10 @@
                       Smart Search
                 .col-md-5
                   .group-link
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action ml-auto" do
+                    = link_to site_visit_planned_params.merge!(format: :csv), class: "btn btn-action ml-auto" do
                       = render 'icons/export'
                       Export
-                    = link_to params.except(:action, :controller).merge!(calender_view: true), class: "btn btn-action btn-sm" do
+                    = link_to site_visit_planned_params.merge!(calender_view: true), class: "btn btn-action btn-sm" do
                       = render 'icons/calendar'
                       Calender
               #adv-searchbox.box-body
@@ -61,18 +61,16 @@
                                   = text_field_tag :end_date, (@end_date.to_date rescue nil), class: 'form-control dateFormat pull-right', required: true
                             .col-12
                               %h5 Search By Project Details  
-                            .col-md-3
+                            .col-md-6
                               = render partial: 'shared/projects_filter'
                             - if current_user.company.expected_visit_ids.present?
-                              .col-md-4
+                              .col-md-6
                                 .form-group
                                   %label Select status
-                                  = select_tag :visit_status_ids, options_from_collection_for_select(current_user.company.expected_visit_statuses, :id, :name, params[:visit_status_ids]),multiple: true, class: "form-control multi-select-list"
+                                  = select_tag :visit_status_ids, options_from_collection_for_select(current_user.company.expected_visit_statuses, :id, :name, params[:visit_status_ids]),multiple: true, prompt: "Select status", class: "tomselect-checkbox"
                             .col-12
                               %h5 Search By Manager 
-                            .col-md-4
-                              = render partial: 'shared/managers_filter'
-                            .col-md-4
+                            .col-md-6
                               = render partial: 'shared/managers_filter'
                             .col-12
                               %h5 Search by visited?
@@ -94,10 +92,10 @@
                       %th Name
                       %th.sorter-false
                         - if params["sort"].present? and params["sort"] == "desc"
-                          = link_to params.merge(key: "tentative_visit_planned", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to site_visit_planned_params.merge(key: "tentative_visit_planned", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Scheduled Date
                         - else
-                          = link_to params.merge(key: "tentative_visit_planned", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                          = link_to site_visit_planned_params.merge(key: "tentative_visit_planned", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                             Scheduled Date
                       %th Day
                       %th Time

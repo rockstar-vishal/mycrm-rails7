@@ -15,7 +15,7 @@
           .card
             .card-header
               .group-link
-                = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                = link_to activity_search_params.merge!(format: :csv), class: "btn btn-action" do
                   = fa_icon "download"
                   Export
               %h3.card-title= @user.name

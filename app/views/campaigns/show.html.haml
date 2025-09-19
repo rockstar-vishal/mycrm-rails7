@@ -21,50 +21,63 @@
               .col-md-9
                 .group-link
                   = link_to 'Back', reports_campaigns_report_path, class: 'btn btn-primary ml-auto'
-          .table-body
+          .p-0
             .row
               .col-md-6
-                %table.table.table-bordered.table-striped
-                  %tbody
-                    %tr
-                      %th{style: "width: 30%"} Title
-                      %td= @campaign.title
-                    %tr
-                      %th Start Date
-                      %td= @campaign.start_date
-                    %tr
-                      %th End Date
-                      %td= @campaign.end_date
-                    %tr
-                      %th Budget
-                      %td= "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.budget)}".html_safe
-                    %tr
-                      %th Source
-                      %td= @campaign.source_name
+                %h4.lead-heading Campaign Basic information
+                .lead-body.mb-3
+                  .row
+                    .col-md-6.mb-3
+                      %span.lead-title Title
+                      %span.lead-info
+                        = @campaign.title
+                    .col-md-6.mb-3
+                      %span.lead-title Start Date
+                      %span.lead-info
+                        = @campaign.start_date
+                    .col-md-6.mb-3
+                      %span.lead-title End Date
+                      %span.lead-info
+                        = @campaign.end_date
+                    .col-md-6.mb-3
+                      %span.lead-title Budget
+                      %span.lead-info
+                        = "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.budget)}".html_safe
+                    .col-md-6.mb-3
+                      %span.lead-title Source
+                      %span.lead-info
+                        = @campaign.source_name
               .col-md-6
-                %table.table.table-bordered.table-striped
-                  %tbody
-                    %tr
-                      %th{style: "width: 30%"} Targeted Leads
-                      %td= @campaign.targeted_leads || 'N/A'
-                    %tr
-                      %th Targeted QL
-                      %td= @campaign.targeted_ql || 'N/A'
-                    %tr
-                      %th Targeted SV
-                      %td= @campaign.targeted_sv || 'N/A'
-                    %tr
-                      %th Targeted Bookings
-                      %td= @campaign.targeted_bookings || 'N/A'
-                    %tr
-                      %th Projects
-                      %td= @campaign.projects.pluck(:name).join(', ') rescue "N/A"
+                %h4.lead-heading Campaign Targeted information
+                .lead-body.mb-3
+                  .row
+                    .col-md-6.mb-3
+                      %span.lead-title Targeted Leads
+                      %span.lead-info
+                        = @campaign.targeted_leads || 'N/A'
+                    .col-md-6.mb-3
+                      %span.lead-title Targeted QL
+                      %span.lead-info
+                        = @campaign.targeted_ql || 'N/A'
+                    .col-md-6.mb-3
+                      %span.lead-title Targeted SV
+                      %span.lead-info
+                        = @campaign.targeted_sv || 'N/A'
+                    .col-md-6.mb-3
+                      %span.lead-title Targeted Bookings
+                      %span.lead-info
+                        = @campaign.targeted_bookings || 'N/A'
+                    .col-md-6.mb-3
+                      %span.lead-title Projects
+                      %span.lead-info
+                        = @campaign.projects.pluck(:name).join(', ') rescue "N/A" 
+    
 
       .row.mt-4
-        .card-body
+        .table-body
           - if @campaign.spends.any?
             .table-responsive
-              %table.table.table-bordered.table-hover
+              %table.table.table-hover
                 %thead
                   %tr
                     %th Date
@@ -80,7 +93,7 @@
                   %strong Total Spend: 
                   = "#{fa_icon 'rupee'} #{Utility.to_words(@campaign.spends.sum(:spend_amount))}".html_safe
           - else
-            .alert.alert-info No spends recorded for this campaign yet.
+            .alert.alert-info.mt-3 No spends recorded for this campaign yet.
 
       - if @leads.present?
         .row.mt-4
@@ -88,11 +101,11 @@
             .card
               .card-header
                 %h4.mb-0 Campaign Metrics
-              .card-body
+              .table-body
                 - @campaign.calculate_metrics(@leads)
                 .row
                   .col-md-6
-                    %table.table.table-bordered
+                    %table.table
                       %thead
                         %tr
                           %th Metric
@@ -116,7 +129,7 @@
                           %td= @campaign.targeted_sv || 'N/A'
                           %td= @campaign.actual_sv
                   .col-md-6
-                    %table.table.table-bordered
+                    %table.table
                       %thead
                         %tr
                           %th Cost Metric

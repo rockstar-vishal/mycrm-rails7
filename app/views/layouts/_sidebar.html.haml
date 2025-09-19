@@ -14,13 +14,13 @@
   = link_to root_path, class: "brand-link logo-switch" do
     - company = current_user.company
     - if company.icon.present?
-      = image_tag  "#{company.icon.url}", class: 'brand-image-xl logo-xs'
+      %img.brand-image-xl.logo-xs{src: company.icon.url, alt: "Company Icon"}
     - else
-      = image_tag  "small-logo.png", class: 'brand-image-xl logo-xs'
+      = image_tag "small-logo.png", class: 'brand-image-xl logo-xs'
     - if company.logo.present?
-      = image_tag  "#{company.logo.url}", class: 'brand-image-xs logo-xl'
+      %img.brand-image-xs.logo-xl{src: company.logo.url, alt: "Company Logo"}
     - else
-      = image_tag  "logo.png", class: 'brand-image-xs logo-xl'
+      = image_tag "logo.png", class: 'brand-image-xs logo-xl'
   .sidebar
     %nav.mt-2
       %ul.nav.nav-pills.nav-sidebar.flex-column{"data-accordion" => "false", "data-widget" => "treeview", :role => "menu"}
@@ -48,7 +48,7 @@
               - if current_user.company.setting.present? && current_user.company.enable_customize_status_report
                 %li.nav-item
                   = link_to reports_customized_status_dashboard_path, class: "nav-link #{'active' if (params[:action] == 'customized_status_dashboard')}" do
-                    = render partial: 'icons/line'
+                    = render partial: 'icons/customStatus'
                     %p Customize Status Dashboard
               %li.nav-item
                 = link_to users_search_histories_path, class: "nav-link #{'active' if params[:controller] == 'users/search_histories'}" do
@@ -147,7 +147,7 @@
                 - if current_user.company.setting.present? && current_user.company.enable_site_visit_planned_tracker && (current_user.company.expected_visit_ids.present? || current_user.company.expected_site_visit_id.present?)
                   %li.nav-item
                     = link_to reports_site_visit_planned_tracker_path, class: "nav-link #{'active' if (params[:action] == 'site_visit_planned_tracker')}" do
-                      = render partial: 'icons/line'
+                      = render partial: 'icons/ratio'
                       %p Booking Ratio
                 - if current_user.company.setting.present? && current_user.company.enable_call_center_dashboard
                   %li.nav-item
@@ -279,31 +279,31 @@
               %ul.nav.nav-treeview
                 %li.nav-item
                   = link_to cost_sheets_path, class: "nav-link #{'active' if (params[:controller] == 'cost_sheets')}" do
-                    = render partial: 'icons/line'
+                    = render partial: 'icons/costSheet'
                     %p Cost Sheets
           - if current_user.company.inventory_integration_enable
             %li.nav-item.has-treeview{class: "#{['companies/flats'].include?(params[:controller]) ? 'menu-open' : ''}"}
               = link_to '#', class: "nav-link #{'active' if ['companies/flats'].include?(params[:controller])}" do
-                = render partial: 'icons/line'
+                = render partial: 'icons/postPulse'
                 %p
                   PostPulse Integration
                 
               %ul.nav.nav-treeview
                 %li.nav-item
                   = link_to fetch_biz_flats_companies_flats_path, class: "nav-link #{'active' if (params[:controller] == 'companies/flats')}" do
-                    
+                    = render partial: 'icons/floorPlan'
                     %p Postsale Flats
           - if current_user.company.setting.present? && current_user.company.enable_inventory_management
             %li.nav-item.has-treeview{class: "#{['companies/inventories'].include?(params[:controller]) ? 'menu-open' : ''}"}
               = link_to companies_inventories_path, class: "nav-link #{'active' if ['companies/inventories'].include?(params[:controller])}" do
-                = render partial: 'icons/line'
+                = render partial: 'icons/inventoryr'
                 %p
                   Inventory Panel
                 
               %ul.nav.nav-treeview
                 %li.nav-item
                   = link_to companies_inventories_path, class: "nav-link #{'active' if (params[:controller] == 'companies/inventories')}" do
-                    = render partial: 'icons/line'
+                    = render partial: 'icons/inventoryr'
                     %p Manage Inventory
 
 %aside.control-sidebar.control-sidebar-dark

@@ -1,2 +1,3 @@
 $('#modal-window .modal-content').html("<%= j render 'show' %>");
-$('#modal-window').modal('show');
+var modal = new bootstrap.Modal(document.getElementById('modal-window'));
+modal.show();

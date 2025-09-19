@@ -15,12 +15,13 @@
           = f.select :datatype, options_for_select(MagicField.datatypes, f.object.datatype), {include_blank: "Select DataType"}, class: 'form-control'
       .col-md-6
         .form-group.required
-          = f.select :is_sv_required, options_for_select([["No", false], ["Yes", true]], f.object.is_sv_required), required: true, label: "Is Required", prompt: "Please select"
+          = f.select :is_sv_required, options_for_select([["No", false], ["Yes", true]], f.object.is_sv_required), label: "Is Required", prompt: "Please select"
       .col-md-12
         .form-group.required
-          = f.check_box :is_select_list, class: 'custom-checkbox'
+          = f.check_box :is_select_list, class: 'is-select-list-checkbox'
           .item-list{:style => ("display:none;" unless f.object.is_select_list?)}
-            = f.text_field :items, value: f.object.items.join(',')
+            = f.text_field :items, value: f.object.items.join(','), class: 'items-field'
+          = f.hidden_field :items, value: '', class: 'items-hidden-field'
           - if @company.enable_sv_form_print
             = f.check_box :print_enabled
           - structures=Company.find(params[:id]).structures
@@ -29,12 +30,3 @@
       .col-md-12
         %center
           = link_to_remove_association "Remove", f, :class=>"btn btn-remove-small"
-:javascript
-  $(".custom-checkbox").change(function () {
-    var isChecked = $(this).closest('[type=checkbox]').is(':checked')
-    if(isChecked) {
-      $(this).parent().parent().next().first().show();
-    } else {
-      $(this).parent().parent().next().first().hide();
-    }
-  });

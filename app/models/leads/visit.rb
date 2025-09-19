@@ -1,8 +1,8 @@
 class Leads::Visit < ActiveRecord::Base
 
   belongs_to :lead
-  belongs_to :user
-  belongs_to :source
+  belongs_to :user, optional: true
+  belongs_to :source, optional: true
   has_many :visits_projects, class_name: 'Leads::VisitsProject'
   has_many :projects, class_name: '::Project', through: :visits_projects
   validates :date, presence: true
@@ -15,9 +15,7 @@ class Leads::Visit < ActiveRecord::Base
     "Online Meeting": 6
   }
 
-  has_attached_file :site_visit_form,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :site_visit_form
 
   validates_attachment_content_type  :site_visit_form,
                         content_type: ['application/pdf', 'application/msword', 'image/jpeg', 'image/png', 'application/vnd.ms-excel',
@@ -62,7 +60,7 @@ class Leads::Visit < ActiveRecord::Base
   def set_lead_revisit
     if self.lead.visits.executed.count > 1 && self.is_visit_executed
       unless self.lead.revisit
-        self.lead.update_attributes(revisit: true)
+        self.lead.update(revisit: true)
       end
     end
   end

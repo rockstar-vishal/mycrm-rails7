@@ -43,7 +43,7 @@ class ProjectsController < ApplicationController
   end
 
   def update
-    if @project.update_attributes(project_params)
+    if @project.update(project_params)
       flash[:notice] = "Project updated successfully"
       xhr_redirect_to redirect_to: projects_path
     else

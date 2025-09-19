@@ -1,4 +1,4 @@
-class CreateCloudTelephonySids < ActiveRecord::Migration
+class CreateCloudTelephonySids < ActiveRecord::Migration[7.1]
   def change
     create_table :cloud_telephony_sids do |t|
       t.string :number

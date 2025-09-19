@@ -18,22 +18,22 @@ Rails.application.routes.draw do
   resources :leads do
     member do
       get :histories
-      get "visits/new", to: :new_visit, as: :new_visit
-      post "visits/create", to: :create_visit, as: :create_visit
-      get "visits/:visit_id/edit", to: :edit_visit, as: :edit_visit
-      delete "visits/:visit_id", to: :delete_visit, as: :delete_visit
+      get "visits/new", action: :new_visit, as: :new_visit
+      post "visits/create", action: :create_visit, as: :create_visit
+      get "visits/:visit_id/edit", action: :edit_visit, as: :edit_visit
+      delete "visits/:visit_id", action: :delete_visit, as: :delete_visit
       post :make_call
       get :localities
       get :fetch_source_subsource
       put :deactivate
       put :activate
-      get "visits/:visit_id/print", to: :print_visit, as: :print_visit
+      get "visits/:visit_id/print", action: :print_visit, as: :print_visit
     end
     collection do
-      get ":status_id/stages", to: :stages
+      get ":status_id/stages", action: :stages
       get :import
-      get 'calender_view', as: :calender_view, to: :calender_view
-      post :import, to: :perform_import
+      get 'calender_view', as: :calender_view, action: :calender_view
+      post :import, action: :perform_import
       put :bulk_action
       get :export
       get :prepare_bulk_update
@@ -55,19 +55,19 @@ Rails.application.routes.draw do
       post :edit_lead
       get :partner_lead_edit
       get :visit_details
-      get "visits/:visit_id/edit", to: :edit_visit, as: :edit_visit
+      get "visits/:visit_id/edit", action: :edit_visit, as: :edit_visit
     end
   end
   namespace :leads do
     resources :notifications, only: [] do
       collection do
-        get ':lead_id/send_sms', to: :send_sms, as: :send_sms
-        get ':lead_id/template_detail/:template_id', to: :template_detail, as: 'template_detail'
-        post ':template_id/:lead_id/update_template_detail', to: :update_template_detail, as: 'update_template_detail'
-        post ':lead_id/shoot_notification/:notification_id', to: :shoot_notification, as: 'shoot_notification'
+        get ':lead_id/send_sms', action: :send_sms, as: :send_sms
+        get ':lead_id/template_detail/:template_id', action: :template_detail, as: 'template_detail'
+        post ':template_id/:lead_id/update_template_detail', action: :update_template_detail, as: 'update_template_detail'
+        post ':lead_id/shoot_notification/:notification_id', action: :shoot_notification, as: 'shoot_notification'
 
-        get ':lead_id/send_email', to: :send_email, as: :send_email
-        post ':lead_id/shoot_email', to: :shoot_email, as: :shoot_email
+        get ':lead_id/send_email', action: :send_email, as: :send_email
+        post ':lead_id/shoot_email', action: :shoot_email, as: :shoot_email
       end
     end
   end
@@ -103,7 +103,7 @@ Rails.application.routes.draw do
       get :bulk_update
       put :import_bulk_update
       get :import
-      post :import, to: :perform_import
+      post :import, action: :perform_import
     end
   end
   resources :statuses
@@ -118,12 +118,15 @@ Rails.application.routes.draw do
     resources :search_histories, only: [:index, :destroy]
   end
   resources :users, param: :uuid do
+    member do
+      get :profile_image
+    end
     collection do
       get :edit_profile
       patch :update_profile
       get :edit_user_config
-      put :round_robin, to: :enable_round_robin
-      delete :round_robin, to: :disable_round_robin
+      put :round_robin, action: :enable_round_robin
+      delete :round_robin, action: :disable_round_robin
     end
   end
   namespace :companies do
@@ -157,8 +160,8 @@ Rails.application.routes.draw do
   resources :companies do
     member do
       get :fb_pages
-      get "fb_pages/import", to: :prepare_import_fb_pages
-      post "fb_pages/import", to: :import_fb_pages
+      get "fb_pages/import", action: :prepare_import_fb_pages
+      post "fb_pages/import", action: :import_fb_pages
       get :mobile_logo_form
       get :broker_form
       get :project_form
@@ -169,15 +172,15 @@ Rails.application.routes.draw do
       post :update_sv_form
     end
   end
-  get :configurations, :to => 'leads#configurations', path: '/configurations'
+  get :configurations, controller: 'leads', action: 'configurations', path: '/configurations'
   namespace :reports do
     get :source
     get :projects
     get :campaigns
     get :campaigns_report
-    get "campaign/:campaign_uuid", to: :campaign_detail, as: :campaign_detail
+    get "campaign/:campaign_uuid", action: :campaign_detail, as: :campaign_detail
     get :backlog
-    get "closing_executive/backlog", to: :closing_executive_backlog
+    get "closing_executive/backlog", action: :closing_executive_backlog
     get :dead
     get :leads
     get :source_wise_visits
@@ -199,15 +202,15 @@ Rails.application.routes.draw do
     get :channel_partner
     get :gre_source_report
     get :sales_dashboard
-    get ':lead_id/scheduled_site_visits_detail', to: :scheduled_site_visits_detail, as: :scheduled_site_visits_detail
-    get ":user_id/activity", to: :activity_details, as: :activity_details
+    get ':lead_id/scheduled_site_visits_detail', action: :scheduled_site_visits_detail, as: :scheduled_site_visits_detail
+    get ":user_id/activity", action: :activity_details, as: :activity_details
   end
 
   namespace :api do
     post :login
     get :company_logo
     delete :logout
-    get 'manifest', to: 'manifest#show'
+    get 'manifest', controller: 'manifest', action: 'show'
     namespace :mobile_crm do
       get :projects
       get :additional_settings
@@ -216,9 +219,9 @@ Rails.application.routes.draw do
       get :dashboard
       get :user_incentive_detail
       get :call_logs
-      get 'suggest/users', to: :suggest_users
-      get 'suggest/projects', to: :suggest_projects
-      get 'suggest/managers', to: :suggest_managers
+      get 'suggest/users', action: :suggest_users
+      get 'suggest/projects', action: :suggest_projects
+      get 'suggest/managers', action: :suggest_managers
       resources :leads, only: [:index, :show, :update, :create], param: :uuid do
         collection do
           get :magic_fields
@@ -226,7 +229,7 @@ Rails.application.routes.draw do
           get :settings
         end
         member do
-          delete "visits/:visit_id", to: :delete_visit
+          delete "visits/:visit_id", action: :delete_visit
           post :log_call_attempt
           get :histories
           put :deactivate
@@ -310,7 +313,7 @@ Rails.application.routes.draw do
           post :callback
           post :incoming_call_connect
           post :incoming_call_disconnect
-          get ':call_id/dialwhom', to: :dialwhom
+          get ':call_id/dialwhom', action: :dialwhom
         end
       end
       resources :ivr_manager, only: [] do
@@ -321,35 +324,35 @@ Rails.application.routes.draw do
       end
       resources :way_voice, only: [] do
         collection do
-          post ':uuid/outbound_disconnect', to: "way_voice#outbound_disconnect"
-          post ':uuid/incoming_call', to: "way_voice#incoming_call"
+          post ':uuid/outbound_disconnect', controller: "way_voice", action: "outbound_disconnect"
+          post ':uuid/incoming_call', controller: "way_voice", action: "incoming_call"
 
         end
       end
       resources :tata_teleservice, only: [] do
         collection do
-          post ':uuid/incoming_call', to: "tata_teleservice#incoming_call"
+          post ':uuid/incoming_call', controller: "tata_teleservice", action: "incoming_call"
           post :callback
-          post ':uuid/auto_dailer_hangup', to: "tata_teleservice#auto_dailer_hangup"
+          post ':uuid/auto_dailer_hangup', controller: "tata_teleservice", action: "auto_dailer_hangup"
         end
       end
       resources :slash_rtcservice, only: [] do
         collection do
           post :callback
-          post ':uuid/incoming_call', to: "slash_rtcservice#incoming_call"
+          post ':uuid/incoming_call', controller: "slash_rtcservice", action: "incoming_call"
           post :hangup
         end
       end
 
       resources :twispire, only: [] do
         collection do
-          post ':uuid/incoming_call', to: "twispire#incoming_call"
+          post ':uuid/incoming_call', controller: "twispire", action: "incoming_call"
         end
       end
 
       resources :call_logs, only: [] do
         collection do
-          post ':uuid/incoming_call', to: "call_logs#incoming_call_hangup"
+          post ':uuid/incoming_call', controller: "call_logs", action: "incoming_call_hangup"
         end
       end
     end
@@ -362,34 +365,41 @@ Rails.application.routes.draw do
   end
 
   namespace :public do
-    post "companies/:uuid/leads", to: "company_leads#create_lead"
-    post "companies/:uuid/jd_leads", to: "company_leads#create_jd_lead"
-    post "companies/:uuid/leads-all", to: "company_leads#create_leads_all"
-    post "companies/:uuid/wix_lead", to: "company_leads#create_wix_leads"
-    post "companies/:uuid/whatspp_lead_create", to: "company_leads#whatspp_lead_create"
-    post "companies/:uuid/create_smartping_leads", to: "company_leads#create_smartping_leads"
-    patch "companies/:uuid/whatspp_lead_update", to: "company_leads#whatspp_lead_update"
-    post "companies/:uuid/create_external_lead", to: "company_leads#create_external_lead"
-    get "companies/:uuid/settings", to: "company_leads#settings"
-    post "companies/:uuid/google_ads", to: "company_leads#google_ads"
-    match "companies/:uuid/magicbricks", to: "company_leads#magicbricks", via: [:get, :post]
-    post "companies/:uuid/nine_nine_acres", to: "company_leads#nine_nine_acres"
-    post "companies/:uuid/telecalling/leads", to: "telecalling#create_lead"
-    post "companies/:uuid/housing", to: "company_leads#housing"
-    patch "companies/:uuid/lead_update", to: "company_leads#lead_update"
-    patch "companies/:uuid/update_lead_interests", to: "company_leads#lead_update_on_project"
+    post "companies/:uuid/leads", controller: "company_leads", action: "create_lead"
+    post "companies/:uuid/jd_leads", controller: "company_leads", action: "create_jd_lead"
+    post "companies/:uuid/leads-all", controller: "company_leads", action: "create_leads_all"
+    post "companies/:uuid/wix_lead", controller: "company_leads", action: "create_wix_leads"
+    post "companies/:uuid/whatspp_lead_create", controller: "company_leads", action: "whatspp_lead_create"
+    post "companies/:uuid/create_smartping_leads", controller: "company_leads", action: "create_smartping_leads"
+    patch "companies/:uuid/whatspp_lead_update", controller: "company_leads", action: "whatspp_lead_update"
+    post "companies/:uuid/create_external_lead", controller: "company_leads", action: "create_external_lead"
+    get "companies/:uuid/settings", controller: "company_leads", action: "settings"
+    post "companies/:uuid/google_ads", controller: "company_leads", action: "google_ads"
+    match "companies/:uuid/magicbricks", controller: "company_leads", action: "magicbricks", via: [:get, :post]
+    post "companies/:uuid/nine_nine_acres", controller: "company_leads", action: "nine_nine_acres"
+    post "companies/:uuid/telecalling/leads", controller: "telecalling", action: "create_lead"
+    post "companies/:uuid/housing", controller: "company_leads", action: "housing"
+    patch "companies/:uuid/lead_update", controller: "company_leads", action: "lead_update"
+    patch "companies/:uuid/update_lead_interests", controller: "company_leads", action: "lead_update_on_project"
     namespace :leads do
-      post "call-in/create", to: :call_in_create
-      get "call_in/sarva/create", to: :sarva_create
-      post "partner/create", to: :partner_create
+      post "call-in/create", action: :call_in_create
+      get "call_in/sarva/create", action: :sarva_create
+      post "partner/create", action: :partner_create
+    end
+    namespace :on_site do
+      get :settings
+      post :submit_cp_lead
+      get :client_settings
+      post :schedule_client_visit
+      get "lead-details/:lead_no", action: "lead_details"
     end
     namespace :companies do
-      get ':uuid/external_api/projects', to: "external_api#projects"
+      get ':uuid/external_api/projects', controller: "external_api", action: "projects"
     end
     namespace :facebook do
-      get :leads, to: :callback
-      post :leads, to: :create_lead
-      post :create_fb_leads, to: :create_fb_leads
+      get :leads, action: :callback
+      post :leads, action: :create_lead
+      post :create_fb_leads, action: :create_fb_leads
     end
   end
 

@@ -4,15 +4,15 @@ module CustomFields
 
   included do
 
-    has_attached_file :logo, :styles => { :small => "180x180#", :thumb => "70x70#" }, path: ":rails_root/public/system/:attachment/:id/:style/:filename",url: "/system/:attachment/:id/:style/:filename"
+    has_attached_file :logo, :styles => { :small => "180x180#", :thumb => "70x70#" }
     validates_attachment  :logo, :content_type => { :content_type => %w(image/jpeg image/jpg image/png) }, :size => { :in => 0..1.megabytes }
-    has_attached_file :icon, :styles => { :small => "180x180#", :thumb => "70x70#" }, path: ":rails_root/public/system/:attachment/:id/:style/:filename",url: "/system/:attachment/:id/:style/:filename"
+    has_attached_file :icon, :styles => { :small => "180x180#", :thumb => "70x70#" }
     validates_attachment  :icon, :content_type => { :content_type => %w(image/jpeg image/jpg image/png) }, :size => { :in => 0..1.megabytes }
-    has_attached_file :favicon, :styles => { :small => "180x180#", :thumb => "70x70#" }, path: ":rails_root/public/system/:attachment/:id/:style/:filename",url: "/system/:attachment/:id/:style/:filename"
+    has_attached_file :favicon, :styles => { :small => "180x180#", :thumb => "70x70#" }
     validates_attachment  :favicon, :content_type => { :content_type => %w(image/jpeg image/jpg image/png) }, :size => { :in => 0..1.megabytes }
 
     ['dead_status', 'new_status', 'expected_site_visit', 'booking_done', 'hot_status', 'site_visit_done','token_status'].each do |status|
-      belongs_to "#{status}".to_sym, class_name: 'Status', foreign_key: "#{status}_id"
+      belongs_to "#{status}".to_sym, class_name: 'Status', foreign_key: "#{status}_id", optional: true
       delegate :name, to: "#{status}", allow_nil: true, prefix: true
     end
 

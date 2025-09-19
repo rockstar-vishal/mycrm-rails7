@@ -1,5 +1,6 @@
-class AddColumnRecordedAudioToLeadsCallLogs < ActiveRecord::Migration
+class AddColumnRecordedAudioToLeadsCallLogs < ActiveRecord::Migration[7.1]
   def change
-    add_attachment :leads_call_logs, :recorded_audio
+    # Active Storage handles file attachments automatically
+    # add_attachment :leads_call_logs, :recorded_audio
   end
 end

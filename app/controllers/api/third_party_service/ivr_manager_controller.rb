@@ -1,25 +1,15 @@
 module Api
   module ThirdPartyService
     class IvrManagerController < PublicApiController
+
       before_action :find_company
 
-      DATA_HASH = {
-        "8238087100" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799",
-        "8238084445" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799",
-        "9998881927" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799"
-      }
-
-      SETTING_HASH = {
-        "8238084445" => { project_id: 6395 },
-        "9998881927" => { project_id: 6396 }
-      }
-
       def incoming_call
-        project_id = (SETTING_HASH.select{|sh| sh[ivr_params[:landingNumber]]}.values.first[:project_id] rescue @company.default_project&.id)
+        project_id = @cloud_telephonysid.project_id || @company.default_project&.id
         user_id = @company.users.active.find_by(mobile: ivr_params[:destinationNumber])&.id || @company.users.active.superadmins.first.id
         @lead = @company.leads.where("RIGHT(REPLACE(mobile,' ', ''), 10) LIKE ?", ivr_params[:sourceNumber].last(10)).last
         if @lead.present?
-          @lead.update_attributes(project_id: project_id)
+          @lead.update(project_id: project_id)
         else
           @lead = @company.leads.build(
             name: '--',
@@ -69,7 +59,8 @@ module Api
       private
 
       def find_company
-        @company = Company.find_by(uuid: DATA_HASH[params["landingNumber"]]) rescue nil
+        @cloud_telephonysid = CloudTelephonySid.active.ivrmanager.where(number: params["landingNumber"]).last
+        @company = @cloud_telephonysid.try(:company)
         if @company.blank?
           render json: {status: false, message: "Invalid IVR"}, status: 400 and return
         end

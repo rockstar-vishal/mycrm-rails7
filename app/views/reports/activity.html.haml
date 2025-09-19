@@ -14,19 +14,18 @@
       .row
         .col-lg-12
           .search-card
-            .row
-              .col-md-5
+            .action-bar
+              %div
                 .group-link
                   %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                     = render 'icons/filters'
                     Smart Search
-                  = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action" do
+                  = link_to activity_search_params.merge!(format: :csv), class: "btn btn-action" do
                     = render 'icons/export'
                     Export
-              .col-md-7
+              %div
                 .group-link
                   = render 'reports_button', locals: {report_name: :activity}
-                  
             #adv-searchbox.box-body
               = form_tag nil, method: :get, class: "filter-search-menu" do
                 .p-2
@@ -37,20 +36,20 @@
                       .col-md-6
                         = render partial: 'shared/activity_range_selector'
                       .col-12
-                        %h5.mt-0 Search By Project Details
-                      .col-md-3
+                        %h5 Search By Project Details
+                      .col-md-6
                         = render partial: 'shared/projects_filter'
                       - if current_user.check_source_presence
-                        .col-md-3
+                        .col-md-6
                           = render partial: 'shared/sources_filter'
-                      .col-md-3
+                      .col-md-6
                         .form-group
                           %label Select Status
-                          = select_tag "lead_statuses[]", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), class: "form-control multi-select-list", multiple: true, data: {prompt_name: 'Select Status'}
-                      .col-md-3
+                          = select_tag "lead_statuses[]", options_from_collection_for_select(current_user.company.statuses, :id, :name, params[:lead_statuses]), prompt: "Select Status", class: "tomselect-checkbox", multiple: true, data: {prompt_name: 'Select Status'}
+                      .col-md-6
                         = render partial: 'shared/managers_filter'
                       - if current_user.company.is_allowed_field?("customer_type")
-                        .col-md-3
+                        .col-md-6
                           = render partial: 'shared/customer_type_filter'
                       .col-md-12
                         = button_tag type: "submit", class: "btn btn-primary" do

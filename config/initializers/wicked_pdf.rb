@@ -9,7 +9,9 @@
 # https://github.com/mileszs/wicked_pdf/blob/master/README.md
 path = `which wkhtmltopdf`.gsub(/\n/, "")
 
-WickedPdf.config = { exe_path: path }
+WickedPdf.configure do |config|
+  config.exe_path = path
+end
 
 # Path to the wkhtmltopdf executable: This usually isn't needed if using
 # one of the wkhtmltopdf-binary family of gems.

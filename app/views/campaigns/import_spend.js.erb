@@ -1,4 +1,7 @@
-$("#spendModal").modal("hide");
+var modal = bootstrap.Modal.getInstance(document.getElementById('spendModal'));
+if (modal) {
+  modal.hide();
+}
 $("#flash-messages").html('<div class="alert alert-success" role="alert"><%= j flash[:notice] %></div>');
 
 setTimeout(() => {

@@ -16,38 +16,43 @@
         = f.text_field :description, class: "form-control", placeholder: "Description"
     .col-md-6
       .form-group
-        = f.select :project_id, options_from_collection_for_select(@current_user.company.projects, :id, :name, f.object.project_id), {prompt: true, label: 'Project'}, class: 'form-control multiselect', required: true
+        = f.select :project_id, options_from_collection_for_select(@current_user.company.projects, :id, :name, f.object.project_id), {prompt: true, label: 'Project'}, class: 'form-control', required: true
     .col-md-6
       .form-group
         = f.select :source_id, options_from_collection_for_select(@current_user.company.sources, :id, :name, f.object.source_id), {prompt: true, label: 'Source'}, class: 'form-control'
-    .col-md-6
-      .form-group
-        = f.select :default_numbers, options_from_collection_for_select(current_user.company.users.active.where.not(mobile: ''), :mobile, :numbers_with_name, f.object.default_numbers), {}, class: 'form-control multi-select-list', multiple: true
-    .w-100
-    .col-md-2
-      .form-group.checkboxSpacing
-        = f.check_box :is_active, class: 'custom-checkbox'
-    .col-md-2
-      .form-group.checkboxSpacing
-        = f.check_box :only_inbound_service, class: 'custom-checkbox', label: 'Is Incoming?'
-    .col-md-2
-      .form-group.checkboxSpacing
-        = f.check_box :is_round_robin_enabled, class: 'custom-checkbox', label: 'RR Enabled?'
-  %div
     .col-md-12
+      .form-group.tom-selectcss-fix
+        = f.select :default_numbers, options_from_collection_for_select(current_user.company.users.active.where.not(mobile: ''), :mobile, :numbers_with_name, f.object.default_numbers), {}, class: 'tomselect-checkbox', multiple: true
+    .w-100
+    .col-md-2.pl-3
       .form-group
-        = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
-          
-          Save
-        = link_to call_ins_path, class: "btn btn-delete" do
-          
-          Cancel
+        = f.check_box :is_active, class: ''
+    .col-md-2
+      .form-group
+        = f.check_box :only_inbound_service, class: '', label: 'Is Incoming?'
+    .col-md-2
+      .form-group
+        = f.check_box :is_round_robin_enabled, class: '', label: 'RR Enabled?'
+
+    .col-md-12
+      = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+        
+        Save
+      = link_to call_ins_path, class: "btn btn-delete" do
+        
+        Cancel
 :javascript
-  $('.multi-select-list').multiselect({
-    numberDisplayed: 1,
-    enableFiltering: true,
-    enableCaseInsensitiveFiltering: true,
-    nonSelectedText: 'Please Select',
-    includeSelectAllOption: true,
-    buttonWidth: '100%'
+  document.querySelectorAll('.tomselect-checkbox').forEach(function(el) {
+    new TomSelect(el, {
+      maxItems: 30,
+      plugins: {
+        'clear_button': {},
+        'remove_button': {},
+        'dropdown_input': {},
+        'checkbox_options': {
+          checkedClassNames:   ['ts-checked'],
+          uncheckedClassNames: ['ts-unchecked']
+        }
+      }
+    });
   });

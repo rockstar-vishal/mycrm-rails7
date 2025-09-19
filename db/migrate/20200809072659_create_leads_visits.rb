@@ -1,4 +1,4 @@
-class CreateLeadsVisits < ActiveRecord::Migration
+class CreateLeadsVisits < ActiveRecord::Migration[7.1]
   def change
     create_table :leads_visits do |t|
       t.integer :lead_id

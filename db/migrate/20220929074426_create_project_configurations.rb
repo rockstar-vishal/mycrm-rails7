@@ -1,4 +1,4 @@
-class CreateProjectConfigurations < ActiveRecord::Migration
+class CreateProjectConfigurations < ActiveRecord::Migration[7.1]
   def change
     create_table :project_configurations do |t|
       t.integer "company_id"

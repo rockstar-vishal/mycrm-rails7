@@ -2,14 +2,13 @@ class Campaign < ActiveRecord::Base
 	belongs_to :company
 	belongs_to :source
 	validates :title, :start_date, :end_date, :budget, :source_id, presence: true
+    has_many :campaigns_projects, class_name: '::CampaignsProject'
+    has_many :projects, through: :campaigns_projects
+    has_many :spends, :class_name=>"::Campaigns::Spend", dependent: :destroy
 
-  has_many :projects, through: :campaigns_projects
-  has_many :campaigns_projects, class_name: '::CampaignsProject'
-  has_many :spends, :class_name=>"::Campaigns::Spend", dependent: :destroy
+    delegate :name, to: :source, prefix: true, allow_nil: true
 
-  delegate :name, to: :source, prefix: true, allow_nil: true
-
-  attr_accessor :targeted_ad_spend, :actual_ad_spend, :actual_leads, :actual_ql, 
+    attr_accessor :targeted_ad_spend, :actual_ad_spend, :actual_leads, :actual_ql, 
 	              :actual_sv, :actual_cpl, :actual_cpql, :actual_cpsv, :cpb, 
 	              :inquiry_to_ql, :qualified_to_sv, :inquiry_to_sv,
 	              :sv_to_booking, :inquiry_to_booking, :targeted_cpl,

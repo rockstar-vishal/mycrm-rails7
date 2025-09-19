@@ -1,4 +1,4 @@
-class AddIndexInLeadsVisits < ActiveRecord::Migration
+class AddIndexInLeadsVisits < ActiveRecord::Migration[7.1]
   def change
     add_index :leads_visits, :is_visit_executed
     add_index :leads_visits, :date

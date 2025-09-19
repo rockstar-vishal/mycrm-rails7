@@ -50,7 +50,7 @@ class CostSheetsController < ApplicationController
   end
 
   def update
-    if @cost_sheet.update_attributes(cost_sheet_params)
+    if @cost_sheet.update(cost_sheet_params)
       flash[:notice] = "Cost sheet updated successfully"
       redirect_to cost_sheets_path
     else

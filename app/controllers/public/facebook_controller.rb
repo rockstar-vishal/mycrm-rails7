@@ -16,7 +16,7 @@ module Public
       page_id = leadgen_params[:page_id]
       external_entry = ::Facebook::External.find_by_fbpage_id page_id
       if external_entry.present?
-        status, response = HTTPSao.secure_post external_entry.endpoint_url, params.except(:controller, :action).to_json
+        status, response = HttpSao.secure_post external_entry.endpoint_url, params.except(:controller, :action).to_unsafe_h.to_json
         if status
           render json: {message: "Success"}, status: 201 and return
         else

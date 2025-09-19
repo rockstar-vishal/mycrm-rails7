@@ -1,4 +1,8 @@
+require 'csv'
+
 class Broker < ActiveRecord::Base
+  EXPORT_LIMIT = 5000
+  PER_PAGE = 20
   include AppSharable
   include PostsaleIntegrationApi
 
@@ -7,11 +11,9 @@ class Broker < ActiveRecord::Base
   belongs_to :company
   has_many :leads, dependent: :restrict_with_error
   default_scope { order(created_at: :asc) }
-  belongs_to :rm, class_name: "::User", foreign_key: :rm_id
+  belongs_to :rm, class_name: "::User", foreign_key: :rm_id, optional: true
 
-  has_attached_file :rera_document,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :rera_document
   validates_attachment :rera_document, 
                         content_type: { :content_type => %w( application/pdf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document) }
 
@@ -61,10 +63,10 @@ class Broker < ActiveRecord::Base
 
     def to_csv(options = {}, exporting_user, ip_address, brokers_count)
       exporting_user.company.export_logs.create(user_id: exporting_user.id, ip_address: ip_address, count: brokers_count)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['CP Uuid','Name', 'Mobile', 'Email', 'Firm Name', 'Rera Number', 'RM','Locality', 'Address', 'Other Contacts','Rera Status', 'CP Code']
         csv << exportable_fields
-        all.includes{rm}.each do |broker|
+        all.includes(:rm).each do |broker|
           this_exportable_fields = [broker.uuid, broker.name, broker.mobile, broker.email, broker.firm_name, broker.rera_number, (broker.rm.name rescue '-'), broker.locality, broker.address, broker.other_contacts, broker.rera_status, broker.cp_code]
           csv << this_exportable_fields
         end

@@ -1,4 +1,4 @@
-class ProessAssignmentChangeNotification
+class ProcessAssignmentChangeNotification
   @queue = :process_assignment_change_notification
   @status_update_logger = Logger.new('log/assignment_change_notification.log')
 

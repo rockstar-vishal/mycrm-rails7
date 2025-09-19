@@ -41,7 +41,8 @@
                       = link_to 'view', "http://#{@lead.company.domain}/leads/#{@lead.id}/edit"
 
   %div{:style => "padding: 30px 70px 0; margin:0; text-align: center; line-height: 28px;"}
-    %img{:alt => "", :src => "#{@lead.company.logo&.url(:small)}", :style => "display: table; margin:15px auto 30px; max-width: 200px; max-height: 100px;"}/
+    - if @lead.company.logo.present?
+      %img{:alt => "", :src => @lead.company.logo.url, :style => "display: table; margin:15px auto 30px; max-width: 200px; max-height: 100px;"}/
     %p{:style => "color: #BBBBBB; font-size: 12px; margin:0 0 20px;font-family: 'Roboto', Arial, sans-serif;"}
       Copyright © 2022
       %a{:href => "https://#{@lead.company.domain}", :style => "color: #BBBBBB; font-size: 12px;text-align: center; text-decoration: none", :target => "_blank"} #{@lead.company.domain}

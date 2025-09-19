@@ -1,4 +1,4 @@
-class CreateTriggerEvents < ActiveRecord::Migration
+class CreateTriggerEvents < ActiveRecord::Migration[7.1]
   def change
     create_table :trigger_events do |t|
       t.integer :from_status

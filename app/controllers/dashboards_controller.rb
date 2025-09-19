@@ -22,7 +22,7 @@ class DashboardsController < ApplicationController
     dates_range.map{|k| @lead_gen.select{|a| a['created_date'] == k}.present? ? true : @lead_gen << {"created_date"=>k, "count"=>0}}
     @conversions = @leads.where(:conversion_date=>@start_date.to_date..@end_date.to_date).booked_for(current_user.company).group("conversion_date").select("conversion_date, COUNT(*)").as_json(except: [:id])
     dates_range.map{|k| @conversions.select{|a| a['conversion_date'] == k}.present? ? true : @conversions << {"conversion_date"=>k, "count"=>0}}
-    @visits = @leads.joins{visits}.where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date).group("leads_visits.date").select("COUNT(*), leads_visits.date as visit_date").as_json(except: [:id])
+    @visits = @leads.joins(:visits).where("leads_visits.date BETWEEN ? AND ?", @start_date.to_date, @end_date.to_date).group("leads_visits.date").select("COUNT(*), leads_visits.date as visit_date").as_json(except: [:id])
     dates_range.map{|k| @visits.select{|a| a['visit_date'] == k}.present? ? true : @visits << {"visit_date"=>k, "count"=>0}}
   end
 

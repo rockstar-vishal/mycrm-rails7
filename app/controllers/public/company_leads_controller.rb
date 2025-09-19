@@ -1,11 +1,13 @@
 module Public
   class CompanyLeadsController < ::PublicApiController
+    include MagicFieldsPermittable
     include ActionController::HttpAuthentication::Token::ControllerMethods
     before_action :find_company
     before_action :set_api_key, only: :create_lead
 
     def create_lead
-      lead = @company.leads.build(lead_params.merge(:source_id=>@api_obj.source_id, :user_id=>@api_obj.user_id, :project_id=>@api_obj.project_id))
+      params_data = lead_params.merge(:source_id=>@api_obj.source_id, :user_id=>@api_obj.user_id, :project_id=>@api_obj.project_id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -50,13 +52,14 @@ module Public
       phone = external_lead_params[:mobile] rescue ""
       lead = @company.leads.where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND mobile LIKE ?)", email, "#{phone.last(10) if phone.present?}").last
       if lead.present?
-        if lead.update_attributes(external_lead_params.merge(status_id: @company.expected_site_visit&.id))
+        if lead.update(external_lead_params.merge(status_id: @company.expected_site_visit&.id))
           render json: {message: "Updated Successfuly", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
         else
           render json: {message: "Failed", errors: lead.errors.full_messages.join(', ')}, status: 422 and return
         end
       else
-        lead = @company.leads.build(external_lead_params.merge(status_id: @company.expected_site_visit&.id))
+        params_data = external_lead_params.merge(status_id: @company.expected_site_visit&.id)
+        lead = Lead.build_with_magic_fields(@company, params_data)
         if lead.save
           render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
         else
@@ -74,11 +77,8 @@ module Public
       end
       project_id = @company.projects.find_id_from_name(params[:project]) || @company.default_project&.id
       user = @company.users.find_by_email params[:user_email]
-      lead = @company.leads.build(lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source, enquiry_sub_source_id: enquiry_sub_source_id))
-      mf_names = @company.magic_fields.pluck(:name)
-      mf_names.each do |mf_name|
-        lead.send("#{mf_name}=", params[mf_name.to_sym])
-      end
+      params_data = lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source, enquiry_sub_source_id: enquiry_sub_source_id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       lead.user_id = user.id if user.present?
       if lead.save
         if @company.secondary_source_enabled
@@ -129,10 +129,10 @@ module Public
 
     def whatspp_lead_update
       project_id = @company.projects.find_id_from_name(params[:project]) || @company.default_project&.id
-      lead = @company.leads.where("project_id = ? AND ((email IS NOT NULL AND email != '' AND email = ?) OR (mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = ?))", project_id, lead_params[:email].to_s.strip, lead_params[:mobile].last(10)).last
+      lead = @company.leads.where("project_id = ? AND ((email IS NOT NULL AND email != '' AND email = ?) OR (mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = ?))", project_id, params[:email].to_s.strip, lead_params[:mobile].last(10)).last
 
       if lead.present?
-        if lead.update_attributes(lead_params.slice(:comment))
+        if lead.update(lead_params.slice(:comment))
           render json: {status: true, message: "Lead Updated Successfuly"}, status: 200 and return
         else
           render json: {status: false, message: lead.errors.full_messages.join(', ')}, status: 422 and return
@@ -185,7 +185,8 @@ module Public
       sub_source = params[:sub_source]
       project_id = @company.projects.find_id_from_name(params[:project]) || @company.default_project&.id
       user = @company.users.find_by_email params[:user_email]
-      lead = @company.leads.build(lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source))
+      params_data = lead_params.merge(:source_id=>source_id, :project_id=>project_id, :sub_source=>sub_source)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       lead.user_id = user.id if user.present?
       if lead.save
         render json: {message: "SUCCESS", data: {lead_no: lead.reload.lead_no}}, status: 200 and return
@@ -227,7 +228,7 @@ module Public
       lead = @company.leads.where("RIGHT(REPLACE(mobile,' ', ''), 10) LIKE ? AND project_id = ?", mobile.last(10), project_id).last rescue nil
 
       if lead.present? && params[:sv]
-        if lead.update_attributes(lead_params.slice(:visit_date, :visit_comments, :comment))
+        if lead.update(lead_params.slice(:visit_date, :visit_comments, :comment))
           lead.visits.create(date: lead_params[:visit_date], comment: lead_params[:visit_comments])
           render json: {status: true, message: "Visit Details Updated Successfuly"}, status: 200 and return
         else
@@ -252,7 +253,8 @@ module Public
         project = @company.default_project
       end
       render json: {message: "Project ID Invalid"}, status: 400 and return if project.blank?
-      lead = @company.leads.build(lead_params.merge(:source_id=>::Source::MAGICBRICKS, :project_id=>project.id))
+      params_data = lead_params.merge(:source_id=>::Source::MAGICBRICKS, :project_id=>project.id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -270,7 +272,8 @@ module Public
         project = @company.default_project
       end
       render json: {message: "Project ID Invalid"}, status: 400 and return if project.blank?
-      lead = @company.leads.build(lead_params.merge(:source_id=>::Source::NINE_NINE_ACRES, :project_id=>project.id))
+      params_data = lead_params.merge(:source_id=>::Source::NINE_NINE_ACRES, :project_id=>project.id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -287,7 +290,8 @@ module Public
         project = @company.default_project
       end
       render json: {message: "Project ID Invalid"}, status: 400 and return if project.blank?
-      lead = @company.leads.build(lead_params.merge(:source_id=>::Source::HOUSING, :status_id=>@company.new_status_id, :project_id=>project.id))
+      params_data = lead_params.merge(:source_id=>::Source::HOUSING, :status_id=>@company.new_status_id, :project_id=>project.id)
+      lead = Lead.build_with_magic_fields(@company, params_data)
       if lead.save
         render json: {message: "Success", data: {lead_no: lead.reload.lead_no}}, status: 201 and return
       else
@@ -307,7 +311,16 @@ module Public
     private
 
     def lead_params
-      params.permit(:name, :email, :mobile, :comment, :visit_date, :visit_comments)
+      # Get magic field names for this company
+      magic_fields = @company.magic_fields.pluck(:name).map(&:to_sym)
+      
+      # Base parameters that are always allowed
+      base_params = [:name, :email, :mobile, :comment, :visit_date, :visit_comments]
+      
+      # Combine base params with magic fields
+      all_params = base_params + magic_fields
+      
+      params.permit(*all_params)
     end
 
     def lead_update_params
@@ -315,7 +328,16 @@ module Public
     end
 
     def external_lead_params
-      params.permit(:name, :email, :mobile, :project_id, :source_id, :city_id, :comment, :tentative_visit_planned, :broker_id)
+      # Get magic field names for this company
+      magic_fields = @company.magic_fields.pluck(:name).map(&:to_sym)
+      
+      # Base parameters that are always allowed
+      base_params = [:name, :email, :mobile, :project_id, :source_id, :city_id, :comment, :tentative_visit_planned, :broker_id]
+      
+      # Combine base params with magic fields
+      all_params = base_params + magic_fields
+      
+      params.permit(*all_params)
     end
 
     def find_company

@@ -38,7 +38,7 @@ class Companies::Integration < ActiveRecord::Base
   INTEGRATION_FIELDS.each do |method|
     define_method("#{method}=") do |val|
       if ["true", "false", "t", "f"].include?(val)
-        val = ActiveRecord::ConnectionAdapters::Column.value_to_boolean(val)
+        val = ActiveModel::Type::Boolean.new.cast(val)
       end
       self.data_will_change!
       self.data = (self.data || {}).merge!({"#{method}" => val})

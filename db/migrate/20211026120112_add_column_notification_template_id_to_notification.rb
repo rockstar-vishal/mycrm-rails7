@@ -1,5 +1,6 @@
-class AddColumnNotificationTemplateIdToNotification < ActiveRecord::Migration
+class AddColumnNotificationTemplateIdToNotification < ActiveRecord::Migration[7.1]
   def change
-    add_column :notifications, :notification_template_id, :integer, index: true
+    add_column :notifications, :notification_template_id, :integer
+    add_index :notifications, :notification_template_id
   end
 end

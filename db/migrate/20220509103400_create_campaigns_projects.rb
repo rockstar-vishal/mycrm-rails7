@@ -1,4 +1,4 @@
-class CreateCampaignsProjects < ActiveRecord::Migration
+class CreateCampaignsProjects < ActiveRecord::Migration[7.1]
   def change
     create_table :campaigns_projects do |t|
       t.integer :campaign_id, index: true

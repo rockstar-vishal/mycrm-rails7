@@ -11,7 +11,7 @@
     .search-card
       #headingOne.card-header.p-0.border-0
         %h2.mb-0
-          %button.btn.btn-link.btn-block.text-left.text-dark{"aria-controls" => "collapseOne", "aria-expanded" => "true", "data-target" => "#collapseOne", "data-toggle" => "collapse", type: "button"}
+          %button.btn.btn-link.btn-block.text-left.text-dark{"aria-controls" => "collapseOne", "aria-expanded" => "true", "data-bs-target" => "#collapseOne", "data-bs-toggle" => "collapse", type: "button"}
             Basic Settings
             %i.right.pl-2.fa.fa-angle-right
       #collapseOne.collapse.show{"aria-labelledby" => "headingOne", "data-parent" => "#userEditForm"}
@@ -34,8 +34,8 @@
               .form-group
                 = f.text_field :mobile, class: "form-control", placeholder: "Mobile Number"
             .col-md-3.required
-              .form-group
-                = f.select :role_id, options_from_collection_for_select(current_user.accessible_roles, :id, :name, (f.object.role_id rescue nil)), {include_blank: "Select Role", label: 'Role'},{class: 'form-control', data: {supervisor_value: current_user.accessible_roles.supervisor.ids, user_project_access: (current_user.company.setting.present? && current_user.company.enabled_project_wise_access && current_user.is_super?)}}
+              .form-group.tom-selectcss-fix
+                = f.select :role_id, options_from_collection_for_select(current_user.accessible_roles, :id, :name, (f.object.role_id rescue nil)), {include_blank: "Select Role", label: 'Role'},{class: 'tomselect-single', data: {supervisor_value: current_user.accessible_roles.supervisor.ids, user_project_access: (current_user.company.setting.present? && current_user.company.enabled_project_wise_access && current_user.is_super?)}}
             .col-md-3
               .form-group
                 = f.password_field :password, class: 'form-control', placeholder: "Password"
@@ -109,7 +109,7 @@
       .search-card
         #headingTwo.card-header.p-0.border-0
           %h2.mb-0
-            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseTwo", "aria-expanded" => "false", "data-target" => "#collapseTwo", "data-toggle" => "collapse", type: "button"}
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseTwo", "aria-expanded" => "false", "data-bs-target" => "#collapseTwo", "data-bs-toggle" => "collapse", type: "button"}
               Cloud Telephony Settings
               %i.right.pl-2.fa.fa-angle-right
         #collapseTwo.collapse{"aria-labelledby" => "headingTwo", "data-parent" => "#userEditForm"}
@@ -148,7 +148,7 @@
         .search-card
           #headingThree.card-header.p-0.border-0
             %h2.mb-0
-              %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseThree", "aria-expanded" => "false", "data-target" => "#collapseThree", "data-toggle" => "collapse", type: "button"}
+              %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseThree", "aria-expanded" => "false", "data-bs-target" => "#collapseThree", "data-bs-toggle" => "collapse", type: "button"}
                 User Incentives
                 %i.right.pl-2.fa.fa-angle-right
           #collapseThree.collapse{"aria-labelledby" => "headingThree", "data-parent" => "#userEditForm"}
@@ -164,7 +164,7 @@
       .search-card
         #headingFour.card-header.p-0.border-0
           %h2.mb-0
-            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseFour", "aria-expanded" => "false", "data-target" => "#collapseFour", "data-toggle" => "collapse", type: "button"}
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseFour", "aria-expanded" => "false", "data-bs-target" => "#collapseFour", "data-bs-toggle" => "collapse", type: "button"}
               User Manager
               %i.right.pl-2.fa.fa-angle-right
         #collapseFour.collapse{"aria-labelledby" => "headingFour", "data-parent" => "#userEditForm"}
@@ -181,7 +181,7 @@
       .search-card
         #headingFive.card-header.p-0.border-0
           %h2.mb-0
-            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseFive", "aria-expanded" => "false", "data-target" => "#collapseFive", "data-toggle" => "collapse", type: "button"}
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseFive", "aria-expanded" => "false", "data-bs-target" => "#collapseFive", "data-bs-toggle" => "collapse", type: "button"}
               Round Robin Settings
               %i.right.pl-2.fa.fa-angle-right
         #collapseFive.collapse{"aria-labelledby" => "headingFive", "data-parent" => "#userEditForm"}
@@ -198,7 +198,7 @@
       .search-card
         #headingSix.card-header.p-0.border-0
           %h2.mb-0
-            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSix", "aria-expanded" => "false", "data-target" => "#collapseSix", "data-toggle" => "collapse", type: "button"}
+            %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSix", "aria-expanded" => "false", "data-bs-target" => "#collapseSix", "data-bs-toggle" => "collapse", type: "button"}
               Users Projects
               %i.right.pl-2.fa.fa-angle-right
         #collapseSix.collapse{"aria-labelledby" => "headingSix", "data-parent" => "#userEditForm"}
@@ -215,8 +215,8 @@
     .search-card{"id" => "marketing-manager-card", style: "display: none;"}
       #headingSeven.card-header.p-0.border-0
         %h2.mb-0
-          -# %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSeven", "aria-expanded" => "false", "data-target" => "#collapseSeven", "data-toggle" => "collapse", type: "button"}
-          %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSeven", "aria-expanded" => "false", "data-target" => "#collapseSeven", "data-toggle" => "collapse", type: "button", id: "source-button"}
+          -# %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSeven", "aria-expanded" => "false", "data-bs-target" => "#collapseSeven", "data-bs-toggle" => "collapse", type: "button"}
+          %button.btn.btn-link.btn-block.text-left.text-dark.collapsed{"aria-controls" => "collapseSeven", "aria-expanded" => "false", "data-bs-target" => "#collapseSeven", "data-bs-toggle" => "collapse", type: "button", id: "source-button"}
             Accessible Sources
             %i.right.pl-2.fa.fa-angle-right
       #collapseSeven.collapse{"aria-labelledby" => "headingSeven", "data-parent" => "#userEditForm"}

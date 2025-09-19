@@ -2,25 +2,20 @@
   - default_tab = (@default_tab.presence || 'bulk_update')
   .row
     .col-12
-      %ul.nav.nav-tabs.nav-pills{role: 'tablist'}
+      %ul.nav.nav-tabs
         %li.nav-item
-          = link_to '#bulk_update',
-            class: "nav-link #{'active' if default_tab == 'bulk_update'}",
-            data: { toggle: 'tab' },
-            role: 'tab',
-            'aria-selected' => (default_tab == 'bulk_update'),
-            'aria-controls' => 'bulk_update' do
+          = link_to '#bulk_update', class: "nav-link #{'active' if default_tab == 'bulk_update'}", id: 'tab1-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab1", "aria-selected" => (default_tab == 'bulk_update').to_s do
             Bulk Update
         %li.nav-item
-          = link_to '#send_email',
-            class: "nav-link #{'active' if default_tab == 'send_email'}",
-            data: { toggle: 'tab' },
-            role: 'tab',
-            'aria-selected' => (default_tab == 'send_email'),
-            'aria-controls' => 'send_email' do
+          = link_to '#send_email', class: "nav-link #{'active' if default_tab == 'send_email'}", id: 'tab2-tab', "data-bs-toggle"=>"tab", role: "tab", "aria-controls"=>"tab2", "aria-selected" => (default_tab == 'send_email').to_s do
             Send Email
+     
 
       .tab-content
+        #tab1.tab-pane.fade{class: "#{'show active' if default_tab == 'sms'}", role: 'tabpanel', 'aria-labelledby' => 'tab1-tab'}
+          1
+        #tab2.tab-pane.fade{:class => ("show active" if @default_tab == 'lead-attempt')}
+          2
         #bulk_update.tab-pane.fade{class: ("show active" if default_tab == 'bulk_update'), role: 'tabpanel', 'aria-labelledby' => 'bulk_update-tab'}
           .lead-body
             .row

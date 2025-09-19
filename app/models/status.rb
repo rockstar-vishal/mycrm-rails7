@@ -13,7 +13,7 @@ class Status < ActiveRecord::Base
 
 
   def fetch_stages(company)
-    company_stage_status = self.company_stage_statuses.joins{:company_stage}.where(company_stage: {company_id: company.id})
+    company_stage_status = self.company_stage_statuses.joins(:company_stage).where(company_stage: {company_id: company.id})
     if company_stage_status.present?
       company_stage_status
     else

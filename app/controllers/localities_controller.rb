@@ -48,7 +48,7 @@ class LocalitiesController < ApplicationController
   end
 
   def update
-    if @locality.update_attributes(locality_params)
+    if @locality.update(locality_params)
       flash[:notice] = "#{@locality.name} - Locality Updated Successfully"
       xhr_redirect_to redirect_to: localities_path
     else
@@ -64,6 +64,11 @@ class LocalitiesController < ApplicationController
       :region_id
     )
   end
+
+  def localities_params
+    params.permit(:search_string, :page)
+  end
+  helper_method :localities_params
 
   def set_locality
     @locality = Locality.find(params[:id])

@@ -8,7 +8,7 @@ module Users
 
     included do
 
-      belongs_to :cloud_telephony, class_name: 'CloudTelephony'
+      belongs_to :cloud_telephony, class_name: 'CloudTelephony', optional: true
 
       def is_cloud_telephony_active?(integration_name)
         self.company.respond_to?("#{integration_name}_integration") &&

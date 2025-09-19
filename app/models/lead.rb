@@ -15,7 +15,7 @@ class Lead < ActiveRecord::Base
 
   audited associated_with: :company, only: [:status_id, :user_id, :comment, :tentative_visit_planned, :closing_executive, :project_id, :ncd, :source_id, :broker_id]
 
-  attr_accessor :should_delete, :actual_comment, :cannot_send_notification, :enable_admin_assign, :lead_visit_status_id
+  attr_accessor :should_delete, :actual_comment, :cannot_send_notification, :enable_admin_assign, :lead_visit_status_id, :project_uuid
 
   belongs_to :company
   has_magic_fields :through => :company
@@ -26,21 +26,21 @@ class Lead < ActiveRecord::Base
   has_many :call_attempts, dependent: :destroy
   has_many :custom_audits, class_name: "CustomAudit", foreign_key: :auditable_id, dependent: :destroy
   has_many :magic_attributes, class_name: 'MagicAttribute', dependent: :destroy
-  belongs_to :source
+  belongs_to :source, optional: true
   belongs_to :project
-  belongs_to :user
-  belongs_to :presale_user, class_name: 'User', foreign_key: :presale_user_id
-  belongs_to :postsale_user, class_name: 'User', foreign_key: :closing_executive
-  belongs_to :last_lead_modified_user, class_name: 'User', foreign_key: :last_modified_by
-  belongs_to :status
-  belongs_to :call_in
-  belongs_to :city
-  belongs_to :locality
-  belongs_to :broker
-  belongs_to :enq_subsource, :class_name=> 'SubSource', foreign_key: :enquiry_sub_source_id
-  belongs_to :stage
-  belongs_to :presales_stage, class_name: 'Stage', foreign_key: :presale_stage_id
-  belongs_to :dead_reason, :class_name=>"::Companies::Reason"
+  belongs_to :user, optional: true
+  belongs_to :presale_user, class_name: 'User', foreign_key: :presale_user_id, optional: true
+  belongs_to :postsale_user, class_name: 'User', foreign_key: :closing_executive, optional: true
+  belongs_to :last_lead_modified_user, class_name: 'User', foreign_key: :last_modified_by, optional: true
+  belongs_to :status, optional: true
+  belongs_to :call_in, optional: true
+  belongs_to :city, optional: true
+  belongs_to :locality, optional: true
+  belongs_to :broker, optional: true
+  belongs_to :enq_subsource, :class_name=> 'SubSource', foreign_key: :enquiry_sub_source_id, optional: true
+  belongs_to :stage, optional: true
+  belongs_to :presales_stage, class_name: 'Stage', foreign_key: :presale_stage_id, optional: true
+  belongs_to :dead_reason, :class_name=>"::Companies::Reason", optional: true
   has_many :leads_secondary_sources, class_name: "::Leads::SecondarySource"
   has_many :secondary_sources, through: :leads_secondary_sources, source: :source
   has_many :call_logs, class_name: "Leads::CallLog", dependent: :destroy
@@ -54,9 +54,7 @@ class Lead < ActiveRecord::Base
   validates :dead_reason, presence: true, if: Proc.new { |a| a.company.dead_status_ids.map(&:to_i).include?(a.status_id) }
   validates :lead_no, presence: true, uniqueness: true
 
-  has_attached_file :image,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
+  has_attached_file :image
   validates_attachment_content_type  :image,
                     content_type: ['image/jpeg', 'image/png'],
                     size: { in: 0..5.megabytes }
@@ -91,15 +89,16 @@ class Lead < ActiveRecord::Base
   before_validation :set_lead_no, :set_defaults, on: :create
   before_validation :strip_mobile_number
 
-  delegate :name, to: :project, prefix: true, allow_blank: true
+  delegate :name, to: :project, prefix: true, allow_nil: true
 
   accepts_nested_attributes_for :visits, reject_if: :all_blank, allow_destroy: true
 
   after_commit :delete_audit_logs, on: :destroy
   after_commit :client_integration_to_postsale, if: :client_integration_enable?
   before_create :set_executive
-  before_save :set_closing_excutive, on: :update
+  before_update :set_closing_excutive
   after_create :set_presale_user, if: :presale_user_site_visit_enabled?
+
   after_commit :notify_lead_create_event, :send_lead_create_brower_notification, on: :create
   before_save :set_site_visit_scheduled
   after_save :set_visit, if: :is_advance_visit_enabled?
@@ -182,6 +181,14 @@ class Lead < ActiveRecord::Base
     end
   end
 
+  def project_uuid=(default_value)
+    self.project_id = (Project.find_by_uuid(default_value).id rescue nil)
+  end
+
+  def project_uuid
+    return self.project.uuid
+  end
+
   def set_user_details
     if self.changes.present? && self.changes["user_id"].present?
       self.last_user_assigned_date = Time.zone.now
@@ -240,9 +247,9 @@ class Lead < ActiveRecord::Base
       combined_ids = dead_status_ids + [booking_done_id]
       if self.company.setting.present? && self.company.setting.global_validation.present?
         if self.company.setting.open_closed_lead_enabled
-          leads = ::Lead.where.not(:id=>self.id, status_id: dead_status_ids).where(:company_id=>self.company_id)
+          leads = ::Lead.where.not(:id=>self.id).where.not(status_id: dead_status_ids).where(:company_id=>self.company_id)
         else
-          leads = ::Lead.where.not(:id=>self.id, status_id: [dead_status_ids, booking_done_id].flatten).where(:company_id=>self.company_id)
+          leads = ::Lead.where.not(:id=>self.id).where.not(status_id: [dead_status_ids, booking_done_id].flatten).where(:company_id=>self.company_id)
         end
       else
         leads = ::Lead.where.not(:id=>self.id).where.not(:status_id=>combined_ids).where(:company_id=>self.company_id, :project_id=>project_id)
@@ -375,7 +382,7 @@ class Lead < ActiveRecord::Base
           messageable_id: self.id,
           messageable_type: "Lead",
           mobile: self.mobile,
-          text: "Dear #{self.name}, Thank you for showing interest in our project #{self.project_name}. Our Sales Representative #{self.user&.name}(#{self&.user&.mobile}) shall be in touch with you. In the meantime, please visit #{self.project_name} to know more details about the project. \nRegards, \nTeam #{self.project_name}",
+          text: "Dear #{self.name}, Thank you for showing interest in our project #{self.project_name}. Our Sales Representative #{self&.user&.name}(#{self&.user&.mobile}) shall be in touch with you. In the meantime, please visit #{self.project_name} to know more details about the project. \nRegards, \nTeam #{self.project_name}",
           user_id: self.user.id
         )
         ss.save
@@ -408,7 +415,7 @@ class Lead < ActiveRecord::Base
   end
 
   def set_presale_user
-    self.update_attributes(presale_user_id: self.user_id)
+    self.update(presale_user_id: self.user_id)
   end
 
   def is_ncd_required?
@@ -425,7 +432,7 @@ class Lead < ActiveRecord::Base
     if self.company.events.include?("lead_create")
       url = "http://#{self.company.domain}/leads/#{self.id}/edit"
       message_text = "Lead #{self.name}, assigned to #{self.user&.name} has been created at #{self.created_at.strftime('%d-%b-%y %H:%M %p')}. <a href=#{url} target='_blank'>click here</a>"
-      Pusher.trigger(self.company.uuid, 'lead_create', {message: message_text, notifiables: [self.user.uuid]})
+      # Pusher.trigger(self.company.uuid, 'lead_create', {message: message_text, notifiables: [self.user.uuid]})
     end
   end
 
@@ -607,12 +614,12 @@ class Lead < ActiveRecord::Base
       end
       if params[:visited_date_from].present?
         visited_date_from = Date.parse(params[:visited_date_from]).beginning_of_day
-        lead_ids = leads.joins{visits}.where("leads_visits.date >= ?", visited_date_from).ids.uniq
+        lead_ids = leads.joins(:visits).where("leads_visits.date >= ?", visited_date_from).ids.uniq
         leads=leads.where(id: lead_ids)
       end
       if params[:visited_date_upto].present?
         visited_date_to = Date.parse(params[:visited_date_upto]).end_of_day
-        lead_ids = leads.joins{visits}.where("leads_visits.date <= ?", visited_date_to).ids.uniq
+        lead_ids = leads.joins(:visits).where("leads_visits.date <= ?", visited_date_to).ids.uniq
         leads=leads.where(id: lead_ids)
       end
       if params[:site_visit_from].present?
@@ -828,7 +835,7 @@ class Lead < ActiveRecord::Base
         end
       end
       if search_params[:sv_user].present?
-        leads = leads.joins{visits}.where(visits: {user_id: search_params[:sv_user]})
+        leads = leads.joins(:visits).where(visits: {user_id: search_params[:sv_user]})
       end
       if search_params["visit_expiring"].present?
         leads=leads.visit_expiration
@@ -837,7 +844,7 @@ class Lead < ActiveRecord::Base
         leads = leads.backlogs_for(user.company)
       end
       if search_params["merged"].present?
-        leads = leads.joins{leads_secondary_sources}
+        leads = leads.joins(:leads_secondary_sources)
       end
       if search_params["todays_call_only"].present?
         leads = leads.active_for(user.company).todays_calls
@@ -846,7 +853,7 @@ class Lead < ActiveRecord::Base
         leads = leads.where("leads.comment ILIKE ?", "%#{search_params["comment"]}%")
       end
       if search_params["visit_form"].present?
-        leads = leads.joins{visits}.thru_visit_form(user.company)
+        leads = leads.joins(:visits).thru_visit_form(user.company)
       end
       if search_params[:dead_reason_ids].present?
         leads = leads.where(:dead_reason_id=>search_params[:dead_reason_ids])
@@ -873,7 +880,7 @@ class Lead < ActiveRecord::Base
         leads = leads.where(:locality_id=>search_params["locality_ids"])
       end
       if search_params["country_ids"].present?
-        leads = leads.joins{project}.where("projects.country_id IN (?)", search_params["country_ids"])
+        leads = leads.joins(:project).where("projects.country_id IN (?)", search_params["country_ids"])
       end
       if search_params["lead_ids"].present?
         leads = leads.where(:id=>search_params["lead_ids"])
@@ -951,21 +958,20 @@ class Lead < ActiveRecord::Base
         end
       end
       if search_params["broker_ids"].present?
-        leads = leads.joins{broker}.where(source_id: user.company.sources.cp_sources&.ids, broker_id: search_params["broker_ids"])
+        leads = leads.joins(:broker).where(source_id: user.company.sources.cp_sources&.ids, broker_id: search_params["broker_ids"])
       end
       if search_params["postponed"].present?
-        leads = leads.joins{visits}.where("leads_visits.is_postponed='t'")
+        leads = leads.joins(:visits).where("leads_visits.is_postponed='t'")
       end
       if search_params["visit_cancel"].present?
-        leads = leads.joins{visits}.where("leads_visits.is_canceled='t'")
+        leads = leads.joins(:visits).where("leads_visits.is_canceled='t'")
       end
       if search_params["site_visit_done"].present?
-        leads = leads.joins{visits}.where(visits: {is_visit_executed: true})
+        leads = leads.joins(:visits).where(visits: {is_visit_executed: true})
       end
-      # leads = leads.includes(:magic_attributes).references(:magic_attributes)
       conditions = []
       values = []
-      user.company.magic_fields.each do |field|
+      user.company&.magic_fields&.each do |field|
         search_value = search_params[field.name]
         if search_value.present?
           if field.datatype == 'string' || field.datatype == 'date'
@@ -1043,7 +1049,7 @@ class Lead < ActiveRecord::Base
     end
 
     def to_csv(options = {}, exporting_user)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['Customer Name', 'Lead Number', 'Project', 'Assigned To', 'Lead Status', 'Presale Stage', 'Next Call Date', 'Comment', 'Source','Broker', 'Broker Number', 'Broker CreatedAt','Visited', 'Visited Date', 'Visit Counts', 'Visit Comments','Dead Reason', 'Dead Sub Reason', 'City', 'Created At',  'Last Updated At', 'Sub Source', 'Last User Assigned Date' ,'Last Modified By']
         if exporting_user.is_super? || exporting_user.is_sl_admin? || exporting_user.is_marketing_manager?
           exportable_fields << 'Mobile'
@@ -1073,12 +1079,12 @@ class Lead < ActiveRecord::Base
         if exporting_user.company.fb_ads_ids.present?
           exportable_fields << 'Facebook Ads Id'
         end
-        magic_fields = exporting_user.company.magic_fields.order(:id).pluck(:id, :pretty_name).to_h
+        magic_fields = exporting_user.company&.magic_fields&.order(:id)&.pluck(:id, :pretty_name)&.to_h || {}
         exportable_fields = exportable_fields | magic_fields.values
         csv << exportable_fields
 
         magic_attributes = MagicAttribute.where(lead_id: all.ids).group("lead_id").select("lead_id, ARRAY_AGG(magic_field_id ORDER BY magic_field_id) AS magic_field_ids, ARRAY_AGG(value ORDER BY magic_field_id) AS values").as_json(except: [:id])
-        all.includes{project.city}.find_each do |client|
+        all.includes(project: :city).find_each do |client|
           dead_reason = ""
           dead_sub_reason = ""
           if exporting_user.company.dead_status_ids.include?(client.status_id.to_s)
@@ -1165,7 +1171,41 @@ class Lead < ActiveRecord::Base
 
   def comment=(default_value)
     if default_value.present?
-      comment = "#{self.comment_was} \n #{Time.zone.now.strftime("%d-%m-%y %H:%M %p")} (#{(Lead.current_user.name rescue nil)}) : #{default_value}"
+      # Server-side deduplication: Check if the same comment was added recently
+      current_user_name = (Lead.current_user.name rescue nil)
+      new_comment_text = default_value.strip
+      
+      # Check if the last comment entry matches the new comment (within last 5 minutes)
+      if self.comment_was.present?
+        # Extract the last comment entry (everything after the last timestamp pattern)
+        last_comment_match = self.comment_was.match(/(\d{2}-\d{2}-\d{2} \d{2}:\d{2} [AP]M) \(([^)]+)\) : (.*)$/m)
+        
+        if last_comment_match
+          last_timestamp = last_comment_match[1]
+          last_user = last_comment_match[2]
+          last_comment_text = last_comment_match[3].strip
+          
+          # Parse the timestamp to check if it's within the last 5 minutes
+          begin
+            last_time = Time.zone.strptime(last_timestamp, "%d-%m-%y %H:%M %p")
+            time_diff = Time.zone.now - last_time
+            
+            # If same user, same comment text, and within 5 minutes, skip adding duplicate
+            if last_user == current_user_name && 
+               last_comment_text == new_comment_text && 
+               time_diff <= 5.minutes
+              Rails.logger.info "Prevented duplicate comment for lead #{self.id}: '#{new_comment_text}' by #{current_user_name}"
+              return # Don't add the duplicate comment
+            end
+          rescue ArgumentError
+            # If timestamp parsing fails, continue with adding the comment
+            Rails.logger.warn "Could not parse timestamp '#{last_timestamp}' for lead #{self.id}, adding comment anyway"
+          end
+        end
+      end
+      
+      # Add the new comment
+      comment = "#{self.comment_was} \n #{Time.zone.now.strftime("%d-%m-%y %H:%M %p")} (#{current_user_name}) : #{new_comment_text}"
       write_attribute(:comment, comment)
     end
   end
@@ -1257,7 +1297,7 @@ class Lead < ActiveRecord::Base
           custnumber: self.mobile&.last(10),
           refurl: current_user.company.mcube_integration_callback_url
         }.to_json
-        success, response = HTTPSao.secure_post(url, request_body)
+        success, response = HttpSao.secure_post(url, request_body)
         success = response["status"]
         if !success
           return false, response["msg"]
@@ -1330,7 +1370,7 @@ class Lead < ActiveRecord::Base
     begin
       radom_reference_no = SecureRandom.uuid
       url = "https://way2voice.in:444/FileApi/OBDCall?key=3646&userid=mukandan&password=mukandan@123&CallerNo=#{self.mobile.last(10)}&AgentNo=#{self.user.mobile}&refid=#{radom_reference_no}"
-      status, code, response = HTTPSao.secure_get(url)
+      status, code, response = HttpSao.secure_get(url)
       if response["status"] == "success"
         radom_reference_no = response["cdtrno"]
       end
@@ -1477,7 +1517,7 @@ class Lead < ActiveRecord::Base
     begin
       api_key = current_user.company.callerdesk_integration.integration_key
       url = "https://app.callerdesk.io/api/click_to_call_v2?calling_party_a=#{current_user.mobile}&calling_party_b=#{self.mobile}&deskphone=#{current_user.cloud_telephony_sid&.number}&authcode=#{api_key}&call_from_did=1"
-      status, code, response = HTTPSao.secure_get(url)
+      status, code, response = HttpSao.secure_get(url)
       if status && code == "200"
         call_log = self.call_logs.build(
           caller: 'User',
@@ -1504,7 +1544,7 @@ class Lead < ActiveRecord::Base
 
   def magic_field_values
     field_attributes = []
-    self.company.magic_fields.each do |field|
+    self.company&.magic_fields&.each do |field|
       field_attributes.push({
         key: "#{field.name}",
         value: self.send("#{field.name}"),
@@ -1539,7 +1579,7 @@ class Lead < ActiveRecord::Base
   def selectable_company_stages
     if self.persisted?
       if self.company.company_stage_statuses.present?
-        self.company.company_stages.joins{:company_stage_statuses}.where(company_stage_statuses: {status_id: self.status_id})
+        self.company.company_stages.joins(:company_stage_statuses).where(company_stage_statuses: {status_id: self.status_id})
       else
         self.company.company_stages
       end
@@ -1644,4 +1684,100 @@ class Lead < ActiveRecord::Base
         end
       end
     end
+
+  # Dynamic magic field setter/getter generation
+  after_initialize :define_magic_field_methods, if: :should_define_magic_fields?
+
+  # Helper method to separate magic fields from regular attributes
+  def self.separate_magic_fields(company, attributes)
+    return attributes, {} unless company.present? && company.respond_to?(:magic_fields)
+    
+    magic_field_names = company.magic_fields.pluck(:name).map(&:to_sym)
+    regular_attributes = attributes.except(*magic_field_names)
+    magic_attributes = attributes.slice(*magic_field_names)
+    
+    [regular_attributes, magic_attributes]
+  end
+
+  # Helper method to build leads with magic fields
+  def self.build_with_magic_fields(company, attributes = {})
+    return build(attributes) unless company.present? && company.respond_to?(:magic_fields)
+    
+    magic_field_names = company.magic_fields.pluck(:name).map(&:to_sym)
+    regular_attributes = attributes.except(*magic_field_names)
+    magic_attributes = attributes.slice(*magic_field_names)
+    
+    # Build with only regular attributes
+    lead = company.leads.build(regular_attributes)
+    
+    # Set magic fields using dynamic setters
+    magic_attributes.each do |key, value|
+      lead.send("#{key}=", value) if lead.respond_to?("#{key}=")
+    end
+    
+    lead
+  end
+
+  private
+
+  def should_define_magic_fields?
+    # Only define magic fields if we have a company_id
+    self.respond_to?(:company_id)
+  end
+
+  def define_magic_field_methods
+    return unless company.present?
+    return unless company.respond_to?(:magic_fields)
+    
+    company.magic_fields.each do |magic_field|
+      # Define setter
+      define_singleton_method("#{magic_field.name}=") do |value|
+        return value unless company.present? && company.respond_to?(:magic_fields)
+        
+        magic_attribute = magic_attributes.find_or_initialize_by(magic_field: magic_field)
+        
+        # If it's a persisted record, update it directly
+        if magic_attribute.persisted?
+          magic_attribute.update_column(:value, value)
+        else
+          magic_attribute.value = value
+        end
+        
+        # Ensure the magic attribute is in the collection
+        magic_attributes << magic_attribute unless magic_attributes.include?(magic_attribute)
+        
+        value
+      end
+      
+      # Define getter
+      define_singleton_method(magic_field.name) do
+        return nil unless company.present? && company.respond_to?(:magic_fields)
+        
+        magic_attribute = magic_attributes.find_by(magic_field: magic_field)
+        magic_attribute&.value
+      end
+    end
+  end
+
+  # Cleanup orphaned magic field values for failed saves
+  def cleanup_orphaned_magic_fields
+    return if persisted? # Only cleanup for failed saves
+    return unless respond_to?(:magic_attributes)
+    
+    magic_attributes.destroy_all
+  end
+
+  # Save magic attributes when lead is saved
+  after_save :save_magic_attributes
+
+  private
+
+  def save_magic_attributes
+    return unless respond_to?(:magic_attributes)
+    
+    magic_attributes.each do |magic_attribute|
+      magic_attribute.save! if magic_attribute.new_record? || magic_attribute.changed?
+    end
+  end
+
 end

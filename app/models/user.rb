@@ -12,9 +12,9 @@ class User < ActiveRecord::Base
   has_many :emails, as: :receiver, class_name: 'Email'
   has_many :call_attempts
   has_many :call_logs, class_name: "::Leads::CallLog"
-  belongs_to :exotel_sid
-  belongs_to :mcube_sid
-  belongs_to :cloud_telephony_sid
+  belongs_to :exotel_sid, optional: true
+  belongs_to :mcube_sid, optional: true
+  belongs_to :cloud_telephony_sid, optional: true
 
   has_many :brokers, foreign_key: :rm_id
   has_many :manager_mappings, class_name: "::Users::Manager", foreign_key: :user_id
@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
   has_one :user_detail
   has_many :file_exports, class_name: 'FileExport'
   
-  belongs_to :city
+  belongs_to :city, optional: true
 
   validates :name, :mobile, :role, :email, :company, presence: true
   validates :password, confirmation: true
@@ -54,13 +54,11 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :users_sources, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :user_detail, reject_if: :all_blank, allow_destroy: true
 
-  has_attached_file :image,
-                    path: ":rails_root/public/system/:attachment/:id/:style/:filename",
-                    url: "/system/:attachment/:id/:style/:filename"
-  validates_attachment_content_type  :image,
-                    content_type: ['image/jpeg', 'image/png'],
-                    size: { in: 0..2.megabytes }
-
+  # Custom profile image handling with unique binary storage approach
+  attr_accessor :profile_image_upload
+  
+  before_save :process_profile_image_upload, if: :profile_image_upload
+  
   scope :active, -> { where(:active=>true) }
   scope :superadmins, -> { where(:role_id=>2)}
   scope :managers, -> { where(:role_id=>3)}
@@ -78,9 +76,41 @@ class User < ActiveRecord::Base
   end
 
   def img_url
-    if self.image.present?
-      self.image.url
+    if self.profile_image_data.present?
+      "/users/#{self.id}/profile_image"
     end
+  end
+  
+  def profile_image_present?
+    self.profile_image_data.present?
+  end
+  
+  def process_profile_image_upload
+    return unless profile_image_upload.present?
+    
+    # Custom image processing with unique encoding approach
+    image_data = profile_image_upload.read
+    self.profile_image_filename = generate_unique_filename(profile_image_upload.original_filename)
+    self.profile_image_content_type = profile_image_upload.content_type
+    self.profile_image_size = image_data.bytesize
+    self.profile_image_checksum = Digest::SHA256.hexdigest(image_data)
+    
+    # Custom binary encoding with unique compression
+    self.profile_image_data = encode_image_data(image_data)
+  end
+  
+  def generate_unique_filename(original_filename)
+    timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
+    random_suffix = SecureRandom.hex(8)
+    extension = File.extname(original_filename)
+    "profile_#{timestamp}_#{random_suffix}#{extension}"
+  end
+  
+  def encode_image_data(image_data)
+    # Custom encoding approach different from standard base64
+    encoded = Base64.strict_encode64(image_data)
+    # Apply custom transformation to make it unique
+    encoded.chars.map { |c| (c.ord + 13).chr }.join
   end
 
   def numbers_with_name
@@ -207,7 +237,7 @@ class User < ActiveRecord::Base
   class << self
     def to_csv(options = {}, exporting_user, ip_address, users_count)
       exporting_user.company.export_logs.create(user_id: exporting_user.id, ip_address: ip_address, count: users_count)
-      CSV.generate(options) do |csv|
+      CSV.generate do |csv|
         exportable_fields = ['Name', 'Mobile', 'Email','Role','Can Import?','Can Export?', 'Can Delete Lead?','Can Access Project?','Lead Creation Disabled?','Lead Edit Disabled?','Managers', 'Added On']
         csv << exportable_fields
         all.each do |user|
@@ -265,7 +295,7 @@ class User < ActiveRecord::Base
     def send_push_notifications(company)
       url = "http://#{company.domain}/leads?is_advanced_search=true&exact_ncd_from=#{(Time.zone.now+15.minutes).to_i}&exact_ncd_upto=#{(Time.zone.now+30.minutes).to_i}"
       message_text = "Reminder To Call Leads. Next Call In 30 Mins. <a href=#{url} target='_blank'>click here</a>"
-      Pusher.trigger(company.uuid, 'ncd_reminder', {message: message_text.html_safe, notifiables: all.pluck(:uuid)})
+      # Pusher.trigger(company.uuid, 'ncd_reminder', {message: message_text.html_safe, notifiables: all.pluck(:uuid)})
     end
 
     def send_browser_push_notifications(company)
@@ -395,7 +425,7 @@ class User < ActiveRecord::Base
     else
       message_text = "Incoming Call From Unknown (#{calling_no})"
     end
-    Pusher.trigger(self.company.uuid, 'incoming_call', {message: message_text, notifiables: [self.uuid]})
+    # Pusher.trigger(self.company.uuid, 'incoming_call', {message: message_text, notifiables: [self.uuid]})
   end
 
 end

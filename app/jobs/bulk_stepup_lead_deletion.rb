@@ -6,7 +6,7 @@ class BulkStepupLeadDeletion
   def self.perform file_path
     begin
       @lead_nos=[]
-      CSV.foreach(file_path,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+      CSV.foreach(file_path, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
           @lead_nos<<row["Lead Number"]
       end
       company=Company.find(83)

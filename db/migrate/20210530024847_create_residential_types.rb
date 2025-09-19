@@ -1,4 +1,4 @@
-class CreateResidentialTypes < ActiveRecord::Migration
+class CreateResidentialTypes < ActiveRecord::Migration[7.1]
   def change
     create_table :residential_types do |t|
       t.string :property_type

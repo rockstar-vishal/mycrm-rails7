@@ -1,3 +1,35 @@
+@import "bootstrap";
+@import "adminlte";
+@import "datatables";
+@import "font-awesome";
+@import "chosen";
+@import "crm";
+@import "fullcalendar";
+@import "jquery-tablesorter/theme.default";
+// Flatpickr CSS is loaded via CDN
+@import "multi-select";
+
+// Bootstrap 5 Modal Focus Fixes
+.modal .close[data-bs-dismiss="modal"] {
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Ensure proper focus management for Bootstrap 5 modals
+.modal[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.modal[aria-hidden="false"] {
+  pointer-events: auto;
+}
+
 /*
  * This is a manifest file that'll be compiled into application.css, which will include all the files
  * listed below.
@@ -13,15 +45,3 @@
  *= require_tree .
  *= require_self3
  */
-@import "bootstrap";
-@import "adminlte";
-@import "datatables";
-@import "font-awesome";
-@import "multi-select";
-@import "chosen";
-@import "datetimepicker";
-@import "toastr";
-@import "crm";
-@import "plyr";
-@import "fullcalendar";
-@import "jquery-tablesorter/theme.default";

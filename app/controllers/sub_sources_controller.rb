@@ -38,7 +38,7 @@ class SubSourcesController < ApplicationController
 
   # PATCH/PUT /sub_sources/1
   def update
-    if @sub_source.update_attributes(sub_source_params)
+    if @sub_source.update(sub_source_params)
       flash[:notice] = "Sub source updated successfully"
       xhr_redirect_to redirect_to: sub_sources_path
     else

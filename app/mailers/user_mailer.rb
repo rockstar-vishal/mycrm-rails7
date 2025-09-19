@@ -1,5 +1,5 @@
 class UserMailer < ActionMailer::Base
-  add_template_helper(ApplicationHelper)
+  helper ApplicationHelper
 
   def share_lead_details_on_email(user, email_lists, leads, mail_params)
     @subject = mail_params[:subject]

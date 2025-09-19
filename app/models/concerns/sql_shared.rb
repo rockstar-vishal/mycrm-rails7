@@ -5,6 +5,7 @@ module SqlShared
 
   def leads_visits_combinations(search_params, company_id, user, is_source_wise: false)
     # Start with a base relation and apply common joins
+    
     relation = Lead.joins(:visits)
 
     # Conditionally apply the user or source join
@@ -32,7 +33,7 @@ module SqlShared
     end
     
     if search_params["is_visit_executed"].present?
-      relation = relation.where(visits: { is_visit_executed: search_params["is_visit_executed"] })
+      relation = relation.where(leads_visits: { is_visit_executed: search_params["is_visit_executed"] })
     end
     
     # **Corrected date comparison:** Pass Time objects directly

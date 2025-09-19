@@ -12,8 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery.remotipart
-//= require datatables
+//= require dataTables/jquery.dataTables
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require popper
 //= require moment
 //= require fullcalendar
@@ -21,18 +21,15 @@
 //= require cocoon
 //= require chosen-jquery
 //= require jquery.multi-select
-//= require bootstrap-multiselect
-//= require datetimepicker
 //= require chartkick
 //= require clipboard
 //= require Chart.bundle
-//= require plyr
 //= require pusher
-//= require toastr
 //= require adminlte.min
 //= require jquery-tablesorter
+// Flatpickr is loaded via CDN
+//= require custom_field_toggles
 //= require_tree .
-//= require signature-pad
 
 
 $(document).ready(function() {
@@ -52,22 +49,62 @@ $(document).ready(function() {
     bPaginate: false,
     bFilter: false
   });
-  $('.multi-select-list').multiselect({
-    numberDisplayed: 1,
-    enableFiltering: true,
-    enableCaseInsensitiveFiltering: true,
-    nonSelectedText: 'Please Select',
-    includeSelectAllOption: true,
-    buttonWidth: '100%',
-    maxHeight: 350,
+  $('.multi-select-list').multiSelect({
+    keySelect: [32],
+    selectableOptgroup: false,
+    disabledClass: 'disabled',
+    dblClick: false,
+    keepOrder: false,
+    cssClass: ''
   });
+
+  // Initialize multiselect elements
+  $('.multiselect').multiSelect({
+    keySelect: [32],
+    selectableOptgroup: false,
+    disabledClass: 'disabled',
+    dblClick: false,
+    keepOrder: false,
+    cssClass: ''
+  });
+
+  document.querySelectorAll('.tomselect-checkbox').forEach(function(el) {
+  new TomSelect(el, {
+    maxItems: 30,
+    plugins: {
+      'clear_button': {},
+      'remove_button': {},
+      'dropdown_input': {},
+      'checkbox_options': {
+        checkedClassNames:   ['ts-checked'],
+        uncheckedClassNames: ['ts-unchecked']
+      }
+    }
+  });
+});
+
+  // Single select TomSelect configuration
+  document.querySelectorAll('.tomselect-single').forEach(function(el) {
+  new TomSelect(el, {
+    maxItems: 1,
+    plugins: {
+      'clear_button': {},
+      'dropdown_input': {}
+    }
+  });
+});
+
 
   // clipboard js
 
-  $('.clipboard-btn').tooltip({
-    trigger: 'click',
-    placement: 'top'
+  // Initialize tooltips for Bootstrap 5
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
   });
+
+  // For clipboard buttons, use data attributes for tooltips
+  $('.clipboard-btn').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'top');
 
   $('.chosen-select').chosen({
     allow_single_deselect: true,
@@ -78,14 +115,22 @@ $(document).ready(function() {
   $('#company_cost_sheet_letter_types_chosen').attr('style', 'width: 250px !important;');
 
   function setTooltip(btn, message) {
-    $(btn).tooltip('show')
-      .attr('data-original-title', message)
-      .tooltip('show');
+    // For Bootstrap 5, we need to use the new API
+    var tooltip = bootstrap.Tooltip.getInstance(btn);
+    if (tooltip) {
+      tooltip.hide();
+    }
+    $(btn).attr('data-bs-original-title', message);
+    tooltip = new bootstrap.Tooltip(btn);
+    tooltip.show();
   }
 
   function hideTooltip(btn) {
     setTimeout(function() {
-      $(btn).tooltip('hide');
+      var tooltip = bootstrap.Tooltip.getInstance(btn);
+      if (tooltip) {
+        tooltip.hide();
+      }
     }, 1000);
   }
 
@@ -103,21 +148,127 @@ $(document).ready(function() {
   // clipboard js ends
   var date = new Date();
   var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
-  $('.datetimepickerncd').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
-  $('.datetimepickerleaseexpired').datetimepicker({timepicker: false,format:'d/m/Y', maxDate: today});
-  // For Modal
-  $(document).on('show.bs.modal', '#modal-window', function() {
-    $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
-    $('.datetimepickerncd_modal').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss", minDate: today});
-    $('.dateFormat').datetimepicker({
-      timepicker: false,
-      format:'d/m/Y'
-    });
-  })
-  $('.dateFormat').datetimepicker({
-    timepicker: false,
-    format:'d/m/Y'
+  
+  // Initialize Flatpickr for datetime fields
+  flatpickr('.datetimepicker', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    allowInput: true,
+    clickOpens: true,
+    closeOnSelect: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
+  
+  // Initialize Flatpickr for NCD fields with minimum date
+  flatpickr('.datetimepickerncd', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    minDate: today,
+    allowInput: true,
+    clickOpens: true,
+    closeOnSelect: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
+  
+  // Initialize Flatpickr for lease expired fields with maximum date
+  flatpickr('.datetimepickerleaseexpired', {
+    enableTime: false,
+    dateFormat: 'd/m/Y',
+    maxDate: today,
+    allowInput: true,
+    clickOpens: true,
+    closeOnSelect: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
+  // For Modal - Bootstrap 5
+  document.addEventListener('show.bs.modal', function(event) {
+    if (event.target.id === 'modal-window') {
+      // Initialize Flatpickr for modal datetime fields
+      flatpickr('.datetimepicker', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i:S',
+        time_24hr: true,
+        minuteIncrement: 30,
+        allowInput: true,
+        clickOpens: true,
+        closeOnSelect: true,
+        locale: {
+          firstDayOfWeek: 1
+        }
+      });
+      
+      // Initialize Flatpickr for modal NCD fields
+      flatpickr('.datetimepickerncd_modal', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i:S',
+        time_24hr: true,
+        minuteIncrement: 30,
+        minDate: today,
+        allowInput: true,
+        clickOpens: true,
+        closeOnSelect: true,
+        locale: {
+          firstDayOfWeek: 1
+        }
+      });
+      
+      // Initialize Flatpickr for modal date fields
+      flatpickr('.dateFormat', {
+        enableTime: false,
+        dateFormat: 'd/m/Y',
+        allowInput: true,
+        clickOpens: true,
+        closeOnSelect: true,
+        locale: {
+          firstDayOfWeek: 1
+        }
+      });
+    }
+  });
+  
+  // Fix Bootstrap 5 modal close button focus issues
+  document.addEventListener('hide.bs.modal', function(event) {
+    if (event.target.id === 'modal-window') {
+      // Remove focus from any focused elements before hiding
+      var focusedElement = event.target.querySelector(':focus');
+      if (focusedElement) {
+        focusedElement.blur();
+      }
+    }
+  });
+  
+  // Handle modal close button clicks properly
+  $(document).on('click', '.modal .close[data-bs-dismiss="modal"]', function(e) {
+    e.preventDefault();
+    // Remove focus before closing
+    this.blur();
+    // Get the modal instance and hide it
+    var modalElement = this.closest('.modal');
+    var modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
+    }
+  });
+  // Initialize Flatpickr for date-only fields
+  flatpickr('.dateFormat', {
+    enableTime: false,
+    dateFormat: 'd/m/Y',
+    allowInput: true,
+    clickOpens: true,
+    closeOnSelect: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
   });
 
 
@@ -397,4 +548,40 @@ function initiateLeadCalender() {
     }
   });
 }
+
+// Reinitialize TomSelect fields after modal content loads
+$(document).on('shown.bs.modal', function() {
+  // Reinitialize tomselect-checkbox fields
+  document.querySelectorAll('.tomselect-checkbox').forEach(function(el) {
+    // Check if TomSelect is already initialized
+    if (!el.classList.contains('ts-hidden-accessible')) {
+      new TomSelect(el, {
+        maxItems: 30,
+        plugins: {
+          'clear_button': {},
+          'remove_button': {},
+          'dropdown_input': {},
+          'checkbox_options': {
+            checkedClassNames:   ['ts-checked'],
+            uncheckedClassNames: ['ts-unchecked']
+          }
+        }
+      });
+    }
+  });
+  
+  // Reinitialize tomselect-single fields
+  document.querySelectorAll('.tomselect-single').forEach(function(el) {
+    // Check if TomSelect is already initialized
+    if (!el.classList.contains('ts-hidden-accessible')) {
+      new TomSelect(el, {
+        maxItems: 1,
+        plugins: {
+          'clear_button': {},
+          'dropdown_input': {}
+        }
+      });
+    }
+  });
+});
 

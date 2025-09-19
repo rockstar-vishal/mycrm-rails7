@@ -22,7 +22,7 @@ class Companies::FbFormsController < ApplicationController
   end
 
   def update
-    if @fb_form.update_attributes(update_form_params)
+    if @fb_form.update(update_form_params)
       flash[:notice] = "Updated Successfully"
     else
       flash[:error] = "Cannot Update Mapping - #{@fb_form.errors.full_messages.join(', ')}"

@@ -5,10 +5,13 @@
       .brand-logo
         - company = Company.find_by(domain: request.host)
         - if company.present?
-          - log_url = company.logo.url.present? ? "#{company.logo.url(:original)}" : 'logo.jpg'
+          - log_url = company.logo.url.present? ? company.logo.url : 'logo.jpg'
         -else
           - log_url = 'logo.png'
-        = image_tag  "#{log_url}", class: 'logo-fix-size'
+        - if log_url.start_with?('http')
+          %img.logo-fix-size{src: log_url, alt: "Company Logo"}
+        - else
+          = image_tag log_url, class: 'logo-fix-size'
     .holder-login
       #login
         %div.login-outer

@@ -1,4 +1,4 @@
-class CreateCostSheets < ActiveRecord::Migration
+class CreateCostSheets < ActiveRecord::Migration[7.1]
   def change
     create_table :cost_sheets do |t|
       t.string :project_name

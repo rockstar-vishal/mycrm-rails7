@@ -30,7 +30,7 @@ class CloudTelephonySidsController < ApplicationController
   end
 
   def update
-    if @cloud_telephony_sid.update_attributes(cloud_telephony_params)
+    if @cloud_telephony_sid.update(cloud_telephony_params)
       flash[:notice] = 'Cloud Telephony Sid Updated Successfully'
       xhr_redirect_to redirect_to: cloud_telephony_sids_path
     else

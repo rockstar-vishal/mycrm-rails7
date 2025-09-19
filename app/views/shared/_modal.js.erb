@@ -3,5 +3,24 @@
   $modal.find(".modal-content").html("<%= j (render partial) %>");
   $modal.removeClass('right');
   $modal.addClass("<%= options[:class] %>")
-  $modal.modal();
+  
+  // Bootstrap 5: Get existing modal instance or create new one
+  var modalElement = $modal[0];
+  var modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+  
+  // Ensure proper focus management
+  modal.show();
+  
+  // Fix focus management for Bootstrap 5
+  setTimeout(function() {
+    var closeButton = $modal.find('.close[data-bs-dismiss="modal"]');
+    if (closeButton.length) {
+      closeButton.on('click', function() {
+        // Remove focus before closing to prevent ARIA issues
+        this.blur();
+        // Use Bootstrap 5 method to close
+        modal.hide();
+      });
+    }
+  }, 100);
 })()

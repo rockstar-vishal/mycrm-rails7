@@ -1,12 +1,12 @@
 .col-md-12
   .lead-card.lead-follow-up
-    = link_to leads_path({todays_call_only: true, is_advanced_search: true}.merge!(params)), class: "lead-card-link" do
+    = link_to leads_path({todays_call_only: true, is_advanced_search: true}.merge(params.to_unsafe_h)), class: "lead-card-link" do
       .lead-card-icon.today_calls_leads_counts
       .lead-card-body
         %span.title Active Tasks
         %span.subtitle Calls Today
   .lead-card.lead-backlog
-    = link_to leads_path({backlogs_only: true, is_advanced_search: true}.merge!(params)), class: "lead-card-link" do
+    = link_to leads_path({backlogs_only: true, is_advanced_search: true}.merge(params.to_unsafe_h)), class: "lead-card-link" do
       .lead-card-icon= @leads.backlogs_for(@company).count
       .lead-card-body
         %span.title MFA
@@ -28,16 +28,16 @@
 
   - if @company.hot_status_ids.reject(&:blank?).present?
     .lead-card.lead-hot
-      = link_to leads_path({lead_statuses: @company.hot_status_ids, is_advanced_search: true}.merge!(params)), class: "lead-card-link" do
+      = link_to leads_path({lead_statuses: @company.hot_status_ids, is_advanced_search: true}.merge(params.to_unsafe_h)), class: "lead-card-link" do
         .lead-card-icon= @leads.where(status_id: @company.hot_status_ids).count
         .lead-card-body
           %span.title Hot Leads
           %span.subtitle Priority
-  
+
 
   - if @company.new_status_id.present?
     .lead-card.lead-new
-      = link_to leads_path({lead_statuses: [@company.new_status_id], is_advanced_search: true}.merge!(params)), class: "lead-card-link" do
+      = link_to leads_path({lead_statuses: [@company.new_status_id], is_advanced_search: true}.merge(params.to_unsafe_h)), class: "lead-card-link" do
         .lead-card-icon= @leads.where(status_id: @company.new_status_id).count
         .lead-card-body
           %span.title New Leads
@@ -46,18 +46,17 @@
 
   - if @company.booking_done_id.present?
     .lead-card.lead-booked
-      = link_to leads_path({lead_statuses: [@company.booking_done_id], is_advanced_search: true}.merge!(params)), class: "lead-card-link" do
+      = link_to leads_path({lead_statuses: [@company.booking_done_id], is_advanced_search: true}.merge(params.to_unsafe_h)), class: "lead-card-link" do
         .lead-card-icon= @leads.where(status_id: @company.booking_done_id).count
         .lead-card-body
           %span.title Booked Leads
           %span.subtitle Confirmed
-   
+    
 
   - if @company.dead_status_ids.present?
     .lead-card.lead-dead
-      = link_to leads_path({lead_statuses: @company.dead_status_ids, is_advanced_search: true}.merge!(params)), class: "lead-card-link" do
+      = link_to leads_path({lead_statuses: @company.dead_status_ids, is_advanced_search: true}.merge(params.to_unsafe_h)), class: "lead-card-link" do
         .lead-card-icon#dead_lead_counts
         .lead-card-body
           %span.title Drop off Leads
           %span.subtitle Closed
-  

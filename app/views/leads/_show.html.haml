@@ -1,6 +1,6 @@
 .modal-header
   %h5.modal-title Preview Profile
-  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+  %button.close{"aria-label" => "Close", "data-bs-dismiss" => "modal", :type => "button"}
     %span{"aria-hidden" => "true"} ×
 .modal-body.show-body
   .intro-lead-data
@@ -25,10 +25,10 @@
       
   %ul.nav.nav-tabs.nav-justified
     %li{:class => ("active" if @default_tab == 'leads-detail')}
-      = link_to '#tab1', class: "nav-link #{('active' if @default_tab == 'leads-detail')}", "data-toggle"=>"tab" do
+      = link_to '#tab1', class: "nav-link #{('active' if @default_tab == 'leads-detail')}", "data-bs-toggle"=>"tab" do
         Lead Detail
     %li{:class => ("active" if @default_tab == 'site-visit-detail')}
-      = link_to '#tab2', class: "nav-link #{('active' if @default_tab == 'site-visit-detail')}", "data-toggle"=>"tab" do
+      = link_to '#tab2', class: "nav-link #{('active' if @default_tab == 'site-visit-detail')}", "data-bs-toggle"=>"tab" do
         Visits
   .tab-content.show-content-modal
     #tab1.tab-pane.fade{:class => ("show active" if @default_tab == 'leads-detail')}
@@ -329,11 +329,11 @@
       .lead-body
         .row
           .form-group.col-md-12
-            = link_to 'New Visit Entry',new_visit_lead_path(@lead), remote: true, class: 'btn btn-new btn-sm'
+            = link_to 'New Visit Entry',new_visit_lead_path(@lead), class: 'btn btn-new btn-sm', remote: true
             .table-body
             - if @lead.visits.present?
               .table-responsive
-                %table.table.table-hover
+                %table.table.table-hover.nowrap
                   %thead
                     %tr
                       %th #
@@ -418,13 +418,93 @@
                           %td
                             = link_to print_visit_lead_path(@lead, visit, format: :pdf), target: "_blank", class: "link-edit btn btn-action" do
                               %i.fa.fa-print{"aria-hidden" => "true"}
-                        %td
-                          .action-wrapper
-                            = link_to edit_visit_lead_path(@lead, visit), remote: true, class: "btn btn-action btn-edit" do
-                              = render partial: 'icons/edit'
-                            - if current_user.is_super?
-                              = link_to delete_visit_lead_path(@lead, visit), remote: true, method: :delete, class: 'btn btn-action btn-remove', data: {confirm: "Are you sure?"} do
-                                = render partial: 'icons/clear'
+                        %td.nowrap
+                          
+                          = link_to edit_visit_lead_path(@lead, visit), remote: true, class: "btn btn-action btn-edit" do
+                            = render partial: 'icons/edit'
+                          - if current_user.is_super?
+                            = link_to delete_visit_lead_path(@lead, visit), method: :delete, remote: true, class: 'btn btn-action btn-remove', data: {confirm: "Are you sure you want to delete this visit?", turbo: false} do
+                              = render partial: 'icons/clear'
             - else
               %h3
                 = "No Visits Avaliable"
+
+:javascript
+  // Handle visit deletion
+  $(document).ready(function() {
+    var deleteButtons = {};
+    
+    // Prevent double submission and handle click
+    $(document).on('click', 'a[data-method="delete"][href*="visits"]', function(e) {
+      var deleteBtn = $(this);
+      var visitId = $(this).attr('href').match(/\/visits\/(\d+)/)[1];
+      
+      // Check if button is already disabled
+      if (deleteBtn.hasClass('disabled')) {
+        e.preventDefault();
+        return false;
+      }
+      
+      // Store button reference and disable it
+      deleteButtons[visitId] = deleteBtn;
+      deleteBtn.addClass('disabled').css('opacity', '0.6');
+      
+      // Re-enable after 3 seconds as fallback
+      setTimeout(function() {
+        if (deleteButtons[visitId]) {
+          deleteButtons[visitId].removeClass('disabled').css('opacity', '1');
+          delete deleteButtons[visitId];
+        }
+      }, 3000);
+    });
+    
+    // Use traditional AJAX events (should work even with Turbo)
+    $(document).on('ajax:success', 'a[data-method="delete"][href*="visits"]', function(event, data, status, xhr) {
+      var visitId = $(this).attr('href').match(/\/visits\/(\d+)/)[1];
+      
+      // Find and remove the visit row
+      var visitRow = $('tr').filter(function() {
+        return $(this).find('a[href*="/visits/' + visitId + '"]').length > 0;
+      });
+      
+      if (visitRow.length > 0) {
+        visitRow.fadeOut(300, function() {
+          $(this).remove();
+          
+          // Check if there are any visits left
+          var remainingVisits = $('table tbody tr').length;
+          if (remainingVisits === 0) {
+            $('table').after('<h3>No Visits Available</h3>');
+          }
+        });
+      }
+      
+      // Show success message
+      if (typeof toastr !== 'undefined') {
+        toastr.success('Visit deleted successfully');
+      }
+      
+      // Re-enable button
+      if (deleteButtons[visitId]) {
+        deleteButtons[visitId].removeClass('disabled').css('opacity', '1');
+        delete deleteButtons[visitId];
+      }
+    });
+    
+    // Handle AJAX errors
+    $(document).on('ajax:error', 'a[data-method="delete"][href*="visits"]', function(event, xhr, status, error) {
+      var visitId = $(this).attr('href').match(/\/visits\/(\d+)/)[1];
+      
+      if (typeof toastr !== 'undefined') {
+        toastr.error('Error deleting visit');
+      } else {
+        alert('Error deleting visit');
+      }
+      
+      // Re-enable button
+      if (deleteButtons[visitId]) {
+        deleteButtons[visitId].removeClass('disabled').css('opacity', '1');
+        delete deleteButtons[visitId];
+      }
+    });
+  });

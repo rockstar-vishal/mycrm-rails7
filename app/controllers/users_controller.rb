@@ -46,13 +46,9 @@ class UsersController < ApplicationController
   end
 
   def update
-    if params[:user][:password].blank?
-      params[:user].delete(:password)
-      params[:user].delete(:password_confirmation)
-    end
-    if @user.update_attributes(user_params)
-      flash[:notice] = "User updated successfully"
-      redirect_to users_path and return
+    if @user.update(user_params)
+      flash[:notice] = "User Updated Successfully"
+      redirect_to users_path
     else
       render 'edit'
     end
@@ -68,11 +64,11 @@ class UsersController < ApplicationController
       params[:user].delete(:password)
       params[:user].delete(:password_confirmation)
     end
-    if @user.update_attributes(user_profile_params)
-      flash[:success] = 'Updated Successfully'
-      redirect_to request.referer and return
+    if @user.update(user_profile_params)
+      flash[:notice] = "Profile Updated Successfully"
+      redirect_to users_path
     else
-      render 'edit_profile'
+      render 'edit'
     end
   end
 
@@ -80,30 +76,67 @@ class UsersController < ApplicationController
     @users = current_user.manageables
     render_modal 'edit_user_config'
   end
+  
+  def profile_image
+    user = User.find(params[:id])
+    if user.profile_image_data.present?
+      # Custom decoding approach
+      decoded_data = decode_image_data(user.profile_image_data)
+      send_data decoded_data, 
+                type: user.profile_image_content_type, 
+                disposition: 'inline',
+                filename: user.profile_image_filename
+    else
+      head :not_found
+    end
+  end
+  
+  
+  def decode_image_data(encoded_data)
+    # Custom decoding approach matching the encoding method
+    decoded = encoded_data.chars.map { |c| (c.ord - 13).chr }.join
+    Base64.strict_decode64(decoded)
+  end
 
   def enable_round_robin
     current_user.manageables.each do |user|
       if params[:users_list].present?
-        params[:users_list].include?(user.id.to_s) ? user.update_attributes(:round_robin_enabled => true) : user.update_attributes(:round_robin_enabled => false)
+        params[:users_list].include?(user.id.to_s) ? user.update(:round_robin_enabled => true) : user.update(:round_robin_enabled => false)
       end
     end
     company = current_user.company
-    if company.update_attributes(:round_robin_enabled => true)
+    if company.update(:round_robin_enabled => true)
       flash[:notice] = "Round Robin Assignment enabled successfully"
     else
       flash[:alert] = "Cannot enable Round Robin Assignment - #{company.errors.full_messages.join(', ')}"
     end
-    redirect_to configurations_path and return
+    
+    respond_to do |format|
+      format.js do
+        render js: "window.location.href = '#{configurations_path}';"
+      end
+      format.html do
+        redirect_to configurations_path
+      end
+    end
   end
 
   def disable_round_robin
     company = current_user.company
     current_user.manageables.round_robin_users.each do |user|
       if params[:users_list].present?
-        params[:users_list].include?(user.id.to_s) ? user.update_attributes(:round_robin_enabled => true) : user.update_attributes(:round_robin_enabled => false)
+        params[:users_list].include?(user.id.to_s) ? user.update(:round_robin_enabled => true) : user.update(:round_robin_enabled => false)
       else
         flash[:alert] = "Atleast one user should have round robin enabled"
-        redirect_to request.referer and return
+        respond_to do |format|
+          format.js do
+            xhr_redirect_to redirect_to: request.referer
+          end
+          format.html do
+            redirect_to request.referer
+          end
+        end
+        return
       end
     end
 
@@ -115,12 +148,20 @@ class UsersController < ApplicationController
       end
     end
 
-    if users.count > 1 || (users.count == 1 && company.update_attributes(:round_robin_enabled => false))
+    if users.count > 1 || (users.count == 1 && company.update(:round_robin_enabled => false))
       flash[:notice]  = "Round Robin Assignment disabled successfully"
     else
       flash[:alert] = "Cannot disable this functionality - #{company.errors.full_messages.join(',')}"
     end
-    redirect_to request.referer and return
+    
+    respond_to do |format|
+      format.js do
+        xhr_redirect_to redirect_to: request.referer
+      end
+      format.html do
+        redirect_to request.referer
+      end
+    end
   end
 
   def destroy
@@ -166,6 +207,11 @@ class UsersController < ApplicationController
       )
     end
 
+    def users_params
+      params.permit(:search_query, :page, :is_advanced_search, :name, :email, :mobile, :created_at_from, :created_at_upto, :updated_from, :updated_upto, role_ids: [])
+    end
+    helper_method :users_params
+
     def user_params
       permitted = params.require(:user).permit(
         :name,
@@ -202,6 +248,7 @@ class UsersController < ApplicationController
         :users_sources_attributes => [:id, :_destroy, :source_id, :user_id],
         :user_detail_attributes => [:id, :paid_incentive, :pending_incentive, :earned_incentive]
       )
+      permitted = permitted.except(:password, :password_confirmation) if permitted[:password].blank?
       permitted.merge!(company_id: params[:user][:company_id]) if current_user.is_sysad?
       permitted
     end
@@ -213,7 +260,7 @@ class UsersController < ApplicationController
         :email,
         :password,
         :password_confirmation,
-        :image
+        :profile_image_upload
       )
     end
 end

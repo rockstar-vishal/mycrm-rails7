@@ -1,6 +1,6 @@
 .modal-header
   %h5#flatBlockTitle.modal-title Block Flat: #{@flat_name}
-  %button.hide.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+  %button.hide.close{"aria-label" => "Close", "data-bs-dismiss" => "modal", :type => "button"}
     %span{"aria-hidden" => "true"} ×
 .modal-body
   - if current_user.company.setting.present? && current_user.company.enable_flat_details
@@ -73,20 +73,19 @@
         %label{:for => ""} Comments
         = text_area_tag :comment, nil, rows: 2, class: "form-control"
   .modal-footer
-  %button.btn.bg-gradient-primary.block-flat{"data-dismiss" => "modal"} Save changes
+  %button.btn.bg-gradient-primary.block-flat{"data-bs-dismiss" => "modal"} Save changes
 
 :javascript
   $('.multi-select-list').each(function(){
     var text = $(this).closest('select').data('prompt-name')
     text = text ? 'Select '+ text : 'Please Select'
-    $(this).multiselect({
-      numberDisplayed: 1,
-      enableFiltering: true,
-      enableCaseInsensitiveFiltering: true,
-      nonSelectedText: text,
-      includeSelectAllOption: true,
-      buttonWidth: '100%',
-      maxHeight: 350,
+    $(this).multiSelect({
+      keySelect: [32],
+      selectableOptgroup: false,
+      disabledClass: 'disabled',
+      dblClick: false,
+      keepOrder: false,
+      cssClass: ''
     });
   });
 

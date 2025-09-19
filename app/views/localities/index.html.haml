@@ -29,7 +29,7 @@
                             = fa_icon "search"
                 .col-md-7
                   .group-link
-                    = link_to params.except(:action, :controller).merge!(format: :csv), class: "btn btn-action ml-auto" do
+                    = link_to localities_params.merge!(format: :csv), class: "btn btn-action ml-auto" do
                       = render 'icons/export'
                       Export
 

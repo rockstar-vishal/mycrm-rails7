@@ -32,7 +32,7 @@ class CallInsController < ApplicationController
   end
 
   def update
-    if @call_in.update_attributes(call_in_params)
+    if @call_in.update(call_in_params)
       flash[:notice] = "Call In updated successfully"
       xhr_redirect_to redirect_to: call_ins_path
     else

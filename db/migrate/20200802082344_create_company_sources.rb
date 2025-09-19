@@ -1,4 +1,4 @@
-class CreateCompanySources < ActiveRecord::Migration
+class CreateCompanySources < ActiveRecord::Migration[7.1]
   def change
     create_table :company_sources do |t|
       t.integer :source_id, index: true

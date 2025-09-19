@@ -1,4 +1,4 @@
-class CreateAuditLogs < ActiveRecord::Migration
+class CreateAuditLogs < ActiveRecord::Migration[7.1]
   def change
     create_table :audit_logs do |t|
       t.integer :company_id

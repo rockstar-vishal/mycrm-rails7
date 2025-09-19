@@ -1,4 +1,4 @@
-class CreateLeadsCallLogs < ActiveRecord::Migration
+class CreateLeadsCallLogs < ActiveRecord::Migration[7.1]
   def change
     create_table :leads_call_logs do |t|
       t.integer  :lead_id

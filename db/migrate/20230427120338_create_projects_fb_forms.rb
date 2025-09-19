@@ -1,4 +1,4 @@
-class CreateProjectsFbForms < ActiveRecord::Migration
+class CreateProjectsFbForms < ActiveRecord::Migration[7.1]
   def change
     create_table :projects_fb_forms do |t|
       t.string :form_no

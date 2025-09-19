@@ -23,7 +23,7 @@
 
           .table-body
             .table-responsive
-              %table.table.table-hover.dataTables.responsive.nowrap{style: 'width:100%!important'}
+              %table.table.table-hover.responsive.nowrap{style: 'width:100%!important'}
                 %thead
                   %tr
                     %th.all Sr.
@@ -75,7 +75,7 @@
               .modal-content
                 .modal-header
                   %h5.modal-title Import Spend
-                  %button.close{"data-dismiss" => "modal", "aria-label" => "Close"}
+                  %button.close{"data-bs-dismiss" => "modal", "aria-label" => "Close"}
                     %span{"aria-hidden" => "true"} ×
                 .modal-body
                   = form_for :campaign, url: import_spend_campaigns_path, remote: true, html: {id: "spend-form", multipart: true} do |f|

@@ -1,41 +1,52 @@
-require File.expand_path('../boot', __FILE__)
+require_relative "boot"
 
-require 'rails/all'
-require 'csv'
+require "rails/all"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 module CoreltoLeadQuest
   class Application < Rails::Application
-    config.action_mailer.delivery_method = :smtp
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 7.1
 
-    config.action_mailer.smtp_settings = {
-                                            :user_name => "AKIARRQ5JN5T54YDEF53",
-                                            :password => "BLAemLncb7tr7WqJppih3+mKyILQe8EFipjierUHmVSa",
-                                            :domain => "corelto.co",
-                                            :address => "email-smtp.ap-south-1.amazonaws.com",
-                                            :port => 25,
-                                            :authentication => :plain,
-                                            :enable_starttls_auto => true
-                                        }
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w(assets tasks))
 
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    # config.time_zone = "Central Time (US & Canada)"
+    # config.eager_load_paths << Rails.root.join("extras")
 
-    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
-    # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = 'Asia/Kolkata'
+    # Only loads a smaller set of middleware suitable for API only apps.
+    # Middleware like session, flash, cookies can be added back manually.
+    # Skip views, helpers and assets when generating a new resource.
     config.api_only = false
-    config.middleware.insert_before 0, "Rack::Cors" do
-      allow do
-        origins '*'
-        resource '*', :headers => :any, :methods => [:get, :post, :options, :put, :patch, :delete]
-      end
-    end
-    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-    config.i18n.default_locale = :en
+
+    # Configure the default encoding
+    config.encoding = "utf-8"
+
+    # Configure sensitive parameters which will be filtered from the log file.
+    config.filter_parameters += [:password]
+
+    # Enable escaping HTML in JSON.
+    config.active_support.escape_html_entities_in_json = true
+
+    # Version of your assets, change this if you want to expire all your assets
+    config.assets.version = '1.0'
+
+    # Prevent circular dependencies during initialization
+    config.autoload_paths += %W(#{config.root}/app/models/concerns)
+    config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
+
+    # Disable ActiveStorage since we're using Paperclip
+    config.active_storage.service = :local
+    config.active_storage.resolve_model_to_route = :rails_storage_redirect
   end
 end

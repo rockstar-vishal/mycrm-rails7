@@ -1,4 +1,4 @@
-class CreateCompaniesReasons < ActiveRecord::Migration
+class CreateCompaniesReasons < ActiveRecord::Migration[7.1]
   def change
     remove_column :companies, :rejection_reasons, :text
     remove_column :leads, :dead_reason, :string

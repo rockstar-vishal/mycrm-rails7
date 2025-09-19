@@ -1,4 +1,4 @@
-class CreateCompaniesIntegrations < ActiveRecord::Migration
+class CreateCompaniesIntegrations < ActiveRecord::Migration[7.1]
   def change
     create_table :companies_integrations do |t|
       t.integer :company_id

@@ -1,9 +1,9 @@
 .modal-header
   %h5.modal-title Add Visit
-  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+  %button.close{"aria-label" => "Close", :type => "button", onclick: "closeVisitFormModal()"}
     %span{"aria-hidden" => "true"} ×
 .modal-body
-  = bootstrap_form_for @lead, url: :create_visit_lead, method: :post, remote: true do |f|
+  = bootstrap_form_for @lead, url: create_visit_lead_path(@lead), method: :post, remote: true, multipart: true do |f|
     - if @lead.errors.any?
       #error_explanation
         %h2
@@ -12,7 +12,7 @@
         %ul
           - @lead.errors.full_messages.each do |message|
             %li= message
-    = f.fields_for :visits, @visits, remote: true do |f|
+    = f.fields_for :visits, @visits || @lead.visits.build, remote: true do |f|
       = hidden_field_tag :authenticity_token, form_authenticity_token
       = hidden_field_tag :enable_advance_visits, @lead.company.setting.present? && @lead.company.enable_advance_visits
       .row
@@ -29,14 +29,14 @@
             .form-group.ch-select
               = f.select :project_ids, options_from_collection_for_select(current_user.company.projects, :id, :name, f.object.project_ids), { label: 'Projects'}, {class: 'form-control chosen-select', multiple: true}
         .w-100
-        .col-md-6#check_visit_executed{:style => ("display:none;" unless (@lead.company.setting.present? && @lead.company.enable_advance_visits))}
+        .col-md-12#check_visit_executed{:style => ("display:none;" unless (@lead.company.setting.present? && @lead.company.enable_advance_visits))}
           .row
-            .col-md-6
-              = f.check_box :is_visit_executed, class: "visit_executed", style: "margin-top: 40px;"
-            .col-md-6
-              = f.check_box :is_postponed, class: "visit_postponed", style: "margin-top: 40px;"
-            .col-md-6
-              = f.check_box :is_canceled, class: "visit_postponed", style: "margin-top: 40px;"
+            .col-md-4
+              = f.check_box :is_visit_executed, class: "visit_executed"
+            .col-md-4
+              = f.check_box :is_postponed, class: "visit_postponed"
+            .col-md-4
+              = f.check_box :is_canceled, class: "visit_postponed"
         - if @company.is_allowed_for_visits?('location')
           .col-md-6
             = f.text_field :location, class: "form-control", placeholder: "Location"
@@ -47,8 +47,8 @@
           .col-md-6
             = f.text_field :finalization_period, class: "form-control", placeholder: "Finalization Period"
         .col-12.visit_executed_fields
-          .col-md-12
-            = f.file_field :site_visit_form, label: 'Visit Form', class: "form-control"
+        
+          = f.file_field :site_visit_form, label: 'Visit Form', class: "form-control"
       .visit_executed_fields
         .row
           .col-md-12
@@ -80,16 +80,65 @@
           - if @company.is_allowed_for_visits?('own_contribution_maximum')
             .col-md-6
               = f.text_field :own_contribution_maximum, class: "form-control", placeholder: "Maximum Own Contriution", label: "Maximum Own Contribution"
-      .col-md-12
-        .form-group
-          = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
-           
-            Save
-          = link_to lead_path(@lead), remote: true, class: "btn btn-delete" do
-            
-            Cancel
+      
+      .form-group
+        = button_tag type: "submit", class: "btn btn-new", data: {disable_with: "Please Wait..."} do
+          
+          Save
+        = button_tag type: "button", class: "btn btn-delete", onclick: "closeVisitFormModal()" do
+          
+          Cancel
 :javascript
-  $('.datetimepicker').datetimepicker({dateFormat: "yy-mm-dd HH:ii:ss"});
+  // Function to close visit form modal and return to show modal with visits tab
+  function closeVisitFormModal() {
+    // Close the current modal (visit form)
+    var modal = bootstrap.Modal.getInstance(document.getElementById('modal-window'));
+    if (modal) {
+      modal.hide();
+    }
+    
+    // After modal closes, reopen the show modal with visits tab
+    setTimeout(function() {
+      // Make AJAX request to show the lead with visits tab active
+      $.ajax({
+        url: '#{lead_path(@lead, tab: "site-visit-detail")}',
+        type: 'GET',
+        dataType: 'script',
+        success: function() {
+          // Modal will be opened by the show action
+        }
+      });
+    }, 300); // Small delay to ensure modal is fully closed
+  }
+
+  // Prevent double form submission by disabling submit button after first click
+  $(document).ready(function() {
+    $('form[data-remote]').on('submit', function(e) {
+      var submitBtn = $(this).find('button[type="submit"]');
+      var originalText = submitBtn.text();
+      
+      // Disable button and show loading state
+      submitBtn.prop('disabled', true).text('Please Wait...');
+      
+      // Re-enable button after 3 seconds as fallback
+      setTimeout(function() {
+        submitBtn.prop('disabled', false).text(originalText);
+      }, 3000);
+    });
+  });
+  
+  // Initialize Flatpickr for datetime fields
+  flatpickr('.datetimepicker', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i:S',
+    time_24hr: true,
+    minuteIncrement: 30,
+    allowInput: true,
+    clickOpens: true,
+    locale: {
+      firstDayOfWeek: 1
+    }
+  });
   $(".finance").click(function(){
     $("#finance-content").toggle();
   });

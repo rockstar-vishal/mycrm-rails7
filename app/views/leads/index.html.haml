@@ -1,13 +1,13 @@
 .content-wrapper
   .content-header
-    .container-fluid
-      .row
-        .col-md-12
-          %ol.breadcrumb
-            %li.breadcrumb-item
-              %a{:href => "/"} Home
-            %li.breadcrumb-item.active Funnel
-          %h1.m-0 Funnel
+    .row
+      .col-md-12
+        %ol.breadcrumb
+          %li.breadcrumb-item
+            %a{:href => "/"} Home
+          %li.breadcrumb-item.active Funnel
+        %h1.m-0 Funnel
+      .col-md-12
         - if @company.setting.present? && @company.enable_cards_on_advance_search
           = render "filtered_index_buckets", locals: {:@company => @company, :@leads => @leads}
         - elsif @company.card_status.reject(&:blank?).present?
@@ -22,8 +22,8 @@
         .col-lg-12
           .table-card
             .search-card
-              .row
-                .col-md-6
+              .action-bar
+                %div
                   .search-outer
                     = form_tag leads_path, method: :get do
                       .search-group
@@ -41,18 +41,19 @@
                     %a#adv-search{:href => "javascript:void(0);", :class=>"btn btn-filter"}
                       = render 'icons/filters'
                       Smart Search
-                .col-md-6
+                %div
                   .group-link
                     - if current_user.is_super? || current_user.can_import
                       = link_to import_leads_path, :class=>"ml-auto", target: "_blank" do
                         = render 'icons/import'
                         Import
                     - if current_user.is_super? || current_user.can_export? || (current_user.is_executive? && @company.setting.present? && @company.enable_executive_export_leads)
-                      = link_to params.except(:action, :controller).merge!(format: :csv), class: "" do
+
+                      = link_to search_params.merge!(format: :csv), class: "" do
                         = render 'icons/export'
                         Export
                     - if current_user.is_super? && @company.enable_lead_export && current_user.company.daily_file_exports < 2
-                      = link_to params.except(:action, :controller), remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
+                      = link_to params.except(:action, :controller).to_unsafe_h, remote: true, class: "", data: { confirm: "Are you sure you want to export all leads?" } do
                         = render 'icons/export'
                         Export All
                     = link_to calender_view_leads_path, class: "" do
@@ -63,7 +64,7 @@
                     = link_to new_lead_path, class: "btn-new #{current_user.disable_create_lead ? ' disabled' : ''}" do
                       
                       Add Lead
-              - magic_fields = @company.magic_fields
+              - magic_fields = @company&.magic_fields || []
               - magic_field_names = magic_fields.pluck(:name)
               = render partial: "advance_search_form", locals: {magic_fields: magic_fields}
             = render partial: 'dailing_modal'
@@ -74,7 +75,7 @@
                 - if current_user.is_super? || current_user.can_import?
                   = render 'bulk_action'
                 .table-responsive
-                  %table.table.tablesorter
+                  %table.table.tablesorter.table-hover
                     %thead
                       %tr
                         - unless params[:deactivated].present?
@@ -98,20 +99,20 @@
                         -if company_index_fields.include?("status_id")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "status_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "status_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Stage
                             - else
-                              = link_to params.merge(key: "status_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "status_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Stage
                         -if company_index_fields.include?('presale_stage_id')
                           %th Stage
                         -if company_index_fields.include?("project_id")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "project_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "project_id", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Project
                             - else
-                              = link_to params.merge(key: "project_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "project_id", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Product
                         -if company_index_fields.include?("broker_id")
                           %th Broker
@@ -122,10 +123,10 @@
                         -if company_index_fields.include?("ncd")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "ncd", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "ncd", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Follow up 
                             - else
-                              = link_to params.merge(key: "ncd", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "ncd", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Follow up 
                         -if company_index_fields.include?("budget")
                           %th Budget
@@ -148,10 +149,10 @@
                         -if company_index_fields.include?("created_at")
                           %th.sorter-false
                             - if params["sort"].present? and params["sort"] == "desc"
-                              = link_to params.merge(key: "created_at", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "created_at", sort: "asc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Created at
                             - else
-                              = link_to params.merge(key: "created_at", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
+                              = link_to search_params.merge(key: "created_at", sort: "desc"), class: "lead-collapse", "aria-controls" => "collapseOne", role: "button" do
                                 Created at
                         - magic_index_fields.each do |field|
                           %th
@@ -174,7 +175,7 @@
                                   - source_def_data = lead.source&.name
                                   
                                   - if lead.source.present?
-                                    %span{class: "badge bg-gradient-#{find_class(lead.source)}", title: source_def_data, "data-toggle": "tooltip"}
+                                    %span{class: "badge bg-gradient-#{find_class(lead.source)}", title: source_def_data, "data-bs-toggle": "tooltip"}
                                       = source_def_data
                             - if magic_index_fields.include?("firm_name")
                               %td= lead.firm_name
@@ -211,7 +212,7 @@
                                       - visit_count = lead.visits.count
                                     - unless visit_count.zero?
                                       %br
-                                      = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
+                                      = link_to lead_path(lead, tab: 'site-visit-detail'), title: "#{visit_count} Visits", "data-bs-toggle": "tooltip", class: "badge bg-gradient-success", remote: true do
                                         = "Visits: #{visit_count}"
                             -if company_index_fields.include?('presale_stage_id')
                               %td= lead.presales_stage&.name
@@ -283,7 +284,7 @@
                   %div#zentrixcloudiframeHolder
                 - if @leads.present?
                   
-                  %strong{style: "text-align: center; display: block;"} Lead Count - #{@leads_count}
+                  %label{style: "text-align: center; display: block;"} Lead Count - #{@leads_count}
                   = will_paginate @leads, :class  =>  "ct-pag"
 
 :javascript

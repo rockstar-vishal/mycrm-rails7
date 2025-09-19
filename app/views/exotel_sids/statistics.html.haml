@@ -39,9 +39,9 @@
       %b Today's Activity
       %ul#statisticsTab.nav.nav-tabs{:role => "tablist"}
         %li.nav-item{:role => "presentation"}
-          %a.nav-link.active{"aria-controls" => "incoming-stats", "aria-selected" => "true", "data-toggle" => "tab", :href => "#incoming-stats", :role => "tab"} Incoming Calls
+          %a.nav-link.active{"aria-controls" => "incoming-stats", "aria-selected" => "true", "data-bs-toggle" => "tab", :href => "#incoming-stats", :role => "tab"} Incoming Calls
         %li.nav-item{:role => "presentation"}
-          %a.nav-link{"aria-controls" => "outgoing-stats", "aria-selected" => "false", "data-toggle" => "tab", :href => "#outgoing-stats", :role => "tab"} Outgoing Calls
+          %a.nav-link{"aria-controls" => "outgoing-stats", "aria-selected" => "false", "data-bs-toggle" => "tab", :href => "#outgoing-stats", :role => "tab"} Outgoing Calls
       #statisticsTabContent.tab-content
         #incoming-stats.tab-pane.fade.show.active{"aria-labelledby" => "home-tab", :role => "tabpanel"}
           .row

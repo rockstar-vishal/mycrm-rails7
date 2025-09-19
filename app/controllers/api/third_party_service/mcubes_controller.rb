@@ -4,16 +4,21 @@ class Api::ThirdPartyService::McubesController < PublicApiController
 
   def callback
     @call_log = Leads::CallLog.find_by(sid: mcube_params[:callid])
-    if @call_log.update(
-      start_time: Time.zone.parse(mcube_params[:starttime]),
-      end_time: (Time.zone.parse(mcube_params[:endtime]) rescue nil),
-      recording_url: mcube_params[:filename],
-      duration: mcube_params[:answeredtime],
-      status: mcube_params[:status]
-    )
-      render :json=>{:status=>"Success"}
+    
+    if @call_log.present?
+      if @call_log.update(
+        start_time: Time.zone.parse(mcube_params[:starttime]),
+        end_time: (Time.zone.parse(mcube_params[:endtime]) rescue nil),
+        recording_url: mcube_params[:filename],
+        duration: mcube_params[:answeredtime],
+        status: mcube_params[:status]
+      )
+        render :json=>{:status=>"Success"}
+      else
+        render :json=>{:status=>"Failure"}
+      end
     else
-      render :json=>{:status=>"Failure"}
+      render :json=>{:status=>"Call log not found"}, status: 404
     end
   end
 
@@ -66,7 +71,7 @@ class Api::ThirdPartyService::McubesController < PublicApiController
       user_id = (@company.users.active.find_by(email: mcube_params[:empemail]&.downcase) || @company.users.active.superadmins.first).id
     end
     if @lead.present?
-      @lead.update_attributes(project_id: project || @company.default_project&.id)
+      @lead.update(project_id: project || @company.default_project&.id)
     else
       @lead = @company.leads.build(
         name: mcube_params[:callername].present? ? mcube_params[:callername] :  '--',
@@ -189,7 +194,7 @@ class Api::ThirdPartyService::McubesController < PublicApiController
   private
 
   def find_company
-    @company = Company.joins(:mcube_groups).where("mcubegroups.number ILIKE ?", "%#{mcube_params[:landingnumber]&.last(10)}").where(mcube_groups: { is_active: true }).first ||
+    @company = Company.joins(:mcube_groups).where("mcube_groups.number ILIKE ?", "%#{mcube_params[:landingnumber]&.last(10)}").where(mcube_groups: { is_active: true }).first ||
   Company.joins(:mcube_groups).where(mcube_groups: { number: mcube_params[:landingnumber], is_active: true }).first
     render json: {status: false, message: "Invalid"}, status: 404 and return if @company.blank?
   end

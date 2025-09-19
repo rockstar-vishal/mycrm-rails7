@@ -36,7 +36,7 @@ class CampaignsController < ApplicationController
   end
 
   def update
-    if @campaign.update_attributes(campaign_params)
+    if @campaign.update(campaign_params)
       flash[:notice] = "Campaign updated successfully"
       xhr_redirect_to redirect_to: campaigns_path
     else

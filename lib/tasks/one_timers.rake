@@ -39,7 +39,7 @@ namespace :one_timers do
   task :populate_missing_user_id_in_audits  => :environment do
     company_id = 14
     ::Audited::Audit.where(associated_id: company_id, associated_type: 'Company').where(user_id: nil, auditable_type: 'Lead').find_each do |audit|
-      audit.update_attributes(user_id: audit.auditable&.user_id, user_type: 'User')
+      audit.update(user_id: audit.auditable&.user_id, user_type: 'User')
       puts "Done For #{audit&.auditable&.lead_no}"
     end
   end
@@ -52,7 +52,7 @@ namespace :one_timers do
   task :seed_leads => :environment do
     @errors = []
     file = "#{Rails.root}/public/leads-jee-vee.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
       begin
         company_id = 11
         company = Company.find(11)
@@ -96,7 +96,7 @@ namespace :one_timers do
   task :seed_projects => :environment do
     @errors = []
     file = "#{Rails.root}/public/grd_reality.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
       begin
         company_id = 17
         company = Company.find(company_id)
@@ -148,7 +148,7 @@ namespace :one_timers do
       exportable_fields << 'Tentative Visit Time'
       csv << exportable_fields
 
-      company.leads.where(created_at: DateTime.now.beginning_of_day - 2.week..DateTime.now.end_of_day).includes{project.city}.each do |client|
+      company.leads.where(created_at: DateTime.now.beginning_of_day - 2.week..DateTime.now.end_of_day).includes(project: :city).each do |client|
         dead_reason = ""
         if company.dead_status_ids.include?(client.status_id)
           dead_reason = client.dead_reason.reason
@@ -178,8 +178,8 @@ namespace :one_timers do
 
   task :set_lead_revisit=> :environment do
     company = Company.find(36)
-    company.leads.joins{visits}.select{|x| x.visits.count > 1}.each do |lead|
-      lead.update_attributes(revisit: true)
+    company.leads.joins(:visits).select{|x| x.visits.count > 1}.each do |lead|
+      lead.update(revisit: true)
     end
   end
 
@@ -222,7 +222,7 @@ namespace :one_timers do
   task :set_lead_site_visit_planned => :environment do
     company = Company.find(36)
     company.leads.where.not(tentative_visit_planned: nil).each do |lead|
-      lead.update_attributes(is_site_visit_scheduled: true)
+      lead.update(is_site_visit_scheduled: true)
     end
   end
 
@@ -266,7 +266,7 @@ namespace :one_timers do
     @errors = []
     company = Company.find_by_id(49)
     file = "#{Rails.root}/public/cp_palkhi_sheet.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       begin
         name = row["CP NAME"]&.strip
         firm_name = row["CP FIRM NAME"]&.strip
@@ -347,7 +347,7 @@ namespace :one_timers do
     @errors=[]
     company = Company.find(71)
     file = "#{Rails.root}/public/edgebrokerlist.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       begin
         name = row["CP Name"]&.strip
         firm_name = row["CP Firm Name"]&.strip
@@ -381,7 +381,7 @@ namespace :one_timers do
     files = ["minal_cp", "pavan_cp", "sanket_cp", "akshay_cp", "sanjana_cp"]
     files.each do |f|
       file = "#{Rails.root}/public/#{f}.csv"
-      CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+      CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
         begin
           name = row["CP Name"].strip
           email=  "#{f}#{index}@sample.com"
@@ -443,7 +443,7 @@ namespace :one_timers do
     @errors=[]
     company = Company.find(220)
     file = "#{Rails.root}/public/site_visit_data.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       lead_no = row["Lead Number"]&.strip
       lead = company.leads.find_by(lead_no: lead_no)
       date = row["Visited Date"]&.strip
@@ -494,7 +494,7 @@ namespace :one_timers do
     company = Company.find(10)
     cp_ids=[]
     file = "#{Rails.root}/public/golden-abode-del-brokers.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       cp_ids << row["CP Uuid"]&.strip
     end
     company.brokers.where(uuid: cp_ids).destroy_all
@@ -552,7 +552,7 @@ namespace :one_timers do
   task populate_visit: :environment do
     file="#{Rails.root}/public/sv-data.csv"
     company=Company.find(164)
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       lead_no=row["Lead Number"].strip
       visit_date=Date.parse(row["Created at"].strip)
       lead=company.leads.find_by(lead_no: lead_no)
@@ -686,13 +686,13 @@ namespace :one_timers do
   task update_leads_from_partner_data: :environment do
     company=Company.find(164)
     file = "#{Rails.root}/public/partners_visit_data.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}).with_index(1) do |row, index|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8").with_index(1) do |row, index|
       lead_id = row["Lead Id"]&.strip
       lead = company.leads.find(lead_id)
       comment=row["Comment"]
       created_at=row["Visit date"].strip
       if lead.present?
-        lead.update_attributes(created_at: created_at, comment: comment)
+        lead.update(created_at: created_at, comment: comment)
         puts "Lead id: #{lead_id} updated."
       end
     end
@@ -806,7 +806,7 @@ namespace :one_timers do
     @errors=[]
     company = Company.find(19)
     file = "#{Rails.root}/public/propangel-additional-dids.csv"
-    CSV.foreach(file,{:headers=>:first_row, :encoding=> "iso-8859-1:utf-8"}) do |row|
+    CSV.foreach(file, headers: :first_row, encoding: "iso-8859-1:utf-8") do |row|
       did_number= row["DID Numbers"]&.strip
       sid = CloudTelephonySid.find_or_initialize_by(
         number: did_number,
@@ -957,4 +957,76 @@ namespace :one_timers do
       end
     end
   end
+
+  task seed_callerdesk: :environment do
+    DATA_HASH = {
+      "8884898765"  => '0714749d-e8b6-45cf-989b-b402c34eb574',
+      "9212222900"  => '0714749d-e8b6-45cf-989b-b402c34eb574',
+      "7838737374"  => '32f6c7af-842b-4a60-81aa-de00186ef4dc',
+      "08069247832" => 'bab52de2-8cda-4aff-b9c2-1940c3d59e12',
+      "8929676861"  => 'bab52de2-8cda-4aff-b9c2-1940c3d59e12'
+    }
+
+    SETTING_HASH = {
+      "7838737374" => { source_id: 536 }
+    }
+
+    DATA_HASH.each do |number, uuid|
+      company = Company.find_by(uuid: uuid)
+      unless company
+        puts "No company found for UUID #{uuid} (number: #{number}), skipping..."
+        next
+      end
+      source_id = SETTING_HASH.dig(number, :source_id)
+      telephony_sid = CloudTelephonySid.find_or_initialize_by(number: number)
+      telephony_sid.assign_attributes(
+        description: "Cloud telephony number #{number}",
+        is_active: true,
+        company_id: company.id,
+        vendor: 4,
+        caller_id: number,
+        source_id: source_id
+      )
+      telephony_sid.save
+      puts "Created CloudTelephonySid for #{number} (Company: #{company.id})"
+    end
+  end
+
+  task seed_ivr_manager: :environment do
+    DATA_HASH = {
+      "8238087100" => "52f7cad2-c299-4a51-b33c-c10cf8fab5ef",
+      "8238084445" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799",
+      "9998881927" => "a3b0cc86-f9ae-40f8-95d7-4ad28bd64799"
+    }
+
+    SETTING_HASH = {
+      "8238084445" => { project_id: 6395 },
+      "9998881927" => { project_id: 6396 }
+    }
+
+    DATA_HASH.each do |number, uuid|
+      company = Company.find_by(uuid: uuid)
+      unless company
+        puts "No company found for UUID #{uuid} (number: #{number}), skipping..."
+        next
+      end
+      project_id = SETTING_HASH.dig(number, :project_id)
+      unless company.projects.find_by(id: project_id).present?
+        project_id = company.default_project&.id
+      end
+      telephony_sid = CloudTelephonySid.find_or_initialize_by(number: number)
+      telephony_sid.assign_attributes(
+        description: "Cloud telephony number #{number}",
+        is_active: true,
+        company_id: company.id,
+        vendor: 7,
+        caller_id: number,
+        project_id: project_id
+      )
+      telephony_sid.save
+      puts "Created CloudTelephonySid for #{number} (Company: #{company.id})"
+    end
+
+  end
+
 end

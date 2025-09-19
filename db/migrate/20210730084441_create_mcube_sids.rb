@@ -1,4 +1,4 @@
-class CreateMcubeSids < ActiveRecord::Migration
+class CreateMcubeSids < ActiveRecord::Migration[7.1]
   def change
     create_table :mcube_sids do |t|
       t.string :number

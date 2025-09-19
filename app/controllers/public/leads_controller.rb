@@ -1,5 +1,6 @@
 module Public
   class LeadsController < ::PublicApiController
+    include MagicFieldsPermittable
     def call_in_create
       if params["dispnumber"].blank? && params["caller_id"].blank?
         render json: {status: false, message: "Customer and Enquiry number both are required"}, status: 422
@@ -25,10 +26,36 @@ module Public
 
     def partner_create
       render json: {status: false, message: "Broker / Company / Project UUID not sent"}, status: 400 and return if params[:company_uuid].blank? || params[:broker_uuid].blank? || params[:project_uuid].blank?
+      
       company = Company.find_by_uuid params[:company_uuid]
+      render json: {status: false, message: "Company not found"}, status: 400 and return unless company
+      
       broker = company.brokers.find_by_partner_broker_uuid params[:broker_uuid]
+      render json: {status: false, message: "Broker not found"}, status: 400 and return unless broker
+      
       project = company.projects.find_by_uuid params[:project_uuid]
-      lead = broker.leads.build(lead_params.merge(project_id: project.id, source_id: ::Source::CHANNEL_PARTNER, status_id: company.booking_done_id, company_id: company.id))
+      render json: {status: false, message: "Project not found"}, status: 400 and return unless project
+      
+      # Get the parameters and separate magic fields from regular attributes
+      params_data = lead_params.merge(project_id: project.id, source_id: ::Source::CHANNEL_PARTNER, status_id: company.booking_done_id, company_id: company.id, partner_lead_no: params[:partner_lead_no])
+      magic_field_names = magic_field_names_for_company(company)
+      
+      # Filter out magic fields from regular attributes
+      regular_params = params_data.except(*magic_field_names)
+      
+      # Create lead with regular attributes
+      lead = broker.leads.build(regular_params)
+      
+      # Handle magic fields by creating MagicAttribute records
+      magic_field_names.each do |field_name|
+        if params_data[field_name].present?
+          magic_field = company.magic_fields.find_by(name: field_name.to_s)
+          if magic_field
+            lead.magic_attributes.build(magic_field: magic_field, value: params_data[field_name])
+          end
+        end
+      end
+      
       if lead.save
         render json: {status: true, message: "Success"}, status: 201 and return
       else
@@ -59,7 +86,14 @@ module Public
     private
 
     def lead_params
-      params.permit(:name, :email, :mobile, :comment)
+      # For partner_create, we get company from the params
+      if params[:company_uuid].present?
+        company = Company.find_by_uuid(params[:company_uuid])
+        standard_lead_params(company, [])
+      else
+        # Fallback for other methods
+        standard_lead_params(Company.first, [])
+      end
     end
   end
 end

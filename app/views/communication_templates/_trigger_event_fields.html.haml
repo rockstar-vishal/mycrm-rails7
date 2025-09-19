@@ -4,11 +4,11 @@
     .col-md-3
       .form-group
         = f.label :object_entity, 'Object Entity'
-        = f.collection_select :object_entity, ['Lead'], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect", required: true
+        = f.collection_select :object_entity, ['Lead'], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control", required: true
     .col-md-3
       .form-group
         = f.label :receiver_type, 'Receiver Type'
-        = f.collection_select :receiver_type, ['Lead', 'User'], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect", required: true
+        = f.collection_select :receiver_type, ['Lead', 'User'], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control", required: true
     .col-md-3
       .form-group
         = f.label :trigger_hook_type, 'Event Hook Type'
@@ -16,7 +16,7 @@
     .col-md-3
       .form-group
         = f.label :trigger_type, 'Trigger Type'
-        = f.collection_select :trigger_type, ["On Create", "On Update"], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control multiselect", required: true
+        = f.collection_select :trigger_type, ["On Create", "On Update"], :to_s, :humanize, { include_blank: 'Please Select', hide_label: true }, class: "form-control", required: true
     .col-md-3
       .form-group
         = f.label :template_id, 'Template ID'

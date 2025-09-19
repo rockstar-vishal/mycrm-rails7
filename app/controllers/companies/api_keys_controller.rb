@@ -32,7 +32,7 @@ class Companies::ApiKeysController < ApplicationController
   end
 
   def update
-    if @key.update_attributes(key_params)
+    if @key.update(key_params)
       flash[:notice] = "API Keys updated successfully"
       xhr_redirect_to redirect_to: companies_api_keys_path
     else
@@ -58,6 +58,6 @@ class Companies::ApiKeysController < ApplicationController
     end
 
     def key_params
-      params.require(:companies_api_key).permit(:source_id, :user_id, :project_id)
+      params.require(:companies_api_key).permit(:user_id, :project_id, :source_id)
     end
 end

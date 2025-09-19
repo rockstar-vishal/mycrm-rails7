@@ -1,4 +1,4 @@
-class CreateFacebookExternals < ActiveRecord::Migration
+class CreateFacebookExternals < ActiveRecord::Migration[7.1]
   def change
     create_table :facebook_externals do |t|
       t.string :fbform_id
