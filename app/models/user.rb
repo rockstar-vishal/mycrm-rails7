@@ -134,7 +134,7 @@ class User < ActiveRecord::Base
   end
 
   def is_telecaller?
-    return self.role.name == "Telecaller"
+    return ["Telemarketer", "Telecaller"].include?(self.role&.name)
   end
 
   def is_sl_admin?
