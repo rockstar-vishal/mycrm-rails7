@@ -5,7 +5,7 @@ module Public
     before_action :find_broker, only: [:settings, :submit_cp_lead]
     before_action :find_lead, only: [:schedule_client_visit, :client_settings, :lead_details]
     def settings
-      render json: {broker_uuid: @broker.uuid, projects: @company.projects.as_api_response(:details)}
+      render json: {broker_uuid: @broker.uuid, projects: @company.projects.as_api_response(:details), broker: @broker.as_api_response(:details)}
     end
 
     def client_settings

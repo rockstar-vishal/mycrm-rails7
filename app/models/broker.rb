@@ -1,6 +1,7 @@
 require 'csv'
 
 class Broker < ActiveRecord::Base
+  acts_as_api
   EXPORT_LIMIT = 5000
   PER_PAGE = 20
   include AppSharable
@@ -27,6 +28,13 @@ class Broker < ActiveRecord::Base
   RERA_STATUS=["Yes", "No", "Work In Progress"]
   after_commit :broker_integration_to_postsale, on: :create, if: :enable_broker_integration?
   after_commit :broker_integration_to_partner_crm, on: :create, if: :enable_partner_crm_integration?
+
+  api_accessible :details do |t|
+    t.add :cp_code
+    t.add :name
+    t.add :firm_name
+    t.add :uuid
+  end
 
   def enable_broker_integration?
     self.company.setting.present? && self.company.setting.biz_integration_enable && self.company.setting.broker_integration_enable
