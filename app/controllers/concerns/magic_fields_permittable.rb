@@ -36,7 +36,7 @@ module MagicFieldsPermittable
     # Handle conflicts between regular Lead attributes and magic fields
     # If a field is both a regular attribute and a magic field, exclude it from base_params
     # and let the dynamic setters handle it as a magic field
-    conflicting_fields = [:budget] # Add other conflicting fields here if needed
+    conflicting_fields = [:budget, :city] # Add other conflicting fields here if needed
     magic_fields.each do |field|
       if conflicting_fields.include?(field)
         base_params.delete(field)

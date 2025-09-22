@@ -2,6 +2,7 @@ module Api
   module MobileCrm
     class LeadsController < ::Api::MobileCrmController
       include MagicFieldsPermittable
+      include Base64ImageHandler
 
       before_action :find_accessible_leads
 
@@ -45,7 +46,11 @@ module Api
 
       def create
         lead = @leads.new
-        lead.assign_attributes(lead_params)
+        
+        # Process image parameter if it's a base64 data URI
+        params_data = process_base64_image_param(lead_params)
+        
+        lead.assign_attributes(params_data)
         lead.user_id = @current_app_user.id if lead.user_id.blank?
         if lead.save
           render json: {status: true, message: "Success"}, status: 201 and return
@@ -159,6 +164,7 @@ module Api
       def search_params
         search_params_with_magic_fields(@current_app_user.company)
       end
+
     end
   end
 end

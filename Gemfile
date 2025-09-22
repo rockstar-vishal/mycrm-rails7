@@ -7,6 +7,7 @@ ruby '3.4.1'
 gem 'rails', '~> 7.1.0'
 gem 'bootsnap', require: false
 gem 'puma', '~> 6.0'
+gem "rqrcode", "~> 3.0"
 
 # Database
 gem 'pg', '~> 1.5'

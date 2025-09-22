@@ -1176,7 +1176,41 @@ class Lead < ActiveRecord::Base
 
   def comment=(default_value)
     if default_value.present?
-      comment = "#{self.comment_was} \n #{Time.zone.now.strftime("%d-%m-%y %H:%M %p")} (#{(Lead.current_user.name rescue nil)}) : #{default_value}"
+      # Server-side deduplication: Check if the same comment was added recently
+      current_user_name = (Lead.current_user.name rescue nil)
+      new_comment_text = default_value.strip
+      
+      # Check if the last comment entry matches the new comment (within last 5 minutes)
+      if self.comment_was.present?
+        # Extract the last comment entry (everything after the last timestamp pattern)
+        last_comment_match = self.comment_was.match(/(\d{2}-\d{2}-\d{2} \d{2}:\d{2} [AP]M) \(([^)]+)\) : (.*)$/m)
+        
+        if last_comment_match
+          last_timestamp = last_comment_match[1]
+          last_user = last_comment_match[2]
+          last_comment_text = last_comment_match[3].strip
+          
+          # Parse the timestamp to check if it's within the last 5 minutes
+          begin
+            last_time = Time.zone.strptime(last_timestamp, "%d-%m-%y %H:%M %p")
+            time_diff = Time.zone.now - last_time
+            
+            # If same user, same comment text, and within 5 minutes, skip adding duplicate
+            if last_user == current_user_name && 
+               last_comment_text == new_comment_text && 
+               time_diff <= 5.minutes
+              Rails.logger.info "Prevented duplicate comment for lead #{self.id}: '#{new_comment_text}' by #{current_user_name}"
+              return # Don't add the duplicate comment
+            end
+          rescue ArgumentError
+            # If timestamp parsing fails, continue with adding the comment
+            Rails.logger.warn "Could not parse timestamp '#{last_timestamp}' for lead #{self.id}, adding comment anyway"
+          end
+        end
+      end
+      
+      # Add the new comment
+      comment = "#{self.comment_was} \n #{Time.zone.now.strftime("%d-%m-%y %H:%M %p")} (#{current_user_name}) : #{new_comment_text}"
       write_attribute(:comment, comment)
     end
   end

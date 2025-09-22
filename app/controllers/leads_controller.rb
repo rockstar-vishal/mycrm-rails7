@@ -146,12 +146,18 @@ class LeadsController < ApplicationController
 
   def show
     @default_tab = params[:tab] || 'leads-detail' 
-    render_modal('show', {:class=>'right'})
+    respond_to do |format|
+      format.js { render_modal('show', {:class=>'right'}) }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def new_visit
     @visits = @lead.visits.build
-    render_modal('site_visit_form')
+    respond_to do |format|
+      format.js { render_modal('site_visit_form') }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def create_visit
@@ -175,11 +181,16 @@ class LeadsController < ApplicationController
     @default_tab = "site-visit-detail"
     @visit = @lead.visits.find(params[:visit_id])
     if @visit.destroy
-      flash[:notice] = "Visit Deleted Successfully"
+      respond_to do |format|
+        format.js { render js: "// Visit deleted successfully" }
+        format.html { redirect_to leads_path, notice: "Visit Deleted Successfully" }
+      end
     else
-      flash[:alert] = "Error!"
+      respond_to do |format|
+        format.js { render js: "alert('Error deleting visit');" }
+        format.html { redirect_to leads_path, alert: "Error deleting visit" }
+      end
     end
-    render_modal('show', {:class=>'right'})
   end
 
   def new
@@ -261,7 +272,10 @@ class LeadsController < ApplicationController
 
   def edit_visit
     @visits=@lead.visits.find(params[:visit_id])
-    render_modal('site_visit_form')
+    respond_to do |format|
+      format.js { render_modal('site_visit_form') }
+      format.html { redirect_to leads_path }
+    end
   end
 
   def print_visit

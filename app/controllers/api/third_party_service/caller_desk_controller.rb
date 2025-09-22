@@ -6,18 +6,6 @@ module Api
 
       before_action :find_company, except: [:call_logs]
 
-      DATA_HASH = {
-        "8884898765" => '0714749d-e8b6-45cf-989b-b402c34eb574',
-        "9212222900" => '0714749d-e8b6-45cf-989b-b402c34eb574',
-        "7838737374" => '32f6c7af-842b-4a60-81aa-de00186ef4dc',
-        "08069247832" => 'bab52de2-8cda-4aff-b9c2-1940c3d59e12',
-        "8929676861" => 'bab52de2-8cda-4aff-b9c2-1940c3d59e12'
-      }
-
-      SETTING_HASH = {
-        "7838737374" => {source_id: 536}
-      }
-
       def call_logs
         @call_log = Leads::CallLog.where(sid: call_params["CallSid"]).last
         if @call_log.update(
@@ -34,7 +22,7 @@ module Api
       end
 
       def hangup
-        selected_source_id = (SETTING_HASH.select{|sh| sh[call_params["DestinationNumber"]]}.values.first[:source_id] rescue 2)
+        selected_source_id = @cloud_telephonysid.source_id || CloudTelephonySid::DEFAULT_SOURCE
         user = @company.users.find_by(mobile: call_params["DialWhomNumber"]&.last(10)) || @company.users.active.superadmins.first
         project_id =  (user.caller_desk_project_id || @company.default_project&.id)
         phone = call_params["SourceNumber"]&.last(10)
@@ -78,7 +66,8 @@ module Api
       private
 
       def find_company
-        @company = Company.find_by(uuid: DATA_HASH[params["DestinationNumber"]]) rescue nil
+        @cloud_telephonysid = CloudTelephonySid.active.callerdesk.where(number: params["CloudTelephonySid"]).last
+        @company = @cloud_telephonysid.try(:company)
         if @company.blank?
           render json: {status: false, message: "Invalid IVR"}, status: 400 and return
         end

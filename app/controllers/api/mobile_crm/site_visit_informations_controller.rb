@@ -2,6 +2,7 @@ module Api
   module MobileCrm
     class SiteVisitInformationsController < ::Api::MobileCrmController
       include MagicFieldsPermittable
+      include Base64ImageHandler
       before_action :authenticate, except: [:settings, :create_lead, :fetch_broker, :create_broker, :fetch_lead, :get_users, :get_cp_ids, :get_executives, :get_projects, :get_sources, :get_sub_sources, :get_brokers, :get_cities, :get_locality, :get_visit_status, :get_brokers_by_firm_name, :get_brokers_firm_name]
       before_action :find_company, :set_api_key, only: [:create_lead, :settings, :fetch_broker, :create_broker, :fetch_lead, :get_users, :get_projects, :get_sources, :get_sub_sources, :get_brokers, :get_cities, :get_executives,  :get_locality, :get_cp_ids, :get_visit_status, :get_brokers_by_firm_name, :get_brokers_firm_name]
       before_action :set_leads, only: [:create_lead, :fetch_lead]
@@ -33,8 +34,37 @@ module Api
         params_data = lead_params.merge(:status_id=>status_id)
         magic_field_names = magic_field_names_for_company(@company)
         
-        # Filter out magic fields from regular attributes
+        # Process image parameter if it's a base64 data URI
+        params_data = process_base64_image_param(params_data)
+        
+        # Handle conflicting fields (fields that are both regular attributes and magic fields)
+        conflicting_fields = [:city, :budget] # Add other conflicting fields here if needed
+        conflicting_magic_fields = magic_field_names & conflicting_fields
+        
+        # Filter out magic fields from regular attributes, including conflicting ones
         regular_params = params_data.except(*magic_field_names)
+        
+        # Remove conflicting fields from regular_params to prevent AssociationTypeMismatch
+        conflicting_magic_fields.each do |field|
+          regular_params.delete(field)
+          Rails.logger.info "Removed conflicting field '#{field}' from regular_params (handled as magic field)"
+        end
+        
+        # Handle city field specifically - if it's a string, convert it to city_id or remove it
+        if regular_params[:city].present? && regular_params[:city].is_a?(String)
+          city_name = regular_params[:city]
+          # Try to find the city by name in the global City model
+          city = City.find_by(name: city_name)
+          if city
+            regular_params[:city_id] = city.id
+            regular_params.delete(:city)
+            Rails.logger.info "Converted city string '#{city_name}' to city_id: #{city.id}"
+          else
+            # If city not found, remove it to prevent AssociationTypeMismatch
+            regular_params.delete(:city)
+            Rails.logger.info "Removed city string '#{city_name}' - city not found"
+          end
+        end
         
         # Update existing lead with regular attributes
         @lead.assign_attributes(regular_params)
@@ -412,6 +442,7 @@ module Api
       end
 
       private
+
 
       def inactive_partner_lead
         request = {"phone" => @lead.mobile.last(10), "project_name"=>@lead.project.name, "lead_no"=>@lead.lead_no}

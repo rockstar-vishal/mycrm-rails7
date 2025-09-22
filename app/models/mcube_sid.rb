@@ -1,8 +1,8 @@
 class McubeSid < ActiveRecord::Base
 
   belongs_to :company
-  belongs_to :project
-  belongs_to :sub_source
+  belongs_to :project, optional: true
+  belongs_to :sub_source, optional: true
   validates :number, presence: true, uniqueness: true
 
   scope :active, -> { where(is_active: true) }
