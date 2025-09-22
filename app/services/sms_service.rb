@@ -12,9 +12,15 @@ class SmsService
         variables = prepare_variables(sv.other_data, otp.validatable_data, otp.code)
         rendered_template = render_template(url, variables)
         if sv.request_method=="post"
-          response = ExotelSao.secure_post("#{rendered_template}", {})
-          sent = true
-          message= response["message"]["message-id"] rescue nil
+          if rendered_template.include?("headers")
+            base_url, payload, headers = parse_msg91_url(rendered_template, otp)
+            response = RestClient.post(base_url, payload.to_json, headers)
+            return true, response
+          else
+            response = ExotelSao.secure_post("#{rendered_template}", {})
+            sent = true
+            message= response["message"]["message-id"] rescue nil
+          end
           return true, response
         else
           url = URI(rendered_template)
@@ -31,6 +37,34 @@ class SmsService
       rescue Exception => e
         return false, e.to_s
       end
+    end
+
+    def parse_msg91_url(otp_form_url, otp)
+      decoded_raw = CGI.unescape(otp_form_url)
+      base_url    = decoded_raw[/^https:\/\/control\.msg91\.com\/api\/v5\/flow/]
+      payload_str = decoded_raw[/payload\s*=\s*\{.*\}\]/].to_s.sub("payload =", "").strip
+      headers_str = decoded_raw[/headers\s*=\s*\{.*\}/].to_s.sub("headers =", "").strip
+
+      mobile_number = payload_str[/mobiles:\s*(\d+)/, 1]
+      otp_code      = payload_str[/var1:\s*(\d+)/, 1]
+      mobile_number = normalize_mobile(mobile_number)
+
+      payload = {
+        template_id: payload_str[/template_id:\s*([a-z0-9]+)/, 1],
+        recipients: [{ mobiles: mobile_number, var1: otp_code }]
+      }
+      headers = {}
+      headers_str.scan(/(\w[\w\-]*)\s*=>\s*([^,}\s]+)/) do |k, v|
+        headers[k] = v
+      end
+
+      [base_url, payload, headers]
+    end
+
+    def normalize_mobile(number)
+      return nil unless number
+      return "91#{number}" if number.length == 10
+      number.start_with?("91") ? number : "91#{number}"
     end
 
     def send_otp(otp)
