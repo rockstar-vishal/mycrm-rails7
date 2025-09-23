@@ -36,7 +36,7 @@ class ProcessGbkgroupQrGenerationTrigger
 
         File.open(qr_file_path, "wb") { |file| file.write(png.to_s) }
       end
-      media_url = "http://gbk-realty.leadquest.corelto.co/tes.png"
+      media_url = "https://#{lead.company.domain}/tes.png"
       request = {
         "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
         "campaignName": campaign_data[:campaign_name],
@@ -82,7 +82,7 @@ class ProcessGbkgroupQrGenerationTrigger
         campaign_name: "Site Visit Confirmation Qr",
         template_params: [
           lead.name,
-          "Vishwajeet Empire - Pale Ambernath East" || lead.project&.name,
+          lead.project&.name || "Vishwajeet Empire - Pale Ambernath East",
           "https://bit.ly/empirelocation",
           lead.tentative_visit_planned&.strftime("%d-%m-%Y") || "Date",
           lead.tentative_visit_planned&.strftime("%I:%M %p") || "Time"
@@ -96,7 +96,7 @@ class ProcessGbkgroupQrGenerationTrigger
         template_params: [
         	lead.name,
           lead.project&.name || "Project",
-          "https://qr-gbk-realty.leadquest.corelto.co/SiteVisit/#{lead.lead_no}",
+          "https://qr-#{lead.company.domain}/SiteVisit/#{lead.lead_no}",
         ]
       }
     end
