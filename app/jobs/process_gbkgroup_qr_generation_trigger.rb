@@ -12,8 +12,7 @@ class ProcessGbkgroupQrGenerationTrigger
       formatted_status = new_lead ? "lead_creation" : "send_site_visit_url"
       campaign_data = send(formatted_status, lead, broker)
       qr_file_path = nil
-
-      if formatted_status == "lead_creation"
+      if formatted_status == "send_site_visit_url"
         qrcode = RQRCode::QRCode.new(lead.lead_no)
 
         png = qrcode.as_png(
@@ -37,19 +36,21 @@ class ProcessGbkgroupQrGenerationTrigger
         File.open(qr_file_path, "wb") { |file| file.write(png.to_s) }
       end
       media_url = "https://#{lead.company.domain}/tes.png"
-      request = {
-        "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
-        "campaignName": campaign_data[:campaign_name],
-        "destination": "+91#{lead.mobile.to_s.last(10)}",
-        "userName": lead.name,
-        "templateParams": campaign_data[:template_params]
-      }
-      request['media'] = {
-        "url": media_url,
-        "filename": "QR"
-      } if formatted_status == "lead_creation"
-      RestClient.post(url, request)
-      @process_gbkgroup_whatsapp_logger.info("WhatsApp sent to Lead: #{lead.id}")
+      if formatted_status == "send_site_visit_url"
+        request = {
+          "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
+          "campaignName": campaign_data[:campaign_name],
+          "destination": "+91#{lead.mobile.to_s.last(10)}",
+          "userName": lead.name,
+          "templateParams": campaign_data[:template_params]
+        }
+        request['media'] = {
+          "url": media_url,
+          "filename": "QR"
+        } if formatted_status == "send_site_visit_url"
+        RestClient.post(url, request)
+        @process_gbkgroup_whatsapp_logger.info("WhatsApp sent to Lead: #{lead.id}")
+      end
 
       if formatted_status == "lead_creation"
         broker_request = {
@@ -58,10 +59,6 @@ class ProcessGbkgroupQrGenerationTrigger
           "destination": "+91#{broker.mobile.to_s.last(10)}",
           "userName": broker.name,
           "templateParams": campaign_data[:template_params]
-        }
-        broker_request['media'] = {
-        "url": media_url,
-        "filename": "QR"
         }
         RestClient.post(url, broker_request)
         @process_gbkgroup_whatsapp_logger.info("WhatsApp sent to Broker: #{broker.id}")
@@ -79,24 +76,25 @@ class ProcessGbkgroupQrGenerationTrigger
   class << self
     def lead_creation(lead, broker)
       {
-        campaign_name: "Site Visit Confirmation Qr",
+        campaign_name: "3_lead_new",
         template_params: [
           lead.name,
-          lead.project&.name || "Vishwajeet Empire - Pale Ambernath East",
-          "https://bit.ly/empirelocation",
-          lead.tentative_visit_planned&.strftime("%d-%m-%Y") || "Date",
-          lead.tentative_visit_planned&.strftime("%I:%M %p") || "Time"
         ]
       }
     end
 
     def send_site_visit_url(lead, broker)
+      pickup_location = lead.magic_attributes.find_by(
+        magic_field: lead.company.magic_fields.find_by(name: "pickup_location")
+      )&.value || ""
       {
-        campaign_name: "CpFormAutoMessage",
+        campaign_name: "Site Visit Confirmation Qr",
         template_params: [
-        	lead.name,
-          lead.project&.name || "Project",
-          "https://qr-#{lead.company.domain}/SiteVisit/#{lead.lead_no}",
+          lead.name,
+          lead.project&.name || "Vishwajeet Empire - Pale Ambernath East",
+          pickup_location || "https://bit.ly/empirelocation",
+          lead.tentative_visit_planned&.strftime("%d-%m-%Y") || "Date",
+          lead.tentative_visit_planned&.strftime("%I:%M %p") || "Time"
         ]
       }
     end
