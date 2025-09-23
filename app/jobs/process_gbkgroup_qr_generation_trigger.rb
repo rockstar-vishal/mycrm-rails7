@@ -11,6 +11,32 @@ class ProcessGbkgroupQrGenerationTrigger
       url = "https://backend.api-wa.co/campaign/tradai/api/v2"
       formatted_status = new_lead ? "lead_creation" : "send_site_visit_url"
       campaign_data = send(formatted_status, lead, broker)
+      qr_file_path = nil
+
+      if formatted_status == "lead_creation"
+        qrcode = RQRCode::QRCode.new(lead.lead_no)
+
+        png = qrcode.as_png(
+          bit_depth: 1,
+          border_modules: 4,
+          color_mode: ChunkyPNG::COLOR_GRAYSCALE,
+          color: "black",
+          file: nil,
+          fill: "white",
+          module_px_size: 11,
+          resize_exactly_to: false,
+          resize_gte_to: false,
+          size: 300
+        )
+
+        folder_path = Rails.root.join("public")
+        FileUtils.mkdir_p(folder_path) unless Dir.exist?(folder_path)
+
+        qr_file_path = folder_path.join("tes.png")
+
+        File.open(qr_file_path, "wb") { |file| file.write(png.to_s) }
+      end
+      media_url = "http://gbk-realty.leadquest.corelto.co/tes.png"
       request = {
         "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
         "campaignName": campaign_data[:campaign_name],
@@ -19,7 +45,7 @@ class ProcessGbkgroupQrGenerationTrigger
         "templateParams": campaign_data[:template_params]
       }
       request['media'] = {
-        "url": "https://660090b18d6e.ngrok-free.app/tes.png",
+        "url": media_url,
         "filename": "QR"
       } if formatted_status == "lead_creation"
       RestClient.post(url, request)
@@ -34,17 +60,19 @@ class ProcessGbkgroupQrGenerationTrigger
           "templateParams": campaign_data[:template_params]
         }
         broker_request['media'] = {
-        "url": "https://660090b18d6e.ngrok-free.app/tes.png",
+        "url": media_url,
         "filename": "QR"
         }
         RestClient.post(url, broker_request)
         @process_gbkgroup_whatsapp_logger.info("WhatsApp sent to Broker: #{broker.id}")
       end
+       if File.exist?(qr_file_path)
+        File.delete(qr_file_path)
+      end
 
     rescue => e
       @process_gbkgroup_whatsapp_logger.error("Error sending WhatsApp for Lead #{lead&.id}: #{e.message}")
     end
-
     true
   end
 
@@ -68,7 +96,7 @@ class ProcessGbkgroupQrGenerationTrigger
         template_params: [
         	lead.name,
           lead.project&.name || "Project",
-          "https://corelto.com/",
+          "https://qr-gbk-realty.leadquest.corelto.co/SiteVisit/#{lead.lead_no}",
         ]
       }
     end

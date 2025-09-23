@@ -33,7 +33,7 @@ class ProcessGbkgroupWhatsappTrigger
 
   class << self
     def lead_creation(lead, arg)
-      { campagin_name: "LeadCreation", template_params: [lead.name] }
+      { campagin_name: "3_lead_new", template_params: [lead.name] }
     end
 
     def site_visit_planned(lead, arg)
