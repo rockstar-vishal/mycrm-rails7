@@ -54,7 +54,7 @@ class AutoMessageWhenLeadStatusIsMarked
         template_params: [
           lead.name,
           lead.project&.name,
-          "https://qr-gbk-realty.leadquest.corelto.co/SiteVisit/#{lead.lead_no}"
+          "https://qr-#{lead.company.domain}/SiteVisit/#{lead.lead_no}"
         ]
       }
     end
