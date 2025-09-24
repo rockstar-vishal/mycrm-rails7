@@ -500,11 +500,11 @@ class Lead < ActiveRecord::Base
       phone = self.mobile
       dead_status_ids = self.company.dead_status_ids
       booking_done_id = self.company.booking_done_id
-      combined_ids=dead_status_ids + [booking_done_id]
+      combined_ids = dead_status_ids + [booking_done_id]
       if self.company.global_validation.present?
-        leads = self.company.leads.where.not(:id=>self.id).where.not(:status_id=>dead_status_ids, source_id: self.source_id).where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(mobile, 10) ILIKE ?)", email, "#{phone.last(10) if phone.present?}")
+        leads = self.company.leads.where.not(:id=>self.id).where.not(:status_id=>dead_status_ids).where.not(source_id: self.source_id).where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(mobile, 10) ILIKE ?)", email, "#{phone.last(10) if phone.present?}")
       else
-        leads = self.company.leads.where.not(:id=>self.id).where.not(:status_id=>combined_ids, source_id: self.source_id).where(project_id: self.project_id).where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(mobile, 10) ILIKE ?)", email, "#{phone.last(10) if phone.present?}")
+        leads = self.company.leads.where.not(:id=>self.id).where.not(:status_id=>combined_ids).where.not(source_id: self.source_id).where(project_id: self.project_id).where("((email != '' AND email IS NOT NULL) AND email = ?) OR ((mobile != '' AND mobile IS NOT NULL) AND RIGHT(mobile, 10) ILIKE ?)", email, "#{phone.last(10) if phone.present?}")
       end
       if leads.present?
         original_lead = leads.last
