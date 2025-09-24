@@ -30,6 +30,8 @@ class Broker < ActiveRecord::Base
   after_commit :broker_integration_to_postsale, on: :create, if: :enable_broker_integration?
   after_commit :broker_integration_to_partner_crm, on: :create, if: :enable_partner_crm_integration?
 
+  before_validation :set_defaults, on: :create
+
   api_accessible :details do |t|
     t.add :cp_code
     t.add :name
@@ -39,6 +41,17 @@ class Broker < ActiveRecord::Base
 
   def enable_broker_integration?
     self.company.setting.present? && self.company.setting.biz_integration_enable && self.company.setting.broker_integration_enable
+  end
+
+  def set_defaults
+    self.cp_code = generate_uniq_cp_code if self.cp_code.blank?
+  end
+
+  def generate_uniq_cp_code
+    return loop do
+      random_code = SecureRandom.hex(4).upcase
+      break random_code unless self.class.exists?(cp_code: random_code)
+    end
   end
 
   def enable_partner_crm_integration?
