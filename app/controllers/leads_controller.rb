@@ -1,7 +1,7 @@
 class LeadsController < ApplicationController
   include MagicFieldsPermittable
   before_action :set_leads
-  before_action :set_lead, only: [:show, :delete_visit, :make_call,:new_visit, :create_visit, :edit, :update, :destroy, :histories, :edit_visit, :deactivate, :print_visit, :cp_lead_form_whatsapp]
+  before_action :set_lead, only: [:show, :delete_visit, :make_call,:new_visit, :create_visit, :edit, :update, :destroy, :histories, :edit_visit, :deactivate, :print_visit, :shoot_wa_to_interested_lead]
 
   respond_to :html
   PER_PAGE = 20
@@ -573,7 +573,7 @@ class LeadsController < ApplicationController
     redirect_to leads_path and return
   end
 
-  def cp_lead_form_whatsapp
+  def shoot_wa_to_interested_lead
     if @company.client_visit_qr
       Resque.enqueue(::AutoMessageWhenLeadStatusIsMarked, @lead.id)
       redirect_to leads_path, notice: "Whatsapp message sent"
