@@ -22,7 +22,7 @@ class Leads::CallLog < ActiveRecord::Base
   COMPLETED_STATUS=['completed', 'ANSWER', 'Call Complete', 'answered']
 
 	belongs_to :lead, class_name: "::Lead"
-  belongs_to :user, class_name: '::User'
+  belongs_to :user, class_name: '::User', optional: true
 
   has_many :call_attempts, through: :lead
 
