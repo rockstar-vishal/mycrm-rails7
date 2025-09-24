@@ -133,9 +133,10 @@ module Api
       def marketing_incoming_call
         project_id =  @exotel.project_id || @company.default_project&.id
         phone = exotel_params["CallFrom"]&.last(10)
-        if @exotel.is_round_robin_enabled? && ::Leads::CallLog::MISSED_STATUS.include?(exotel_params["DialCallStatus"])
+        if @exotel.is_round_robin_enabled?
           user_id = @exotel.find_round_robin_user
-        else
+        end
+        if exotel_params["DialWhomNumber"].present?
           user_id = @company.users.find_by(mobile: exotel_params["DialWhomNumber"]&.last(10))&.id
         end
         if @company.setting.global_validation.present?
