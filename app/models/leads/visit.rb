@@ -74,7 +74,7 @@ class Leads::Visit < ActiveRecord::Base
       Resque.enqueue(kclass, self.lead.id)
     elsif company.whatsapp_integration.present? && company.whatsapp_integration.integration_key.present? && company.whatsapp_integration.user_name == "GBK Group"
       time = Time.now.strftime("%d-%B-%Y, %H:%M %p")
-      Resque.enqueue(::ProcessGbkgroupWhatsappTrigger, self.lead.id, time)
+      Resque.enqueue(::ProcessGbkgroupWhatsappTrigger, self.lead.id, time, 'visit_done')
     end
   end
 end

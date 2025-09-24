@@ -16,6 +16,7 @@ module Public
       render json: {message: "Invalid Data"}, status: 400 and return if @broker.uuid != params[:broker_uuid]
       lead = create_new_lead lead_params.merge(broker_id: @broker.id)
       if lead.save
+        lead.gbk_group_qr_generation(new_lead = true)
         render json: {message: "Lead Saved", data: {lead_no: lead.reload.lead_no}}, status: 200 and return
       else
         render json: {message: lead.errors.full_messages.join(', ')}, status: 422 and return
@@ -45,6 +46,7 @@ module Public
         @lead.broker_id = origin_lead.broker_id if @lead.broker_id.blank?
       end
       if @lead.save
+        @lead.gbk_group_qr_generation(new_lead = false)
         render json: {message: "Visit Scheduled", data: {lead_no: @lead.reload.lead_no}}, status: 200 and return
       else
         render json: {message: "#{@lead.errors.full_messages.join(', ')}"}, status: 422 and return

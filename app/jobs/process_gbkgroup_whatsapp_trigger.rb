@@ -7,10 +7,13 @@ class ProcessGbkgroupWhatsappTrigger
       url = "https://backend.api-wa.co/campaign/tradai/api/v2"
       if args.first == "on_create"
         formatted_status = "lead_creation"
+      elsif args&.include?('visit_done')
+        formatted_status = "site_visit_done"
       else
         formatted_status = lead.status.name.split(' ').map { |s| s.downcase }.join('_')
       end
       campaign_data = send(formatted_status, lead, args.first)
+      filename = lead.project.name.split(' ').map { |s| s.downcase }.join('_')
       request = {
         "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
         "campaignName": campaign_data[:campagin_name],
@@ -19,8 +22,8 @@ class ProcessGbkgroupWhatsappTrigger
         "templateParams": campaign_data[:template_params]
       }
       request['media'] = {
-        "url": "#{lead.project.project_brochure.url}",
-        "filename": "#{lead.project.name}.pdf"
+        "url": "https://d3jt6ku4g6z5l8.cloudfront.net/FILE/6353da2e153a147b991dd812/4079142_dummy.pdf",
+        "filename": "#{filename}"
       } if ["site_visit_done", "visit_scheduled"].include?(formatted_status)
       response = RestClient.post(url, request)
       @process_gbkgroup_whatsapp_logger.info("processing whatsapp-#{id} - 1")
@@ -33,7 +36,7 @@ class ProcessGbkgroupWhatsappTrigger
 
   class << self
     def lead_creation(lead, arg)
-      { campagin_name: "LeadCreation", template_params: [lead.name] }
+      { campagin_name: "3_lead_new", template_params: [lead.name] }
     end
 
     def site_visit_planned(lead, arg)

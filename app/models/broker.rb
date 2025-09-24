@@ -25,6 +25,7 @@ class Broker < ActiveRecord::Base
     message: "Should be unique", allow_blank: true }
   validate :validate_broker_required_fields
   validate :mobile_uniqueness
+  validates :cp_code, presence: true, if: -> { company&.cp_lead_qr_enable }
   RERA_STATUS=["Yes", "No", "Work In Progress"]
   after_commit :broker_integration_to_postsale, on: :create, if: :enable_broker_integration?
   after_commit :broker_integration_to_partner_crm, on: :create, if: :enable_partner_crm_integration?

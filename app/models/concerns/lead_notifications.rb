@@ -6,7 +6,7 @@ module LeadNotifications
 
     before_validation :set_changes
     after_commit :notify_lead_assign_user, :send_whatsapp_notification_to_client
-    after_commit :create_ravima_leads, :whatsapp_notify_on_status_change, on: :update
+    after_commit :create_ravima_leads, :whatsapp_notify_on_status_change, :create_gbk_group_hot_warm_cold, on: :update
     after_create :send_whatsapp_on_create, :create_ravima_nextel_leads
 
     TRIGGER_MAPPING = [423,424,425,426,427,428,429]
@@ -109,6 +109,12 @@ module LeadNotifications
       end
       if self.company.setting.present? && self.company.enable_nextel_whatsapp_triggers && self.previous_changes.present? && self.previous_changes["status_id"].present?
         Resque.enqueue(::ProcessRavimaWhatsappTrigger, self.id)
+      end
+    end
+
+    def create_gbk_group_hot_warm_cold
+      if company.client_visit_qr && self.previous_changes.present? && self.previous_changes["status_id"].present? && [6,5,14].include?(self.status_id)
+        Resque.enqueue(::AutoMessageWhenLeadStatusIsMarked, self.id)
       end
     end
 

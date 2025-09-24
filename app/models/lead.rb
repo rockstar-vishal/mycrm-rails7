@@ -45,6 +45,7 @@ class Lead < ActiveRecord::Base
   has_many :secondary_sources, through: :leads_secondary_sources, source: :source
   has_many :call_logs, class_name: "Leads::CallLog", dependent: :destroy
   has_many :push_notification_logs, class_name: 'PushNotificationLog', dependent: :destroy
+  has_many :whatsapp_message_logs, dependent: :destroy
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, :allow_blank => true
 
   validate :mobile_validation, if: :mobile_number_present?
@@ -113,6 +114,10 @@ class Lead < ActiveRecord::Base
     :gclick_id,
     :fb_ads_id
   ]
+
+  def gbk_group_qr_generation(new_lead)
+    Resque.enqueue(::ProcessGbkgroupQrGenerationTrigger, self.id, new_lead)
+  end
 
   def default_fields_values
     self.other_data || {}

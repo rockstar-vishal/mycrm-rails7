@@ -113,7 +113,9 @@ class Companies::Setting < ActiveRecord::Base
     :cp_rm_access_enabled,
     :booking_form_enabled,
     :only_10_digit_mobile_number_enabled,
-    :enable_campaign_report
+    :enable_campaign_report,
+    :cp_lead_qr_enable,
+    :client_visit_qr
   ]
 
   def default_fields_values

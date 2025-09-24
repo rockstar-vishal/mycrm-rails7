@@ -27,6 +27,7 @@ Rails.application.routes.draw do
       get :fetch_source_subsource
       put :deactivate
       put :activate
+      post :shoot_wa_to_interested_lead
       get "visits/:visit_id/print", action: :print_visit, as: :print_visit
     end
     collection do
