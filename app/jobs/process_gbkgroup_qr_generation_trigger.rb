@@ -31,11 +31,11 @@ class ProcessGbkgroupQrGenerationTrigger
         folder_path = Rails.root.join("public")
         FileUtils.mkdir_p(folder_path) unless Dir.exist?(folder_path)
 
-        qr_file_path = folder_path.join("tes.png")
+        qr_file_path = folder_path.join("#{lead.lead_no}.png")
 
-        File.open(qr_file_path, "wb") { |file| file.write(png.to_s) }
+        File.open(qr_file_path, "wb") { |file| file.write(png.to_s) } unless File.exist?(qr_file_path)
       end
-      media_url = "https://#{lead.company.domain}/tes.png"
+      media_url = "https://#{lead.company.domain}/#{lead.lead_no}.png"
       if formatted_status == "send_site_visit_url"
         request = {
           "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
@@ -63,9 +63,9 @@ class ProcessGbkgroupQrGenerationTrigger
         RestClient.post(url, broker_request)
         @process_gbkgroup_whatsapp_logger.info("WhatsApp sent to Broker: #{broker.id}")
       end
-       if File.exist?(qr_file_path)
-        File.delete(qr_file_path)
-      end
+      #  if File.exist?(qr_file_path)
+      #   File.delete(qr_file_path)
+      # end
 
     rescue => e
       @process_gbkgroup_whatsapp_logger.error("Error sending WhatsApp for Lead #{lead&.id}: #{e.message}")
