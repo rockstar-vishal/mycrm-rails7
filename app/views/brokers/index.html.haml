@@ -145,7 +145,7 @@
                       %td= broker.rm.name rescue nil
                       %td= link_to (fa_icon("external-link", class: 'text-light')), broker.rera_document.url, target: '_blank', class: "btn btn-action" if broker.rera_document.present?
                       %td
-                        - if @company.cp_lead_qr_enable
+                        - if @company.cp_lead_qr_enable && broker.cp_code.present?
                           %button.clipboard-btn.btn.btn-action{"data-clipboard-text"=>"https://qr-#{@company.domain}/ChannelPartner/#{broker.cp_code}"}
                             = fa_icon "copy"
                       %td
