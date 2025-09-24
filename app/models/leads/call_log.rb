@@ -117,7 +117,7 @@ class Leads::CallLog < ActiveRecord::Base
   end
 
   def log_call_attempt
-    if self.user.company.call_response_report.present? && self.direction != 'incoming' && self.lead.call_attempts.where("user_id = (?) AND response_time iS NOT NULL", self.user_id).blank?
+    if self.lead.company.call_response_report.present? && self.direction != 'incoming' && self.lead.call_attempts.where("user_id = (?) AND response_time iS NOT NULL", self.user_id).blank?
       lead_assigned_at = self.lead.audits.select{|audit| audit.audited_changes["user_id"].present? && (audit.audited_changes["user_id"].is_a?(Array) ? audit.audited_changes["user_id"][0]== self.user_id : audit.audited_changes["user_id"][0]== self.user_id)}.sort_by(&:created_at).first.created_at rescue self.lead.created_at
       response_time = (self.created_at.in_time_zone - lead_assigned_at.in_time_zone).to_i rescue nil
       self.lead.call_attempts.create(
