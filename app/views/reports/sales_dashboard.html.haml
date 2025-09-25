@@ -62,8 +62,13 @@
 
           %hr
 
-          / =========== Leads Table ============
-          %h5.mt-5 Leads Detail
+          %h5.mt-5 Customer Detail
+          
+          - if @leads.present?
+            .pagination-custom-holder.mb-3
+              %label{style: "margin-left: 0;"} Showing #{(@leads.offset_value || 0) + 1} - #{(@leads.offset_value || 0) + @leads.length} of #{@leads.total_entries} leads
+              = will_paginate @leads, class: "ct-pag"
+          
           .table-responsive
             %table.table.table-bordered.table-sm
               %thead
@@ -104,6 +109,10 @@
                     %td= magic["unit"] || ""
                     %td= magic["home address"] || ""
                     %td= magic["office address"] || ""
+          
+          - if @leads.present?
+            .pagination-custom-holder.mt-3
+              = will_paginate @leads, class: "ct-pag"
 
 :javascript
   document.addEventListener("DOMContentLoaded", function () {
@@ -158,3 +167,4 @@
   const chartScript = document.createElement("script");
   chartScript.src = "https://cdn.jsdelivr.net/npm/chart.js";
   document.head.appendChild(chartScript);
+  
