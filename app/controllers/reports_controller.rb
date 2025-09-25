@@ -2,9 +2,10 @@ class ReportsController < ApplicationController
 
   before_action :set_company_props
   before_action :set_start_end_date
-  before_action :set_base_leads, except: [:campaigns, :campaigns_report, :campaign_detail, :activity, :activity_details, :visits, :source_wise_visits, :trends, :site_visit_planned, :customized_status_dashboard, :scheduled_site_visits, :scheduled_site_visits_detail, :presale_visits, :gre_source_report]
+  before_action :set_base_leads, except: [:sales_dashboard, :campaigns, :campaigns_report, :campaign_detail, :activity, :activity_details, :visits, :source_wise_visits, :trends, :site_visit_planned, :customized_status_dashboard, :scheduled_site_visits, :scheduled_site_visits_detail, :presale_visits, :gre_source_report]
   helper_method :ld_path, :bl_path, :dld_path, :ad_path, :comment_edit_text, :status_edit_html, :vd_path, :user_edit_html, :source_edit_html
   helper_method :activity_search_params, :visit_params, :site_visit_tracker_params, :call_log_report_params, :status_dashboard_params, :user_call_reponse_search, :channel_partner_params, :campaigns_params
+  PER_PAGE = 20
 
   def source
     data = @leads.group("source_id, status_id").select("COUNT(*), source_id, status_id, json_agg(id) as lead_ids")
@@ -88,12 +89,12 @@ class ReportsController < ApplicationController
   end
 
   def visits
+    @leads = @leads.advance_search(visit_params.except(:button), current_user)
     if current_user.company.enable_advance_visits
-      data = Lead.leads_visits_combinations(visit_params.merge(is_visit_executed: true, start_date: @start_date, end_time: @end_date), current_user.company_id, current_user)
+      data = @leads.leads_visits_combinations(visit_params.merge(is_visit_executed: true, start_date: @start_date, end_time: @end_date), current_user.company_id, current_user)
     else
-      data = Lead.leads_visits_combinations(visit_params.merge(start_date: @start_date, end_time: @end_date), current_user.company_id, current_user)
+      data = @leads.leads_visits_combinations(visit_params.merge(start_date: @start_date, end_time: @end_date), current_user.company_id, current_user)
     end
-
     @statuses = @statuses.where(:id=>data.map(&:status_id).uniq)
     @manageable_ids = current_user.manageables.ids
     @data = data.as_json
@@ -527,48 +528,52 @@ class ReportsController < ApplicationController
   end
 
   def sales_dashboard
-    render json: {message: "This section is under maintenance until 2nd July"}, status: 200 and return
-    @projects = Project.all
-
-    @leads = Lead.includes(:project, :status, :source, :visits, :broker, :magic_attributes).to_a
-
+    @leads = @leads.includes(:project, :status, :source, :visits, :broker, :magic_attributes => :magic_field)
+    
     if params[:project_id].present?
-      @leads = @leads.select { |lead| lead.project_id == params[:project_id].to_i }
+      @leads = @leads.where(project_id: params[:project_id])
     end
 
     if params[:visit_date].present?
       visit_date = Date.parse(params[:visit_date]) rescue nil
       if visit_date
-        @leads = @leads.select do |lead|
-          lead.visits.any? { |v| v.date.to_date == visit_date }
-        end
+        @leads = @leads.joins(:visits).where(visits: { date: visit_date.beginning_of_day..visit_date.end_of_day })
       end
     end
+    @leads = @leads.paginate(page: params[:page], per_page: PER_PAGE)
+    @projects = Project.select(:id, :name)
 
-    leads = @leads
+    leads_for_counts = @leads.except(:limit, :offset)
+    
+    source_counts = leads_for_counts.each_with_object(Hash.new(0)) do |lead, counts|
+      counts[lead.source&.name] += 1 if lead.source
+    end
+    
+    status_counts = leads_for_counts.each_with_object(Hash.new(0)) do |lead, counts|
+      counts[lead.status&.name] += 1 if lead.status
+    end
 
-    @walkin_count  = leads.count { |lead| lead.source&.name == "Walkin" }
-    @booking_count = leads.count { |lead| lead.status&.name == "Booking Done" }
-    @cp_count      = leads.count { |lead| lead.source&.name == "Channel Partner" }
+    @walkin_count  = source_counts["Walkin"] || 0
+    @cp_count      = source_counts["Channel Partner"] || 0
+    @booking_count = status_counts["Booking Done"] || 0
 
-    @channel_data = Hash[
-      @leads.group_by { |lead| lead.source&.name || "Unknown" }
-            .map { |channel, leads| [channel, leads.count] }
-    ]
+    @channel_data = source_counts
 
-     @lead_magic_values = {}
-      @leads.each do |lead|
-        field_hash = lead.magic_attributes.each_with_object({}) do |ma, hash|
-          key = ma.magic_field.pretty_name.downcase.strip
-          hash[key] = ma.value
-        end
-        @lead_magic_values[lead.id] = field_hash
-      end
+    lead_ids = @leads.map(&:id)
+    magic_attributes = MagicAttribute.includes(:magic_field)
+                                    .where(lead_id: lead_ids)
+                                    .group_by(&:lead_id)
+
+    magic_data = MagicAttribute.joins(:magic_field)
+                              .where(lead_id: lead_ids)
+                              .pluck(:lead_id, 'magic_fields.pretty_name', :value)
+    
+    @lead_magic_values = magic_data.each_with_object({}) do |(lead_id, field_name, value), hash|
+      key = field_name.downcase.strip
+      hash[lead_id] ||= {}
+      hash[lead_id][key] = value
+    end
   end
-
-
-
-
 
   private
 
@@ -627,7 +632,7 @@ class ReportsController < ApplicationController
   end
 
   def visit_params
-    params.permit(:customer_type, :visit_counts, :visit_counts_num, :manager_id, :project_ids=>[], :source_ids=>[], :presale_user_id=>[], :manager_ids=>[])
+    params.permit(:is_advanced_search, :start_date, :end_date, :selected, :customer_type, :visit_counts, :visit_counts_num, :manager_id, :project_ids=>[], :source_ids=>[], :presale_user_id=>[], :manager_ids=>[])
   end
 
   def site_visit_tracker_params

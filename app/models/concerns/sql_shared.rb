@@ -93,12 +93,11 @@ module SqlShared
     # Conditionally apply SELECT and GROUP BY for old Rails versions
     if is_source_wise
       select_clause = "sources.name as source_name, leads.source_id as source_id, leads.status_id AS status_id, COUNT(leads.id) AS leads_count, json_agg(leads.id) AS lead_ids"
-      group_clause = "leads.id, leads.source_id, leads.status_id, sources.name"
+      group_clause = "leads.source_id, leads.status_id, sources.name"
     else
       select_clause = "users.name as user_name, leads.user_id as user_id, leads.status_id AS status_id, COUNT(leads.id) AS leads_count, json_agg(leads.id) AS lead_ids"
-      group_clause = "leads.id, leads.user_id, leads.status_id, users.name"
+      group_clause = "leads.user_id, leads.status_id, users.name"
     end
-
     # Apply the final select and group
     relation = relation.select(select_clause).group(group_clause)
 
