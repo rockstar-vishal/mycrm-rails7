@@ -12,7 +12,7 @@ class OnsiteLeadsController < ApplicationController
       @leads = @company_leads.basic_search(params[:search_query], current_user)
     end
     if params[:visit_expiring].present?
-      @leads=@leads.visit_expiration
+      @leads=@leads.visit_expiration(@company)
     end
     @leads_count = @leads.size
     respond_to do |format|

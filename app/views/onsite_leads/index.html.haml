@@ -14,7 +14,7 @@
               %h5
                 Visit Expirations
                 = link_to onsite_leads_path(visit_expiring: true) do
-                  = @leads.visit_expiration.size
+                  = @leads.visit_expiration(@company).size
   .content
   .container-fluid
     .row

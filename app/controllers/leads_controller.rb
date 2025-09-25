@@ -552,7 +552,7 @@ class LeadsController < ApplicationController
     visit_counter = @leads.joins(:visits).thru_visit_form(current_user.company).uniq.count
     deactivate_leads_count=@leads.unscoped.where(is_deactivated: true).count
     merge_lead_count=@leads.joins(:leads_secondary_sources).pluck(:id).uniq.count
-    visit_expiration_count=@leads.visit_expiration.size
+    visit_expiration_count=@leads.visit_expiration(@company).size
     respond_to do |format|
       format.json do
         render json: {hot_status_count: hot_status_count, new_status_count: new_status_count, booking_done_count: booking_done_count, dead_lead_count: dead_lead_count, today_calls_count: today_calls_count, backlog_leads_count: backlog_leads_count, merge_lead_count: 

@@ -71,7 +71,7 @@ class Lead < ActiveRecord::Base
   scope :site_visit_scheduled, ->{where(is_site_visit_scheduled: true)}
   scope :qualified, -> { where(is_qualified: true) }
   scope :thru_visit_form, -> (company){where(status_id: company.site_visit_done_id).where.not(closing_executive: nil)}
-  scope :visit_expiration, -> {
+  scope :visit_expiration, -> (company){
                               where(
                                 "EXISTS (
                                   SELECT 1
@@ -843,7 +843,7 @@ class Lead < ActiveRecord::Base
         leads = leads.joins(:visits).where(visits: {user_id: search_params[:sv_user]})
       end
       if search_params["visit_expiring"].present?
-        leads=leads.visit_expiration
+        leads=leads.visit_expiration(user.company)
       end
       if search_params["backlogs_only"].present?
         leads = leads.backlogs_for(user.company)
