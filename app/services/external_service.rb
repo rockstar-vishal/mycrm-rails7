@@ -272,10 +272,10 @@ class ExternalService
 
   def partner_params_formation
     lead_params=@params[:lead_params]
-    leads_hash={"email": @params[:email], "id": lead_params[:id], "builders_lead"=> {"closing_executive_id": lead_params["closing_executive"] ,"ncd": lead_params["ncd"], "visited": true,"visit_date": Date.today, "comment": lead_params["comment"], "broker_lead_attributes"=> [{"id": lead_params[:id], "name": lead_params["name"], "phone": lead_params["mobile"], "email": lead_params["email"], "project_id": lead_params["project_id"], "source_id": lead_params["source_id"], "broker_id": lead_params["broker_id"]}]}}
+    leads_hash={"email": @params[:email], "builders_lead"=> {"closing_executive_id": lead_params["closing_executive"] ,"ncd": lead_params["ncd"], "visited": true,"visit_date": Date.today, "comment": lead_params["comment"], "broker_lead_attributes"=> {"id": lead_params[:id], "name": lead_params["name"], "phone": lead_params["mobile"], "email": lead_params["email"], "project_id": lead_params["project_id"], "broker_id": lead_params["broker_id"]}}}
     _hash=[]
     _hash << leads_hash["builders_lead"].keys
-    _hash << leads_hash["builders_lead"]["broker_lead_attributes"][0].keys
+    _hash << leads_hash["builders_lead"]["broker_lead_attributes"].keys
     _hash << leads_hash.keys
     _hash.flatten.map{|h| lead_params.delete(h)}
     leads_hash["builders_lead"].merge!(lead_params)
