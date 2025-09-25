@@ -528,6 +528,7 @@ class ReportsController < ApplicationController
   end
 
   def sales_dashboard
+    render json: {message: "This section is under maintenance until 2nd October"}, status: 200 and return
     @leads = @leads.includes(:project, :status, :source, :visits, :broker, :magic_attributes => :magic_field)
     
     if params[:project_id].present?
