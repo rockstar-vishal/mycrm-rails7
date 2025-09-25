@@ -84,7 +84,7 @@ module LeadNotifications
           Resque.enqueue(::ProcessUrbanWhatsappTrigger, self.id)
         elsif self.company.whatsapp_integration.user_name == "bharat realty" && self.previous_changes.present? && self.previous_changes["status_id"].present? && [self.company.booking_done_id, 50, 593].include?(self.status_id)
           Resque.enqueue(::ProcessBharatWhatsappTrigger, self.id)
-        elsif self.company.whatsapp_integration.user_name == "GBK Group" && self.previous_changes.present? && self.previous_changes["status_id"].present? && [18,22, 50].include?(self.status_id)
+        elsif self.company.whatsapp_integration.user_name == "GBK Group" && self.previous_changes.present? && self.previous_changes["status_id"].present? && [18,22, 50].include?(self.status_id) && self.created_at != self.updated_at
           Resque.enqueue(::ProcessGbkgroupWhatsappTrigger, self.id)
         end
       elsif self.company.whatsapp_integration&.active && self.company.whatsapp_integration.user_name == "ceratec" && self.previous_changes.present? && self.previous_changes["status_id"].present? && [22,33].include?(self.status_id)
