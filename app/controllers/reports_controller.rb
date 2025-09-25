@@ -547,8 +547,8 @@ class ReportsController < ApplicationController
     end
 
     # Get paginated leads with minimal data for display
-    @leads = base_query.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id')
-                      .includes(:project, :status, :source)
+    @leads = base_query.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
+                      .includes(:project, :status, :source, :broker)
                       .paginate(page: params[:page], per_page: PER_PAGE)
     
     @projects = Project.select(:id, :name)
