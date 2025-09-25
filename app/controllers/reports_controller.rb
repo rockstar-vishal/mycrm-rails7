@@ -528,30 +528,46 @@ class ReportsController < ApplicationController
   end
 
   def sales_dashboard
-    render json: {message: "This section is under maintenance until 2nd October"}, status: 200 and return
-    @leads = @leads.includes(:project, :status, :source, :visits, :broker, :magic_attributes => :magic_field)
+    # render json: {message: "This section is under maintenance until 2nd October"}, status: 200 and return
     
+    # Build base query with minimal includes for pagination
+    base_query = @leads.joins(:status, :source)
+    
+    # Apply filters
     if params[:project_id].present?
-      @leads = @leads.where(project_id: params[:project_id])
+      base_query = base_query.where(project_id: params[:project_id])
     end
 
     if params[:visit_date].present?
       visit_date = Date.parse(params[:visit_date]) rescue nil
       if visit_date
-        @leads = @leads.joins(:visits).where(visits: { date: visit_date.beginning_of_day..visit_date.end_of_day })
+        base_query = base_query.joins(:visits)
+                              .where(visits: { date: visit_date.beginning_of_day..visit_date.end_of_day })
       end
     end
-    @leads = @leads.paginate(page: params[:page], per_page: PER_PAGE)
+
+    # Get paginated leads with minimal data for display
+    @leads = base_query.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id')
+                      .includes(:project, :status, :source)
+                      .paginate(page: params[:page], per_page: PER_PAGE)
+    
     @projects = Project.select(:id, :name)
 
-    leads_for_counts = @leads.except(:limit, :offset)
+    # Optimized counting using database aggregation instead of Ruby loops
+    counts_query = base_query.except(:limit, :offset)
     
-    source_counts = leads_for_counts.each_with_object(Hash.new(0)) do |lead, counts|
-      counts[lead.source&.name] += 1 if lead.source
-    end
+    # Single query to get both source and status counts
+    aggregated_counts = counts_query.joins(:status, :source)
+                                   .group('sources.name', 'statuses.name')
+                                   .count
+
+    # Process aggregated results
+    source_counts = Hash.new(0)
+    status_counts = Hash.new(0)
     
-    status_counts = leads_for_counts.each_with_object(Hash.new(0)) do |lead, counts|
-      counts[lead.status&.name] += 1 if lead.status
+    aggregated_counts.each do |(source_name, status_name), count|
+      source_counts[source_name] += count
+      status_counts[status_name] += count
     end
 
     @walkin_count  = source_counts["Walkin"] || 0
@@ -560,19 +576,20 @@ class ReportsController < ApplicationController
 
     @channel_data = source_counts
 
-    lead_ids = @leads.map(&:id)
-    magic_attributes = MagicAttribute.includes(:magic_field)
-                                    .where(lead_id: lead_ids)
-                                    .group_by(&:lead_id)
-
-    magic_data = MagicAttribute.joins(:magic_field)
-                              .where(lead_id: lead_ids)
-                              .pluck(:lead_id, 'magic_fields.pretty_name', :value)
+    # Optimized magic attributes query - single query with proper joins
+    lead_ids = @leads.pluck(:id)
     
-    @lead_magic_values = magic_data.each_with_object({}) do |(lead_id, field_name, value), hash|
-      key = field_name.downcase.strip
-      hash[lead_id] ||= {}
-      hash[lead_id][key] = value
+    if lead_ids.any?
+      @lead_magic_values = MagicAttribute.joins(:magic_field)
+                                        .where(lead_id: lead_ids)
+                                        .pluck(:lead_id, 'magic_fields.pretty_name', :value)
+                                        .each_with_object({}) do |(lead_id, field_name, value), hash|
+                                          key = field_name.downcase.strip
+                                          hash[lead_id] ||= {}
+                                          hash[lead_id][key] = value
+                                        end
+    else
+      @lead_magic_values = {}
     end
   end
 
