@@ -259,7 +259,8 @@ class ReportsController < ApplicationController
     @statuses= current_user.company.statuses.where(id: current_user.company.customize_report_status_ids.reject(&:blank?).map(&:to_i))
     @start_date = params[:start_date].present? ? Time.zone.parse(params[:start_date]).beginning_of_day : (Time.zone.now - start_offset.day).beginning_of_day 
     @end_date = params[:end_date].present? ? Time.zone.parse(params[:end_date]).end_of_day : (Time.zone.now).end_of_day
-    @leads = @leads.where("leads.status_id IN (?) AND leads.created_at BETWEEN ? AND ?",@statuses.ids, @start_date.to_date, @end_date.to_date)
+    @leads = @leads.where("leads.status_id IN (?) AND leads.created_at BETWEEN ? AND ?",@statuses.ids, @start_date.beginning_of_day, @end_date.end_of_day)
+    @leads = @leads.where(user_id: current_user.manageables.ids) unless current_user.is_super?
     if params[:is_advanced_search].present?
       @leads=@leads.advance_search(status_dashboard_params, current_user)
     end
@@ -578,7 +579,6 @@ class ReportsController < ApplicationController
 
     # Optimized magic attributes query - single query with proper joins
     lead_ids = @leads.pluck(:id)
-    
     if lead_ids.any?
       @lead_magic_values = MagicAttribute.joins(:magic_field)
                                         .where(lead_id: lead_ids)
@@ -690,7 +690,7 @@ class ReportsController < ApplicationController
   end
 
   def status_dashboard_params
-    params.permit(:manager_id, :visited, :site_visit_from, :site_visit_upto, project_ids: [], lead_statuses: [], manager_ids: [])
+    params.permit(:is_advanced_search, :start_date, :end_date, :manager_id, :visited, :site_visit_from, :site_visit_upto, project_ids: [], lead_statuses: [], manager_ids: [])
   end
 
   def user_call_reponse_search
