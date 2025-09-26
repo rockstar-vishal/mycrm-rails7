@@ -86,7 +86,8 @@ class Lead < ActiveRecord::Base
                                   AND lv.date <= ?
                                 )",
                                 60.days.ago.beginning_of_day,
-                                50.days.ago.end_of_day)}
+                                50.days.ago.end_of_day)
+                              .where.not(status_id: company.dead_status_ids + [company.booking_done_id])}
   before_validation :set_lead_no, :set_defaults, on: :create
   before_validation :strip_mobile_number
 
