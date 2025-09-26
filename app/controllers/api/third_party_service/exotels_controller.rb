@@ -45,6 +45,11 @@ module Api
       end
 
       def incoming_call
+        # Simple test first
+        Rails.logger.info(" --- TEST: About to render test response ----")
+        head :ok
+        return
+        
         find_company
         Rails.logger.info(" --- DEBUG: Company found: #{@company&.id} ----")
         @call_log = Leads::CallLog.where(to_number: exotel_params["CallFrom"], user_id: @company.users.ids).last
@@ -67,11 +72,13 @@ module Api
           Rails.logger.info(" --- DEBUG: Call log from number: #{from_num} ----")
         end
         if numbers.any?(&:present?)
-          Rails.logger.info(" --- Reached 1 ---- #{numbers} ----")
-          render text: numbers.compact.join(","), content_type: 'text/plain', status: 200
+          final_response = numbers.compact.join(",")
+          Rails.logger.info(" --- Reached 1 ---- #{numbers} ---- Final response: '#{final_response}'")
+          render plain: final_response, status: 200
         else
-          Rails.logger.info(" --- Reached 2 ---- #{default_numbers} ---- ")
-          render text: default_numbers.join(","), content_type: 'text/plain', status: 200
+          final_response = default_numbers.join(",")
+          Rails.logger.info(" --- Reached 2 ---- #{default_numbers} ---- Final response: '#{final_response}'")
+          render plain: final_response, status: 200
         end
       end
 
