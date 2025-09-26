@@ -45,40 +45,26 @@ module Api
       end
 
       def incoming_call
-        # Simple test first
-        Rails.logger.info(" --- TEST: About to render test response ----")
-        head :ok
-        return
-        
         find_company
-        Rails.logger.info(" --- DEBUG: Company found: #{@company&.id} ----")
         @call_log = Leads::CallLog.where(to_number: exotel_params["CallFrom"], user_id: @company.users.ids).last
-        Rails.logger.info(" --- DEBUG: Call log found: #{@call_log&.id} ----")
         if @call_log.present?
           @lead = @company.leads.find_by(id: @call_log.lead_id)
         else
           @lead = @company.leads.find_by(mobile: exotel_params["CallFrom"])
         end
-        Rails.logger.info(" --- DEBUG: Lead found: #{@lead&.id} ----")
         numbers = []
         if @lead.present?
           num = @lead&.user&.mobile
           numbers << num if num
-          Rails.logger.info(" --- DEBUG: Lead user mobile: #{num} ----")
         end
         if @call_log.present?
           from_num = @call_log.from_number
           numbers << from_num if from_num.present?
-          Rails.logger.info(" --- DEBUG: Call log from number: #{from_num} ----")
         end
         if numbers.any?(&:present?)
-          final_response = numbers.compact.join(",")
-          Rails.logger.info(" --- Reached 1 ---- #{numbers} ---- Final response: '#{final_response}'")
-          render plain: final_response, status: 200
+          render plain: numbers.compact.join(","), status: 200
         else
-          final_response = default_numbers.join(",")
-          Rails.logger.info(" --- Reached 2 ---- #{default_numbers} ---- Final response: '#{final_response}'")
-          render plain: final_response, status: 200
+          render plain: default_numbers.join(","), status: 200
         end
       end
 
