@@ -3,7 +3,7 @@ module Public
     include MagicFieldsPermittable
     
     before_action :find_broker, only: [:settings, :submit_cp_lead]
-    before_action :find_lead, only: [:schedule_client_visit, :client_settings, :lead_details]
+    before_action :find_lead, only: [:schedule_client_visit, :client_settings, :lead_details, :add_visit]
     def settings
       render json: {broker_uuid: @broker.uuid, projects: @company.projects.as_api_response(:details), broker: @broker.as_api_response(:details)}
     end
@@ -25,6 +25,16 @@ module Public
 
     def lead_details
       render json: {status: true, lead: @lead.as_api_response(:qr_verification).merge(lead_url: "https://#{@company.domain}/leads?search_query=#{params[:lead_no]}")}, status: 200 and return
+    end
+
+    def add_visit
+      render json: {status: false, message: "Invalid Lead"}, status: 400 and return if @lead.uuid != params[:lead_uuid]
+      visit = @lead.visits.build(date: Time.zone.now, comment: params[:visit_comments])
+      if visit.save
+        render json: {status: true, message: "Visit Created Successfully!"}, status: 200 and return
+      else
+        render json: {status: false, message: "#{visit.errors.full_messages.join(', ')}"}, status: 422 and return
+      end
     end
 
     def schedule_client_visit
