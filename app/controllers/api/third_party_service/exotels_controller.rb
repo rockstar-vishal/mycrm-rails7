@@ -46,24 +46,31 @@ module Api
 
       def incoming_call
         find_company
+        Rails.logger.info(" --- DEBUG: Company found: #{@company&.id} ----")
         @call_log = Leads::CallLog.where(to_number: exotel_params["CallFrom"], user_id: @company.users.ids).last
+        Rails.logger.info(" --- DEBUG: Call log found: #{@call_log&.id} ----")
         if @call_log.present?
           @lead = @company.leads.find_by(id: @call_log.lead_id)
         else
           @lead = @company.leads.find_by(mobile: exotel_params["CallFrom"])
         end
+        Rails.logger.info(" --- DEBUG: Lead found: #{@lead&.id} ----")
         numbers = []
         if @lead.present?
           num = @lead&.user&.mobile
           numbers << num if num
+          Rails.logger.info(" --- DEBUG: Lead user mobile: #{num} ----")
         end
         if @call_log.present?
           from_num = @call_log.from_number
           numbers << from_num if from_num.present?
+          Rails.logger.info(" --- DEBUG: Call log from number: #{from_num} ----")
         end
         if numbers.any?(&:present?)
+          Rails.logger.info(" --- Reached 1 ---- #{numbers} ----")
           render text: numbers.compact.join(","), content_type: 'text/plain', status: 200
         else
+          Rails.logger.info(" --- Reached 2 ---- #{default_numbers} ---- ")
           render text: default_numbers.join(","), content_type: 'text/plain', status: 200
         end
       end
@@ -261,9 +268,12 @@ module Api
 
       def default_numbers
         default_executive_ph_nos = []
+        Rails.logger.info(" --- DEBUG: Looking for ExotelSid with number: #{exotel_params["To"]} ----")
         @exotel_sids = ExotelSid.active.find_by(number: exotel_params["To"])
+        Rails.logger.info(" --- DEBUG: ExotelSid found: #{@exotel_sids&.id} ----")
         if @exotel_sids.present?
           default_executive_ph_nos = @exotel_sids.default_numbers.reject(&:blank?)
+          Rails.logger.info(" --- DEBUG: Default numbers: #{default_executive_ph_nos} ----")
         end
         default_executive_ph_nos
       end
