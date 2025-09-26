@@ -259,8 +259,8 @@ class ReportsController < ApplicationController
     @statuses= current_user.company.statuses.where(id: current_user.company.customize_report_status_ids.reject(&:blank?).map(&:to_i))
     @start_date = params[:start_date].present? ? Time.zone.parse(params[:start_date]).beginning_of_day : (Time.zone.now - start_offset.day).beginning_of_day 
     @end_date = params[:end_date].present? ? Time.zone.parse(params[:end_date]).end_of_day : (Time.zone.now).end_of_day
-    manager_with_team_ids = current_user.subordinate_mappings.pluck(:user_id, :manager_id).flatten.uniq
-    @leads = @leads.where("leads.user_id IN (?) AND leads.status_id IN (?) AND leads.created_at BETWEEN ? AND ?", manager_with_team_ids, @statuses.ids, @start_date.to_date, @end_date.to_date)
+    @leads = @leads.where("leads.status_id IN (?) AND leads.created_at BETWEEN ? AND ?",@statuses.ids, @start_date.beginning_of_day, @end_date.end_of_day)
+    @leads = @leads.where(user_id: current_user.manageables.ids) unless current_user.is_super?
     if params[:is_advanced_search].present?
       @leads=@leads.advance_search(status_dashboard_params, current_user)
     end
