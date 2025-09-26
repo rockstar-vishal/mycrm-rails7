@@ -62,9 +62,9 @@ module Api
           numbers << from_num if from_num.present?
         end
         if numbers.any?(&:present?)
-          render text: numbers.compact, content_type: 'text/plain', status: 200
+          render text: numbers.compact.join(","), content_type: 'text/plain', status: 200
         else
-          render text: default_numbers, content_type: 'text/plain', status: 200
+          render text: default_numbers.join(","), content_type: 'text/plain', status: 200
         end
       end
 
