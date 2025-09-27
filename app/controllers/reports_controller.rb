@@ -552,7 +552,7 @@ class ReportsController < ApplicationController
                       .includes(:project, :status, :source, :broker)
                       .paginate(page: params[:page], per_page: PER_PAGE)
     
-    @projects = Project.select(:id, :name)
+    @projects = @projects.select(:id, :name)
 
     # Optimized counting using database aggregation instead of Ruby loops
     counts_query = base_query.except(:limit, :offset)
