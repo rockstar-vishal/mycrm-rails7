@@ -2,7 +2,7 @@ class ReportsController < ApplicationController
 
   before_action :set_company_props
   before_action :set_start_end_date
-  before_action :set_base_leads, except: [:sales_dashboard, :campaigns, :campaigns_report, :campaign_detail, :activity, :activity_details, :visits, :source_wise_visits, :trends, :site_visit_planned, :customized_status_dashboard, :scheduled_site_visits, :scheduled_site_visits_detail, :presale_visits, :gre_source_report]
+  before_action :set_base_leads, except: [:campaigns, :campaigns_report, :campaign_detail, :activity, :activity_details, :source_wise_visits, :trends, :site_visit_planned, :customized_status_dashboard, :scheduled_site_visits, :scheduled_site_visits_detail, :presale_visits, :gre_source_report]
   helper_method :ld_path, :bl_path, :dld_path, :ad_path, :comment_edit_text, :status_edit_html, :vd_path, :user_edit_html, :source_edit_html
   helper_method :activity_search_params, :visit_params, :site_visit_tracker_params, :call_log_report_params, :status_dashboard_params, :user_call_reponse_search, :channel_partner_params, :campaigns_params
   PER_PAGE = 20
@@ -529,28 +529,22 @@ class ReportsController < ApplicationController
   end
 
   def sales_dashboard
-    # render json: {message: "This section is under maintenance until 2nd October"}, status: 200 and return
-    
     # Build base query with minimal includes for pagination
     base_query = @leads.joins(:status, :source)
-    
-    # Apply filters
-    if params[:project_id].present?
-      base_query = base_query.where(project_id: params[:project_id])
-    end
+    data = @leads.leads_visits_combinations(visit_params.merge(start_date: @start_date, end_time: @end_date), current_user.company_id, current_user)
 
-    if params[:visit_date].present?
-      visit_date = Date.parse(params[:visit_date]) rescue nil
-      if visit_date
-        base_query = base_query.joins(:visits)
-                              .where(visits: { date: visit_date.beginning_of_day..visit_date.end_of_day })
-      end
-    end
+    @walkin_count = data.collect{|k| k["lead_ids"]}.count
+    base_query = base_query.joins(:visits)
+                           .where(project_id: params[:project_id])
+                             .where(visits: { date: @start_date.beginning_of_day..@end_date.end_of_day })
+                             .distinct
 
-    # Get paginated leads with minimal data for display
-    @leads = base_query.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
-                      .includes(:project, :status, :source, :broker)
-                      .paginate(page: params[:page], per_page: PER_PAGE)
+    # Get paginated leads only if filters are applied
+    if params[:project_id].present? && @start_date.present? && @end_date.present?
+      @leads = base_query.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
+                        .includes(:project, :status, :source, :broker)
+                        .paginate(page: params[:page], per_page: PER_PAGE)
+    end
     
     @projects = @projects.select(:id, :name)
 
@@ -570,16 +564,15 @@ class ReportsController < ApplicationController
       source_counts[source_name] += count
       status_counts[status_name] += count
     end
-
-    @walkin_count  = source_counts["Walkin"] || 0
+    @lead_statuses = Status.of_leads.where(name: 'Booked').pluck(:id)
     @cp_count      = source_counts["Channel Partner"] || 0
-    @booking_count = status_counts["Booking Done"] || 0
+    @booking_count = status_counts["Booked"] || 0
 
     @channel_data = source_counts
 
     # Optimized magic attributes query - single query with proper joins
-    lead_ids = @leads.pluck(:id)
-    if lead_ids.any?
+    if @leads.any?
+      lead_ids = @leads.pluck(:id)
       @lead_magic_values = MagicAttribute.joins(:magic_field)
                                         .where(lead_id: lead_ids)
                                         .pluck(:lead_id, 'magic_fields.pretty_name', :value)

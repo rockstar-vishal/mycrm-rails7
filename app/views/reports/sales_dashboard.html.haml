@@ -12,18 +12,20 @@
           .row.mb-3
             .col-md-12
               = form_tag request.path, method: :get, class: "form-inline ml-3 mt-2" do
-                .form-group.mr-2
-                  = label_tag :visit_date, "Site Visit Date", class: "mr-1"
-                  = date_field_tag :visit_date, params[:visit_date], class: "form-control"
+                .col-md-6
+                  = render partial: 'shared/visited_range_selector'
 
                 .form-group.mr-2
                   = label_tag :project_id, "Project Name", class: "mr-1"
                   = select_tag :project_id,
                     options_from_collection_for_select(@projects, :id, :name, params[:project_id]),
-                    include_blank: "All Projects",
-                    class: "form-control"
-
-                = submit_tag "Filter", class: "btn btn-success ml-2"
+                    include_blank: "Select Project",
+                    class: "form-control",
+                    style: "width: 200px;"
+                = submit_tag "Filter",
+                  class: "btn btn-success ml-2",
+                  id: "filter-btn",
+                  disabled: true
 
   .content
     .container-fluid
@@ -36,16 +38,31 @@
             .col-md-2
               .w-100
                 %h6.border.p-1.mb-1.font-weight-bold.text-center Total Walkins
-                .d-inline-block.bg-info.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px;"}
-                  VISITS
-                  %div{style: "font-size: 1rem; font-weight: bold;"}= @walkin_count
+                - if @walkin_count > 0
+                  = link_to reports_visits_path(start_date: @start_date, end_date: @end_date), target: "_blank", class: "text-decoration-none d-block clickable-card" do
+                    .d-inline-block.bg-info.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1.clickable-box{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px; position: relative;"}
+                      VISITS
+                      %div{style: "font-size: 1rem; font-weight: bold;"}= @walkin_count
+                      .click-indicator{style: "position: absolute; top: 2px; right: 5px; font-size: 10px; opacity: 0.8;"} ↗
+                - else
+                  .d-inline-block.bg-info.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px; opacity: 0.6;"}
+                    VISITS
+                    %div{style: "font-size: 1rem; font-weight: bold;"}= @walkin_count
 
             .col-md-2
               .w-100
                 %h6.border.p-1.mb-1.font-weight-bold.text-center Total Bookings
-                .d-inline-block.bg-primary.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px;"}
-                  BOOKINGS
-                  %div{style: "font-size: 1rem; font-weight: bold;"}= @booking_count
+                - if @booking_count > 0
+                  - booking_params = { "is_advanced_search" => "true", "project_ids" => [params[:project_id]], "visited_date_from" => @start_date, "visited_date_upto" => @end_date, :lead_statuses => @lead_statuses }
+                  = link_to leads_path(booking_params), target: "_blank", class: "text-decoration-none d-block clickable-card" do
+                    .d-inline-block.bg-primary.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1.clickable-box{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px; position: relative;"}
+                      BOOKINGS
+                      %div{style: "font-size: 1rem; font-weight: bold;"}= @booking_count
+                      .click-indicator{style: "position: absolute; top: 2px; right: 5px; font-size: 10px; opacity: 0.8;"} ↗
+                - else
+                  .d-inline-block.bg-primary.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px; opacity: 0.6;"}
+                    BOOKINGS
+                    %div{style: "font-size: 1rem; font-weight: bold;"}= @booking_count
 
             .col-md-2
               .w-100
@@ -62,59 +79,106 @@
 
           %hr
 
-          %h5.mt-5 Customer Detail
-          
           - if @leads.present?
+            %h5.mt-5 Customer Detail
+            
             .pagination-custom-holder.mb-3
               %label{style: "margin-left: 0;"} Showing #{(@leads.offset_value || 0) + 1} - #{(@leads.offset_value || 0) + @leads.length} of #{@leads.total_entries} leads
               = will_paginate @leads, class: "ct-pag"
-          
-          .table-responsive
-            %table.table.table-bordered.table-sm
-              %thead
-                %tr
-                  %th Date
-                  %th Project
-                  %th Customer Name
-                  %th Channel
-                  %th Channel Partner
-                  %th Lead Status
-                  %th Occupation
-                  %th Age
-                  %th Family/Not Fam
-                  %th Self-funded/Loan
-                  %th Use
-                  %th Unit
-                  %th Home Address
-                  %th Office Address
-              %tbody
-                - @leads.each do |lead|
-                  - magic = @lead_magic_values[lead.id] || {}
+            
+            .table-responsive
+              %table.table.table-bordered.table-sm
+                %thead
                   %tr
-                    %td= lead.visits.last&.date&.strftime("%d-%m-%Y") || "No Visit"
-                    %td= lead.project&.name
-                    %td= lead.name.presence || "Unnamed"
-                    %td= lead.source&.name || "N/A"
-                    %td
-                      - if lead.source&.name == "Channel Partner"
-                        = lead.broker&.name || "Unnamed Broker"
-                      - else
-                        = "N/A"
-                    %td= lead.status&.name
-                    %td= magic["occupation"] || ""
-                    %td= magic["age"] || ""
-                    %td= magic["family/not fam"] || ""
-                    %td= magic["self-funded/loan"] || ""
-                    %td= magic["use"] || ""
-                    %td= magic["unit"] || ""
-                    %td= magic["home address"] || ""
-                    %td= magic["office address"] || ""
-          
-          - if @leads.present?
+                    %th Date
+                    %th Project
+                    %th Customer Name
+                    %th Channel
+                    %th Channel Partner
+                    %th Lead Status
+                    %th Occupation
+                    %th Age
+                    %th Family/Not Fam
+                    %th Self-funded/Loan
+                    %th Use
+                    %th Unit
+                    %th Home Address
+                    %th Office Address
+                %tbody
+                  - @leads.each do |lead|
+                    - magic = @lead_magic_values[lead.id] || {}
+                    %tr
+                      %td= lead.visits.last&.date&.strftime("%d-%m-%Y") || "No Visit"
+                      %td= lead.project&.name
+                      %td= lead.name.presence || "Unnamed"
+                      %td= lead.source&.name || "N/A"
+                      %td
+                        - if lead.source&.name == "Channel Partner"
+                          = lead.broker&.name || "Unnamed Broker"
+                        - else
+                          = "N/A"
+                      %td= lead.status&.name
+                      %td= magic["occupation"] || ""
+                      %td= magic["age"] || ""
+                      %td= magic["family/not fam"] || ""
+                      %td= magic["self-funded/loan"] || ""
+                      %td= magic["use"] || ""
+                      %td= magic["unit"] || ""
+                      %td= magic["home address"] || ""
+                      %td= magic["office address"] || ""
+            
             .pagination-custom-holder.mt-3
               = will_paginate @leads, class: "ct-pag"
+          - else
+            .text-center.mt-5
+              %h5.text-muted Please apply filters to view customer details
+              %p.text-muted Select a project and visit date range, then click "Filter" to see the data.
+
+:css
+  .clickable-card {
+    transition: all 0.3s ease;
+  }
+  
+  .clickable-box {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+  }
+  
+  .clickable-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-color: #fff;
+    opacity: 0.9 !important;
+  }
+  
+  .clickable-card:hover .click-indicator {
+    opacity: 1 !important;
+    transform: scale(1.2);
+  }
 
 :javascript
+  document.addEventListener("DOMContentLoaded", function () {
+    const filterBtn   = document.getElementById("filter-btn");
+    const project     = document.getElementById("project_id");
+    const dateFrom    = document.getElementById("visited_date_from");
+    const dateUpto    = document.getElementById("visited_date_upto");
+
+    function validateFilters() {
+      filterBtn.disabled = !(project.value && dateFrom.value && dateUpto.value);
+    }
+
+    [project, dateFrom, dateUpto].forEach(el => {
+      if (el) {
+        el.addEventListener("input", validateFilters);
+        el.addEventListener("change", validateFilters);
+      }
+    });
+
+    validateFilters();
+  });
+  
   document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById("channelChart").getContext("2d");
 
@@ -167,4 +231,3 @@
   const chartScript = document.createElement("script");
   chartScript.src = "https://cdn.jsdelivr.net/npm/chart.js";
   document.head.appendChild(chartScript);
-  
