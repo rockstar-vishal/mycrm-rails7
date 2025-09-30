@@ -267,11 +267,10 @@ class Lead < ActiveRecord::Base
         filtered_leads = fetch_leads_with_other_contacts_checks(leads, email, phone, other_phone)
         leads=filtered_leads
       else
-        conditions = [
-          "email IS NOT NULL AND email != '' AND email = :email",
-          "mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = :phone"
-        ].join(" OR ")
-        leads = leads.where(conditions, email: email, phone: phone&.last(10))
+        # Optimized query structure for better index usage
+        email_matches = leads.where("email IS NOT NULL AND email != '' AND email = ?", email)
+        mobile_matches = leads.where("mobile IS NOT NULL AND mobile != '' AND RIGHT(REPLACE(mobile, ' ', ''), 10) = ?", phone&.last(10))
+        leads = email_matches.or(mobile_matches)
       end
       if leads.present?
         if( leads.first.email.present? && leads.first.email == email)
