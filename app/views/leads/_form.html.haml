@@ -185,6 +185,24 @@
       = link_to companies_path, class: "btn btn-delete ml-2" do
         Cancel
 :javascript
+
+  const sourceSelect = document.querySelector("#lead_source_id");
+  const sourcingFieldWrapper = document.querySelector('.custom-field-wrapper[data-field-name="sourcing_manager"]');
+
+  function toggleSourcingManager() {
+    const selectedValue = sourceSelect.value.trim();
+
+    if (selectedValue === "6") {
+      sourcingFieldWrapper.style.display = "";
+    } else {
+      sourcingFieldWrapper.style.display = "none";
+    }
+  }
+
+  toggleSourcingManager();
+
+  sourceSelect.addEventListener("change", toggleSourcingManager);
+
   $("#lead_status_id").change(function () {
     if($(this).val()){
       var stage_url = "/leads/" + $(this).val() + "/stages";
