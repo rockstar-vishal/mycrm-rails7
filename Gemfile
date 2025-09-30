@@ -8,7 +8,7 @@ gem 'rails', '~> 7.1.0'
 gem 'bootsnap', require: false
 gem 'puma', '~> 6.0'
 gem "rqrcode", "~> 3.0"
-
+gem 'newrelic_rpm'
 # Database
 gem 'pg', '~> 1.5'
 
