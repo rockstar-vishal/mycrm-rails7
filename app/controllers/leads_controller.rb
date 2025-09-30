@@ -595,11 +595,22 @@ class LeadsController < ApplicationController
   end
 
   def fetch_source_subsource
-    sub_sources=@company.sub_sources
+    # Early return if source_id is missing when source-wise filtering is enabled
     if @company.setting.present? && @company.enable_source_wise_sub_source
-      sub_sources=sub_sources.joins(:source).where("sources.id=?",params[:id]).as_json(only: [:id, :name])
+      return render json: [], status: 200 unless params[:id].present?
+      
+      # Optimized query: filter at database level, only select needed fields
+      sub_sources = @company.sub_sources
+                           .joins(:source)
+                           .where(sources: { id: params[:id] })
+                           .select(:id, :name)
+                           .as_json(only: [:id, :name])
+    else
+      # When source-wise filtering is disabled, return all sub_sources
+      sub_sources = @company.sub_sources.select(:id, :name).as_json(only: [:id, :name])
     end
-    render json: sub_sources, status: 200 and return
+    
+    render json: sub_sources, status: 200
   end
 
     def set_lead
