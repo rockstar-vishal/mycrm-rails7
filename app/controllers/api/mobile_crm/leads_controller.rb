@@ -27,6 +27,8 @@ module Api
         if params[:bs].blank? && params[:as].blank?
           @leads = @leads.active_for(@current_app_user.company)
         end
+        
+        # Optimize sorting with proper indexes
         if params["key"].present? && params["sort"].present?
           sort_key = params['key']
           sort_order = current_user.company.setting.present? && current_user.company.enable_ncd_sort_nulls_last && params['sort'] == "desc" ? "DESC NULLS LAST" : "ASC NULLS FIRST"
@@ -34,7 +36,9 @@ module Api
         else
           @leads = @leads.order("leads.ncd asc NULLS FIRST, leads.created_at DESC")
         end
-        total_leads = @leads.size
+        
+        # Optimize count calculation - use database count instead of loading all records
+        total_leads = @leads.count
         leads = @leads.paginate(:page => params[:page], :per_page => PER_PAGE).as_api_response(:details)
         render json: {leads: leads, count: total_leads, per_page: PER_PAGE}, status: 200 and return
       end

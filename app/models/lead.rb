@@ -62,7 +62,7 @@ class Lead < ActiveRecord::Base
 
   validate :uniqueness_validation, :either_email_or_phone_present
   default_scope { where(is_deactivated: false) }
-  scope :backlogs_for, -> (company){where("leads.ncd IS NULL OR leads.ncd <= ?", Time.zone.now).active_for(company)}
+  scope :backlogs_for, -> (company){where("(leads.ncd IS NULL OR leads.ncd <= ?)", Time.zone.now).active_for(company)}
   scope :todays_calls, -> {where("leads.ncd BETWEEN ? AND ?",Date.today.beginning_of_day, Date.today.end_of_day)}
   scope :active_for, -> (company){where.not(:status_id=>[company.dead_status_ids, company.booking_done_id].flatten)}
   scope :booked_for, -> (company){where(:status_id=>company.booking_done_id)}
