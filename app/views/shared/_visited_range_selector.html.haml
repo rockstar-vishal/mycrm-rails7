@@ -1,15 +1,15 @@
 .row
   .col-md-6
     .form-group
-      = label_tag :visit_date_from, 'Visit Date From ', class: 'control-label'
+      = label_tag :start_date, 'Visit Date From ', class: 'control-label'
       .input-group
         %span.input-group-addon
           = fa_icon 'calendar'
-        = text_field_tag :start_date, nil, class: 'form-control dateFormat pull-right', required: true
+        = text_field_tag :start_date, params[:start_date], class: 'form-control dateFormat pull-right', required: true, id: 'visited_date_from', autocomplete: 'off'
   .col-md-6
     .form-group
-      = label_tag :visit_date_upto, 'Visit Date Upto', class: 'control-label'
+      = label_tag :end_date, 'Visit Date Upto', class: 'control-label'
       .input-group
         %span.input-group-addon
           = fa_icon 'calendar'
-        = text_field_tag :end_date, nil, class: 'form-control dateFormat pull-right', required: true
+        = text_field_tag :end_date, params[:end_date], class: 'form-control dateFormat pull-right', required: true, id: 'visited_date_upto', autocomplete: 'off'
