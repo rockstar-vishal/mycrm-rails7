@@ -5,11 +5,14 @@
       .input-group
         %span.input-group-addon
           = fa_icon 'calendar'
-        = text_field_tag :start_date, params[:start_date], class: 'form-control dateFormat pull-right', required: true, id: 'visited_date_from', autocomplete: 'off'
+        - start_date = params[:start_date].present? ? params[:start_date] : (Date.current - 30.days).strftime('%d-%m-%Y')
+
+        = text_field_tag :start_date, start_date, class: 'form-control dateFormat pull-right', required: true, id: 'visited_date_from', autocomplete: 'off'
   .col-md-6
     .form-group
       = label_tag :end_date, 'Visit Date Upto', class: 'control-label'
       .input-group
         %span.input-group-addon
           = fa_icon 'calendar'
-        = text_field_tag :end_date, params[:end_date], class: 'form-control dateFormat pull-right', required: true, id: 'visited_date_upto', autocomplete: 'off'
+        - end_date = params[:end_date].present? ? params[:end_date] : Date.current.strftime('%d-%m-%Y')
+        = text_field_tag :end_date, end_date, class: 'form-control dateFormat pull-right', required: true, id: 'visited_date_upto', autocomplete: 'off'

@@ -89,6 +89,7 @@ class ReportsController < ApplicationController
   end
 
   def visits
+    @leads = @leads.where(project_id: params[:project_id]) if params[:project_id].present?
     @leads = @leads.advance_search(visit_params.except(:button), current_user)
     if current_user.company.enable_advance_visits
       data = @leads.leads_visits_combinations(visit_params.merge(is_visit_executed: true, start_date: @start_date, end_time: @end_date), current_user.company_id, current_user)
@@ -545,7 +546,6 @@ class ReportsController < ApplicationController
     # Early return if filters not applied
     booking_status_id = current_user.company.booking_done_id
     @lead_statuses = [booking_status_id]
-    
     unless params[:project_id].present? && @start_date.present? && @end_date.present?
       @walkin_count = 0
       @cp_count = 0
@@ -576,7 +576,7 @@ class ReportsController < ApplicationController
     
     if lead_ids_with_visits.any?
       # Single optimized query for all counts
-      counts = @leads.where(id: lead_ids_with_visits)
+      counts = base_scope.where(id: lead_ids_with_visits)
                      .joins(:source, :status)
                      .select(<<-SQL.squish
                        COUNT(DISTINCT leads.id) as total_count,
@@ -590,7 +590,7 @@ class ReportsController < ApplicationController
       @booking_count = counts&.booking_count || 0
       
       # Channel data based on unique lead IDs
-      channel_data_with_ids = @leads.where(id: lead_ids_with_visits)
+      channel_data_with_ids = base_scope.where(id: lead_ids_with_visits)
                           .joins(:source)
                           .group('sources.id')
                           .distinct
@@ -601,13 +601,12 @@ class ReportsController < ApplicationController
     end
 
     # Paginated results - only get the leads that have visits in the date range
-    @leads = @leads.where(id: lead_ids_with_visits)
+    @leads = base_scope.where(id: lead_ids_with_visits)
                    .select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
                    .includes(:project, :status, :source, :broker)
                    .paginate(page: params[:page], per_page: PER_PAGE)
     
     @projects = @projects.select(:id, :name)
-    
     # Optimized magic attributes - use pluck instead of map
     if @leads.any?
       lead_ids = @leads.pluck(:id)  # Use pluck instead of map(&:id)
