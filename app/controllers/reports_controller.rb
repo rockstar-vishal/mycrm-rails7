@@ -182,13 +182,26 @@ class ReportsController < ApplicationController
   end
 
   def source_wise_inactive
-    @data = @leads.where(:status_id=>current_user.company.dead_status_ids, user_id: current_user.manageables.ids)
-    @reasons = current_user.company.reasons.where(:id=>@data.map(&:dead_reason_id).uniq)
-    @sources=@sources.where(id: @data.map(&:source_id).uniq)
+    # Optimized: Single query with proper includes and aggregation
+    base_query = @leads.where(:status_id=>current_user.company.dead_status_ids, user_id: current_user.manageables.ids)
+    
+    # Get aggregated data in one query
+    @data = base_query.select('source_id, dead_reason_id, COUNT(*) as lead_count')
+                     .group('source_id, dead_reason_id')
+                     .includes(:source)
+    
+    # Extract unique IDs efficiently
+    source_ids = @data.pluck(:source_id).uniq.compact
+    reason_ids = @data.pluck(:dead_reason_id).uniq.compact
+    
+    # Load related data efficiently
+    @reasons = current_user.company.reasons.where(:id=>reason_ids)
+    @sources = @sources.where(id: source_ids)
+    
     respond_to do |format|
       format.html
       format.csv do
-        send_data @leads.source_inactive_report_to_csv({}, current_user), filename: "source_inactive_lead_report_#{Date.today.to_s}.csv"
+        send_data @leads.source_inactive_report_to_csv_optimized({}, current_user), filename: "source_inactive_lead_report_#{Date.today.to_s}.csv"
       end
     end
   end

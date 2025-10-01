@@ -35,6 +35,13 @@ class AddFunctionalIndexesForLeadUniqueness < ActiveRecord::Migration[7.1]
         WHERE other_phones IS NOT NULL AND other_phones != ''
       SQL
     end
+
+    # Index for source-wise inactive report optimization
+    unless index_exists?(:leads, [:status_id, :source_id, :dead_reason_id], name: 'index_leads_status_source_dead_reason')
+      add_index :leads, [:status_id, :source_id, :dead_reason_id],
+                name: 'index_leads_status_source_dead_reason',
+                algorithm: :concurrently
+    end
   end
 
   def down

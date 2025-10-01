@@ -324,7 +324,7 @@ module ReportCsv
         reasons = user.company.reasons.where(:id=>leads.map(&:dead_reason_id).uniq)
         @sources=user.company.sources.where(id: leads.map(&:source_id).uniq)
         CSV.generate do |csv|
-          exportable_fields = ['User', 'Total']
+          exportable_fields = ['Source', 'Total']
           reasons.each do |reason|
             exportable_fields << reason.reason
           end
@@ -337,6 +337,40 @@ module ReportCsv
               this_reason_data = this_source_data.where(:dead_reason_id=>reason.id)
               this_exportable_fields << this_reason_data.count
             end
+            csv << this_exportable_fields
+          end
+        end
+      end
+
+      def source_inactive_report_to_csv_optimized(options={}, user)
+        # Optimized: Single query with aggregation
+        aggregated_data = all.where(:status_id=>user.company.dead_status_ids)
+                             .joins(:source, :dead_reason)
+                             .group('sources.name, sources.id, dead_reason_id, reasons.reason')
+                             .count
+        
+        # Group by source for easier processing
+        source_groups = aggregated_data.group_by { |(source_name, source_id, reason_id, reason_name), count| [source_name, source_id] }
+        
+        # Get all unique reasons for consistent CSV structure
+        all_reasons = user.company.reasons.where(id: aggregated_data.keys.map { |k| k[2] }.uniq).pluck(:id, :reason).to_h
+        
+        CSV.generate do |csv|
+          # Header row
+          exportable_fields = ['Source', 'Total']
+          all_reasons.values.each { |reason| exportable_fields << reason }
+          csv << exportable_fields
+          
+          # Data rows
+          source_groups.each do |(source_name, source_id), source_data|
+            source_total = source_data.values.sum
+            this_exportable_fields = [source_name, source_total]
+            
+            all_reasons.each do |reason_id, reason_name|
+              count = source_data.select { |(_, _, rid, _), _| rid == reason_id }.values.sum
+              this_exportable_fields << count
+            end
+            
             csv << this_exportable_fields
           end
         end
