@@ -575,36 +575,33 @@ class ReportsController < ApplicationController
     lead_ids_with_visits = base_scope.distinct.pluck('leads.id')
     
     if lead_ids_with_visits.any?
-      # Single optimized query for all counts
-      counts = base_scope.where(id: lead_ids_with_visits)
-                     .joins(:source, :status)
-                     .select(<<-SQL.squish
-                       COUNT(DISTINCT leads.id) as total_count,
-                       COUNT(DISTINCT CASE WHEN sources.is_cp = true AND sources.name = 'Channel Partner' THEN leads.id END) as cp_count,
-                       COUNT(DISTINCT CASE WHEN leads.status_id = #{booking_status_id} THEN leads.id END) as booking_count
-                     SQL
-                     ).take
+      # Single optimized query for all counts - base_scope already contains the right leads
+      counts = base_scope.joins(:source, :status)
+                         .select(<<-SQL.squish
+                           COUNT(DISTINCT leads.id) as total_count,
+                           COUNT(DISTINCT CASE WHEN sources.is_cp = true AND sources.name = 'Channel Partner' THEN leads.id END) as cp_count,
+                           COUNT(DISTINCT CASE WHEN leads.status_id = #{booking_status_id} THEN leads.id END) as booking_count
+                         SQL
+                         ).take
 
       @walkin_count = counts&.total_count || 0
       @cp_count = counts&.cp_count || 0
       @booking_count = counts&.booking_count || 0
       
-      # Channel data based on unique lead IDs
-      channel_data_with_ids = base_scope.where(id: lead_ids_with_visits)
-                          .joins(:source)
-                          .group('sources.id')
-                          .distinct
-                          .count('leads.id')
+      # Channel data - base_scope already contains the right leads
+      channel_data_with_ids = base_scope.joins(:source)
+                                        .group('sources.id')
+                                        .distinct
+                                        .count('leads.id')
       
       source_names = current_user.company.sources.where(id: channel_data_with_ids.keys).pluck(:id, :name).to_h
       @channel_data = channel_data_with_ids.transform_keys { |source_id| source_names[source_id] || "Unknown Source" }
     end
 
-    # Paginated results - only get the leads that have visits in the date range
-    @leads = base_scope.where(id: lead_ids_with_visits)
-                   .select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
-                   .includes(:project, :status, :source, :broker)
-                   .paginate(page: params[:page], per_page: PER_PAGE)
+    # Paginated results - base_scope already contains the right leads
+    @leads = base_scope.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
+                       .includes(:project, :status, :source, :broker)
+                       .paginate(page: params[:page], per_page: PER_PAGE)
     
     @projects = @projects.select(:id, :name)
     # Optimized magic attributes - use pluck instead of map
