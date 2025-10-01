@@ -530,8 +530,9 @@ class ReportsController < ApplicationController
 
   def sales_dashboard
     # Early return if filters not applied
-    lead_statuses = current_user.company.booking_done_id
-    @lead_statuses = [lead_statuses]
+    booking_status_id = current_user.company.booking_done_id
+    @lead_statuses = [booking_status_id]
+    
     unless params[:project_id].present? && @start_date.present? && @end_date.present?
       @walkin_count = 0
       @cp_count = 0
@@ -542,6 +543,7 @@ class ReportsController < ApplicationController
       @lead_magic_values = {}
       return
     end
+
     # Base scope - reused for all queries
     base_scope = @leads.joins(:visits)
                        .where(project_id: params[:project_id])
@@ -549,44 +551,53 @@ class ReportsController < ApplicationController
                        .where('leads_visits.date >= ? AND leads_visits.date <= ?', 
                             @start_date.beginning_of_day, 
                             @end_date.end_of_day)
+
+    # Initialize counts
+    @walkin_count = 0
+    @cp_count = 0
+    @booking_count = 0
+    @channel_data = {}
+
+    # Get lead IDs with visits for consistent filtering
     lead_ids_with_visits = base_scope.distinct.pluck('leads.id')
+    
     if lead_ids_with_visits.any?
-      counts = base_scope.distinct.where(id: lead_ids_with_visits)
-                   .joins(:source, :status)
-                   .select(<<-SQL.squish
-                     COUNT(DISTINCT leads.id) as total_count,
-                     COUNT(DISTINCT CASE WHEN sources.is_cp = true AND sources.name = 'Channel Partner' THEN leads.id END) as cp_count,
-                     COUNT(DISTINCT CASE WHEN leads.status_id = #{lead_statuses} THEN leads.id END) as booking_count
-                   SQL
-                   ).take
+      # Single optimized query for all counts
+      counts = @leads.where(id: lead_ids_with_visits)
+                     .joins(:source, :status)
+                     .select(<<-SQL.squish
+                       COUNT(DISTINCT leads.id) as total_count,
+                       COUNT(DISTINCT CASE WHEN sources.is_cp = true AND sources.name = 'Channel Partner' THEN leads.id END) as cp_count,
+                       COUNT(DISTINCT CASE WHEN leads.status_id = #{booking_status_id} THEN leads.id END) as booking_count
+                     SQL
+                     ).take
+
       @walkin_count = counts&.total_count || 0
       @cp_count = counts&.cp_count || 0
       @booking_count = counts&.booking_count || 0
       
-      # Channel data also based on unique lead IDs
+      # Channel data based on unique lead IDs
       channel_data_with_ids = @leads.where(id: lead_ids_with_visits)
                           .joins(:source)
                           .group('sources.id')
                           .distinct
                           .count('leads.id')
+      
       source_names = current_user.company.sources.where(id: channel_data_with_ids.keys).pluck(:id, :name).to_h
       @channel_data = channel_data_with_ids.transform_keys { |source_id| source_names[source_id] || "Unknown Source" }
     end
-    
-    @walkin_count = counts&.total_count || 0
-    @cp_count = counts&.cp_count || 0
-    @booking_count = counts&.booking_count || 0
-    # Paginated results - use DISTINCT ON for better performance
-    @leads = base_scope.select('leads.id, leads.name, leads.mobile, 
-                                leads.email, leads.created_at, leads.status_id, 
-                                leads.source_id, leads.project_id, leads.broker_id')
-                      .includes(:project, :status, :source, :broker)
-                      .paginate(page: params[:page], per_page: PER_PAGE)
+
+    # Paginated results - only get the leads that have visits in the date range
+    @leads = @leads.where(id: lead_ids_with_visits)
+                   .select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
+                   .includes(:project, :status, :source, :broker)
+                   .paginate(page: params[:page], per_page: PER_PAGE)
     
     @projects = @projects.select(:id, :name)
-    # Optimized magic attributes - batch load with minimal overhead
+    
+    # Optimized magic attributes - use pluck instead of map
     if @leads.any?
-      lead_ids = @leads.map(&:id)
+      lead_ids = @leads.pluck(:id)  # Use pluck instead of map(&:id)
       
       @lead_magic_values = MagicAttribute
         .where(lead_id: lead_ids)
