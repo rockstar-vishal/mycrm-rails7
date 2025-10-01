@@ -15,15 +15,16 @@
                 .col-md-6
                   = render partial: 'shared/visited_range_selector'
 
-                .form-group.mr-2
-                  = label_tag :project_id, "Project Name", class: "mr-1"
+                .form-group.mr-1
+                  = label_tag :project_id, "Project Name", class: "mr-1 mt-2"
                   = select_tag :project_id,
                     options_from_collection_for_select(@projects, :id, :name, params[:project_id]),
+                    multiple: true,
                     include_blank: "Select Project",
-                    class: "form-control",
+                    class: "tomselect-checkbox mt-2",
                     style: "width: 200px;"
                 = submit_tag "Filter",
-                  class: "btn btn-success ml-2",
+                  class: "btn btn-success ml-2 mt-2",
                   id: "filter-btn",
                   disabled: true
 
@@ -39,7 +40,7 @@
               .w-100
                 %h6.border.p-1.mb-1.font-weight-bold.text-center Total Walkins
                 - if @walkin_count > 0
-                  = link_to reports_visits_path(start_date: @start_date, end_date: @end_date), target: "_blank", class: "text-decoration-none d-block clickable-card" do
+                  = link_to reports_visits_path(start_date: @start_date, end_date: @end_date, project_id: params[:project_id]), target: "_blank", class: "text-decoration-none d-block clickable-card" do
                     .d-inline-block.bg-info.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1.clickable-box{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px; position: relative;"}
                       VISITS
                       %div{style: "font-size: 1rem; font-weight: bold;"}= @walkin_count
@@ -53,7 +54,7 @@
               .w-100
                 %h6.border.p-1.mb-1.font-weight-bold.text-center Total Bookings
                 - if @booking_count > 0
-                  - booking_params = { "is_advanced_search" => "true", "project_ids" => [params[:project_id]], "visited_date_from" => @start_date, "visited_date_upto" => @end_date, "created_at_from" => @start_date, "created_at_upto" => @end_date, :lead_statuses => @lead_statuses, "visited" => "true" }
+                  - booking_params = { "is_advanced_search" => "true", "project_ids" =>params[:project_id], "visited_date_from" => @start_date, "visited_date_upto" => @end_date, :lead_statuses => @lead_statuses, "visited" => "true" }
                   = link_to leads_path(booking_params), target: "_blank", class: "text-decoration-none d-block clickable-card" do
                     .d-inline-block.bg-primary.text-white.font-italic.font-weight-bold.text-center.align-middle.w-100.mb-1.clickable-box{style: "height: 50px; line-height: 1.2; font-size: 0.85rem; padding-top: 4px; position: relative;"}
                       BOOKINGS
@@ -143,8 +144,8 @@
                   %br
                   Please try different filters or adjust your date range.
               - else
-                %h3.text-muted.font-weight-bold.mb-3 Apply Filters to View Data
-                %p.text-muted.lead 
+                %h3.text-muted.font-weight-bold.mb-5 Apply Filters to View Data
+                %p.text-muted.mb-5
                   Please select a project and visit date range, then click "Filter" 
                   %br
                   to view customer visit details and analytics.
@@ -185,6 +186,9 @@
   #customer-table-container {
     position: relative;
     overflow-x: auto;
+  }
+
+  #customer-table-container:not(:empty) {
     max-height: 600px;
     overflow-y: auto;
   }
