@@ -565,16 +565,6 @@ class ReportsController < ApplicationController
                             @start_date.beginning_of_day, 
                             @end_date.end_of_day)
 
-    # Initialize counts
-    @walkin_count = 0
-    @cp_count = 0
-    @booking_count = 0
-    @channel_data = {}
-
-    # Get lead IDs with visits for consistent filtering
-    lead_ids_with_visits = base_scope.distinct.pluck('leads.id')
-    
-    if lead_ids_with_visits.any?
       # Single optimized query for all counts - base_scope already contains the right leads
       counts = base_scope.joins(:source, :status)
                          .select(<<-SQL.squish
@@ -596,7 +586,6 @@ class ReportsController < ApplicationController
       
       source_names = current_user.company.sources.where(id: channel_data_with_ids.keys).pluck(:id, :name).to_h
       @channel_data = channel_data_with_ids.transform_keys { |source_id| source_names[source_id] || "Unknown Source" }
-    end
 
     # Paginated results - base_scope already contains the right leads
     @leads = base_scope.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
