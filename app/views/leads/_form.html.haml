@@ -190,6 +190,11 @@
   const sourcingFieldWrapper = document.querySelector('.custom-field-wrapper[data-field-name="sourcing_manager"]');
 
   function toggleSourcingManager() {
+    // Check if both elements exist before proceeding
+    if (!sourceSelect || !sourcingFieldWrapper) {
+      return; // Exit early if elements don't exist
+    }
+
     const selectedValue = sourceSelect.value.trim();
 
     if (selectedValue === "6") {
@@ -199,9 +204,11 @@
     }
   }
 
-  toggleSourcingManager();
-
-  sourceSelect.addEventListener("change", toggleSourcingManager);
+  // Only run if sourceSelect exists
+  if (sourceSelect) {
+    toggleSourcingManager();
+    sourceSelect.addEventListener("change", toggleSourcingManager);
+  }
 
   $("#lead_status_id").change(function () {
     if($(this).val()){
