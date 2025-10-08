@@ -425,8 +425,9 @@ class Lead < ActiveRecord::Base
 
   def is_ncd_required?
     if self.company.is_required_fields?("ncd")
-      inactive_status_ids = self.company.dead_status_ids << self.company.booking_done_id.to_s
-      self.company.setting.present? && self.company.set_ncd_non_mandatory_for_booked_status && inactive_status_ids.reject(&:blank?).include?(self&.status_id.to_s) ? false : true
+      inactive_status_ids = (self.company.dead_status_ids | [self.company.booking_done_id.to_s])
+      return false if inactive_status_ids.include?(self&.status_id.to_s)
+      return true
     else
       return false
     end
