@@ -183,17 +183,12 @@ class ReportsController < ApplicationController
   end
 
   def source_wise_inactive
-    # Optimized: Single query with proper includes and aggregation
-    base_query = @leads.where(:status_id=>current_user.company.dead_status_ids, user_id: current_user.manageables.ids)
+    # Use original query for HTML view compatibility
+    @data = @leads.where(:status_id=>current_user.company.dead_status_ids, user_id: current_user.manageables.ids)
     
-    # Get aggregated data in one query
-    @data = base_query.select('source_id, dead_reason_id, COUNT(*) as lead_count')
-                     .group('source_id, dead_reason_id')
-                     .includes(:source)
-    
-    # Extract unique IDs efficiently
-    source_ids = @data.pluck(:source_id).uniq.compact
-    reason_ids = @data.pluck(:dead_reason_id).uniq.compact
+    # Extract unique IDs efficiently without loading all records
+    source_ids = @data.distinct.pluck(:source_id).compact
+    reason_ids = @data.distinct.pluck(:dead_reason_id).compact
     
     # Load related data efficiently
     @reasons = current_user.company.reasons.where(:id=>reason_ids)
