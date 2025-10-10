@@ -19,13 +19,13 @@ class Lead < ActiveRecord::Base
 
   belongs_to :company
   has_magic_fields :through => :company
-  has_many :notifications, dependent: :destroy
-  has_many :visits, :class_name=>"::Leads::Visit", dependent: :destroy
-  has_many :system_messages, as: :messageable, :class_name=>"::SystemSms", dependent: :destroy
-  has_many :emails, as: :receiver, class_name: 'Email', dependent: :destroy
-  has_many :call_attempts, dependent: :destroy
-  has_many :custom_audits, class_name: "CustomAudit", foreign_key: :auditable_id, dependent: :destroy
-  has_many :magic_attributes, class_name: 'MagicAttribute', dependent: :destroy
+  has_many :notifications, dependent: :delete_all
+  has_many :visits, :class_name=>"::Leads::Visit", dependent: :delete_all
+  has_many :system_messages, as: :messageable, :class_name=>"::SystemSms", dependent: :delete_all
+  has_many :emails, as: :receiver, class_name: 'Email', dependent: :delete_all
+  has_many :call_attempts, dependent: :delete_all
+  has_many :custom_audits, class_name: "CustomAudit", foreign_key: :auditable_id, dependent: :delete_all
+  has_many :magic_attributes, class_name: 'MagicAttribute', dependent: :delete_all
   belongs_to :source, optional: true
   belongs_to :project
   belongs_to :user, optional: true
@@ -41,11 +41,11 @@ class Lead < ActiveRecord::Base
   belongs_to :stage, optional: true
   belongs_to :presales_stage, class_name: 'Stage', foreign_key: :presale_stage_id, optional: true
   belongs_to :dead_reason, :class_name=>"::Companies::Reason", optional: true
-  has_many :leads_secondary_sources, class_name: "::Leads::SecondarySource"
+  has_many :leads_secondary_sources, class_name: "::Leads::SecondarySource", dependent: :delete_all
   has_many :secondary_sources, through: :leads_secondary_sources, source: :source
-  has_many :call_logs, class_name: "Leads::CallLog", dependent: :destroy
-  has_many :push_notification_logs, class_name: 'PushNotificationLog', dependent: :destroy
-  has_many :whatsapp_message_logs, dependent: :destroy
+  has_many :call_logs, class_name: "Leads::CallLog", dependent: :delete_all
+  has_many :push_notification_logs, class_name: 'PushNotificationLog', dependent: :delete_all
+  has_many :whatsapp_message_logs, dependent: :delete_all
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, :allow_blank => true
 
   validate :mobile_validation, if: :mobile_number_present?
@@ -1613,7 +1613,8 @@ class Lead < ActiveRecord::Base
     end
 
     def delete_audit_logs
-      audits.destroy_all
+      # Optimized: Use delete_all instead of destroy_all for faster deletion
+      audits.delete_all
     end
 
     def set_executive
