@@ -1056,90 +1056,151 @@ class Lead < ActiveRecord::Base
 
     def to_csv(options = {}, exporting_user)
       CSV.generate do |csv|
+        # Cache company attributes outside the loop to avoid repeated method calls
+        company = exporting_user.company
+        is_privileged_user = exporting_user.is_super? || exporting_user.is_sl_admin? || exporting_user.is_marketing_manager?
+        secondary_source_enabled = company.setting.present? && company.secondary_source_enabled
+        dead_status_ids_set = Set.new(company.dead_status_ids.map(&:to_s))
+        cp_source_ids_set = Set.new(company.cp_sources.ids)
+        fb_ads_enabled = company.fb_ads_ids.present?
+        
+        # Cache field permissions
+        has_customer_type = company.is_allowed_field?("customer_type")
+        has_closing_executive = company.is_allowed_field?("closing_executive")
+        has_referal_name = company.is_allowed_field?("referal_name")
+        has_referal_mobile = company.is_allowed_field?("referal_mobile")
+        has_address = company.is_allowed_field?("address")
+        
+        # Build header row
         exportable_fields = ['Customer Name', 'Lead Number', 'Project', 'Assigned To', 'Lead Status', 'Presale Stage', 'Next Call Date', 'Comment', 'Source','Broker', 'Broker Number', 'Broker CreatedAt','Visited', 'Visited Date', 'Visit Counts', 'Visit Comments','Dead Reason', 'Dead Sub Reason', 'City', 'Created At',  'Last Updated At', 'Sub Source', 'Last User Assigned Date' ,'Last Modified By']
-        if exporting_user.is_super? || exporting_user.is_sl_admin? || exporting_user.is_marketing_manager?
-          exportable_fields << 'Mobile'
-          exportable_fields << 'Email'
-        end
-        if exporting_user.company.setting.present? && exporting_user.company.secondary_source_enabled
-          exportable_fields << 'Secondary Sources'
-        end
-        if exporting_user.company.is_allowed_field?("customer_type")
-          exportable_fields << 'Customer Type'
-        end
-        if exporting_user.company.is_allowed_field?("closing_executive")
-          exportable_fields << 'Closing Executive'
-        end
-        exportable_fields << 'Tentative Visit Date'
-        exportable_fields << 'Tentative Visit Day'
-        exportable_fields << 'Tentative Visit Time'
-        if exporting_user.company.is_allowed_field?("referal_name")
-          exportable_fields << 'Referal Name'
-        end
-        if exporting_user.company.is_allowed_field?("referal_mobile")
-          exportable_fields << 'Referal Mobile'
-        end
-        if exporting_user.company.is_allowed_field?("address")
-          exportable_fields << 'Address'
-        end
-        if exporting_user.company.fb_ads_ids.present?
-          exportable_fields << 'Facebook Ads Id'
-        end
-        magic_fields = exporting_user.company&.magic_fields&.order(:id)&.pluck(:id, :pretty_name)&.to_h || {}
+        exportable_fields.concat(['Mobile', 'Email']) if is_privileged_user
+        exportable_fields << 'Secondary Sources' if secondary_source_enabled
+        exportable_fields << 'Customer Type' if has_customer_type
+        exportable_fields << 'Closing Executive' if has_closing_executive
+        exportable_fields.concat(['Tentative Visit Date', 'Tentative Visit Day', 'Tentative Visit Time'])
+        exportable_fields << 'Referal Name' if has_referal_name
+        exportable_fields << 'Referal Mobile' if has_referal_mobile
+        exportable_fields << 'Address' if has_address
+        exportable_fields << 'Facebook Ads Id' if fb_ads_enabled
+        
+        magic_fields = company&.magic_fields&.order(:id)&.pluck(:id, :pretty_name)&.to_h || {}
         exportable_fields = exportable_fields | magic_fields.values
         csv << exportable_fields
 
-        magic_attributes = MagicAttribute.where(lead_id: all.ids).group("lead_id").select("lead_id, ARRAY_AGG(magic_field_id ORDER BY magic_field_id) AS magic_field_ids, ARRAY_AGG(value ORDER BY magic_field_id) AS values").as_json(except: [:id])
-        all.includes(project: :city).find_each do |client|
+        # Optimize magic attributes lookup with hash map - O(1) instead of O(n)
+        magic_attributes_map = MagicAttribute
+          .where(lead_id: all.ids)
+          .group("lead_id")
+          .select("lead_id, ARRAY_AGG(magic_field_id ORDER BY magic_field_id) AS magic_field_ids, ARRAY_AGG(value ORDER BY magic_field_id) AS values")
+          .as_json(except: [:id])
+          .index_by { |ma| ma["lead_id"] }
+
+        # Eagerly load all associations to prevent N+1 queries
+        leads = all.includes(
+          :status, 
+          :user, 
+          :presales_stage, 
+          :source, 
+          :broker, 
+          :dead_reason, 
+          :postsale_user, 
+          :last_lead_modified_user,
+          :enq_subsource,
+          :secondary_sources,
+          :visits,
+          project: :city
+        )
+
+        leads.find_each do |client|
+          # Build row data
           dead_reason = ""
           dead_sub_reason = ""
-          if exporting_user.company.dead_status_ids.include?(client.status_id.to_s)
-            dead_reason = client.dead_reason&.reason
-            dead_sub_reason = client.dead_sub_reason
+          if dead_status_ids_set.include?(client.status_id.to_s)
+            dead_reason = client.dead_reason&.reason || ""
+            dead_sub_reason = client.dead_sub_reason || ""
           end
-          final_phone = client.mobile
-          final_email = client.email
-          final_source =(client.source.name rescue "-")
-          if client.company.cp_sources.ids.include?(client.source_id)
-            final_broker = ("#{client.broker.name}#{' - ' + client.broker.firm_name if client.broker.firm_name.present?}" rescue "-")
-            broker_number = client.broker&.mobile
-            broker_created=client.broker&.created_at&.strftime("%d %B %Y")
+          
+          final_source = client.source&.name || "-"
+          final_broker = nil
+          broker_number = nil
+          broker_created = nil
+          
+          if cp_source_ids_set.include?(client.source_id)
+            if client.broker
+              final_broker = client.broker.name
+              final_broker += " - #{client.broker.firm_name}" if client.broker.firm_name.present?
+              broker_number = client.broker.mobile
+              broker_created = client.broker.created_at&.strftime("%d %B %Y")
+            else
+              final_broker = "-"
+            end
           end
-          this_exportable_fields = [ client.name, client.lead_no, (client.project.name rescue '-'),(client.user.name rescue '-'), client.status.name, (client.presales_stage&.name rescue '-'), (client.ncd.strftime("%d %B %Y") rescue nil), client.comment, final_source, final_broker, broker_number,broker_created, (client.visits.present? ? "Yes" : "No"), (client.visits.collect { |x| x.date.strftime("%d/%m/%Y") }.join(',') rescue "-"),(client.visits.present? ? client.visits.count : ""),(client.visits.where.not(comment: nil).collect{ |x| x.comment}.join(",") rescue "-"),dead_reason, dead_sub_reason, (client.city.name rescue "-"), (client.created_at.in_time_zone.strftime("%d %B %Y : %I.%M %p") rescue nil), (client.updated_at.in_time_zone.strftime("%d %B %Y : %I.%M %p") rescue nil), client.formatted_subsource, (client.last_user_assigned_date.in_time_zone.strftime("%d %B %Y : %I.%M %p") rescue "-"), (client.last_lead_modified_user.name rescue "-")]
-          if exporting_user.is_super? || exporting_user.is_sl_admin? || exporting_user.is_marketing_manager?
-            this_exportable_fields << final_phone
-            this_exportable_fields << final_email
+          
+          # Pre-calculate visit data
+          visits_array = client.visits.to_a
+          has_visits = visits_array.present?
+          visit_dates = has_visits ? visits_array.map { |x| x.date.strftime("%d/%m/%Y") }.join(',') : "-"
+          visit_count = has_visits ? visits_array.size : ""
+          visit_comments = has_visits ? visits_array.select { |x| x.comment.present? }.map(&:comment).join(",") : "-"
+          
+          # Format subsource
+          formatted_subsource = if client.sub_source.present?
+            client.sub_source
+          elsif client.enq_subsource.present?
+            client.enq_subsource.name
+          else
+            client.sub_source
           end
-          if exporting_user.company.setting.present? && exporting_user.company.secondary_source_enabled
-            this_exportable_fields << ((client.secondary_sources.pluck(:name).join(',')) rescue "")
-          end
-          if exporting_user.company.is_allowed_field?("customer_type")
-            this_exportable_fields << client.customer_type
-          end
-          if exporting_user.company.is_allowed_field?("closing_executive")
-            this_exportable_fields << client.postsale_user&.name
-          end
+          
+          this_exportable_fields = [
+            client.name, 
+            client.lead_no, 
+            client.project&.name || '-',
+            client.user&.name || '-', 
+            client.status&.name,
+            client.presales_stage&.name || '-',
+            client.ncd&.strftime("%d %B %Y"),
+            client.comment,
+            final_source,
+            final_broker,
+            broker_number,
+            broker_created,
+            has_visits ? "Yes" : "No",
+            visit_dates,
+            visit_count,
+            visit_comments,
+            dead_reason,
+            dead_sub_reason,
+            client.city&.name || "-",
+            client.created_at&.in_time_zone&.strftime("%d %B %Y : %I.%M %p"),
+            client.updated_at&.in_time_zone&.strftime("%d %B %Y : %I.%M %p"),
+            formatted_subsource,
+            client.last_user_assigned_date&.in_time_zone&.strftime("%d %B %Y : %I.%M %p") || "-",
+            client.last_lead_modified_user&.name || "-"
+          ]
+          
+          this_exportable_fields.concat([client.mobile, client.email]) if is_privileged_user
+          this_exportable_fields << client.secondary_sources.map(&:name).join(',') if secondary_source_enabled
+          this_exportable_fields << client.customer_type if has_customer_type
+          this_exportable_fields << client.postsale_user&.name if has_closing_executive
           this_exportable_fields << client.tentative_visit_planned&.strftime("%d-%m-%Y")
           this_exportable_fields << client.tentative_visit_planned&.strftime("%A")
           this_exportable_fields << client.tentative_visit_planned&.strftime("%I:%M %p")
-          if exporting_user.company.is_allowed_field?("referal_name")
-            this_exportable_fields << client.referal_name
-          end
-          if exporting_user.company.is_allowed_field?("referal_mobile")
-            this_exportable_fields << client.referal_mobile
-          end
-          if exporting_user.company.is_allowed_field?("address")
-            this_exportable_fields << client.address
-          end
-          if exporting_user.company.fb_ads_ids.present?
-            this_exportable_fields << client.fb_ads_id
-          end
-          magic_attribute_value = magic_attributes.select{ |ma| ma["lead_id"] == client.id }.first
+          this_exportable_fields << client.referal_name if has_referal_name
+          this_exportable_fields << client.referal_mobile if has_referal_mobile
+          this_exportable_fields << client.address if has_address
+          this_exportable_fields << client.fb_ads_id if fb_ads_enabled
+          
+          # Use hash lookup instead of array search - O(1) instead of O(n)
+          magic_attribute_value = magic_attributes_map[client.id]
           if magic_attribute_value.present?
             field_values = magic_attribute_value["magic_field_ids"].zip(magic_attribute_value["values"]).to_h
             values = magic_fields.keys.map { |id| field_values[id] || "" }
-            this_exportable_fields = this_exportable_fields + values
+            this_exportable_fields.concat(values)
+          else
+            this_exportable_fields.concat(magic_fields.keys.map { "" })
           end
+          
           csv << this_exportable_fields
         end
       end
