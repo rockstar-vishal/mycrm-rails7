@@ -478,26 +478,72 @@ module ReportCsv
       end
       
       def calls_report_to_csv(options = {}, user, start_date, end_date)
-        data = all.includes(:user).where("user_id IN (?) AND created_at BETWEEN ? AND ?", user.manageables.ids, start_date, end_date)
-        users = user.manageables.where(id: data.map(&:user_id))
+        # Use the already filtered data from controller instead of re-filtering
+        # Fix ambiguous user_id reference by specifying table name
+        data = all.includes(:user).where("leads_call_logs.user_id IN (?) AND leads_call_logs.created_at BETWEEN ? AND ?", user.manageables.ids, start_date, end_date)
+        
+        # Get unique user IDs efficiently
+        user_ids = data.distinct.pluck(:user_id)
+        users_map = user.manageables.where(id: user_ids).index_by(&:id)
+        
+        # Pre-calculate all statistics using SQL aggregation to avoid N+1 queries
+        # Group by user_id and calculate counts for each status type
+        total_counts = data.group(:user_id).count
+        
+        # Calculate completed calls per user
+        completed_counts = data
+          .where("leads_call_logs.other_data->>'status' IN (?)", ['completed', 'ANSWER', 'Call Complete', 'answered'])
+          .group(:user_id)
+          .count
+        
+        # Calculate missed calls per user
+        missed_counts = data
+          .where("leads_call_logs.other_data->>'status' IN (?)", ['no-answer', 'Missed', 'NOANSWER', 'busy', 'noans', 'client-hangup', 'canceled'])
+          .group(:user_id)
+          .count
+        
+        # Calculate abandoned calls per user
+        abandoned_counts = data
+          .where("leads_call_logs.other_data->>'status' IN (?)", ['CANCEL', 'failed', 'Executive Busy', 'Originate', 'Customer Busy', 'CONNECTING', 'BUSY'])
+          .group(:user_id)
+          .count
+        
+        # Calculate duration statistics per user using SQL aggregation
+        duration_stats = data
+          .group(:user_id)
+          .pluck(
+            'leads_call_logs.user_id',
+            'AVG(CAST(duration AS INTEGER))',
+            'SUM(CAST(duration AS INTEGER))'
+          )
+          .to_h { |user_id, avg, sum| [user_id, { avg: avg&.round(2) || 0, sum: sum || 0 }] }
 
         CSV.generate do |csv|
           exportable_fields = ["User", "Total Calls", "Completed", "Missed", "Abondoned", "Avg. Talk Time", "Total Talk Time"]
           csv << exportable_fields
-          users.each do |user|
-            total_count = data.where(user_id: user.id).count
-            completed_calls = data.completed_calls.where(user_id: user.id).count
-            missed_calls = data.missed.where(user_id: user.id).count
-            abandoned_calls = data.abandoned_calls.where(user_id: user.id).count
-
-            this_exportable_fields = [user.name, total_count, completed_calls, missed_calls, abandoned_calls]
-
-            duration = data.where(user_id: user.id).collect{|c| c.duration}
-            avg_duration = duration.map(&:to_i)
-            avg_talk_time= (avg_duration.sum.to_f / avg_duration.count).round(2)
-            this_exportable_fields << avg_talk_time
-            this_exportable_fields << avg_duration.sum
-
+          
+          user_ids.each do |user_id|
+            user_obj = users_map[user_id]
+            next unless user_obj
+            
+            total_count = total_counts[user_id] || 0
+            completed_calls = completed_counts[user_id] || 0
+            missed_calls = missed_counts[user_id] || 0
+            abandoned_calls = abandoned_counts[user_id] || 0
+            
+            avg_talk_time = duration_stats.dig(user_id, :avg) || 0
+            total_talk_time = duration_stats.dig(user_id, :sum) || 0
+            
+            this_exportable_fields = [
+              user_obj.name, 
+              total_count, 
+              completed_calls, 
+              missed_calls, 
+              abandoned_calls,
+              avg_talk_time,
+              total_talk_time
+            ]
+            
             csv << this_exportable_fields
           end
         end
