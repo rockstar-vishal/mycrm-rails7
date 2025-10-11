@@ -44,7 +44,7 @@ module Api
       end
 
       def show
-        hide_lead_mobile_for_executive = current_user.is_executive? && current_user.company.setting&.hide_lead_mobile_for_executive
+        hide_lead_mobile_for_executive = (current_user.is_telecaller?) || (current_user.is_executive? && current_user.company.setting&.hide_lead_mobile_for_executive)
         render json: { status: true, lead: @lead.as_api_response(:meta_details_with_detail).merge(hide_lead_mobile_for_executive: hide_lead_mobile_for_executive) }, status: 200 and return
       end
 
