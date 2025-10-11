@@ -512,9 +512,9 @@ module ReportCsv
         duration_stats = data
           .group(:user_id)
           .pluck(
-            'leads_call_logs.user_id',
-            'AVG(CAST(duration AS INTEGER))',
-            'SUM(CAST(duration AS INTEGER))'
+            Arel.sql('leads_call_logs.user_id'),
+            Arel.sql('AVG(CAST(duration AS INTEGER))'),
+            Arel.sql('SUM(CAST(duration AS INTEGER))')
           )
           .to_h { |user_id, avg, sum| [user_id, { avg: avg&.round(2) || 0, sum: sum || 0 }] }
 
