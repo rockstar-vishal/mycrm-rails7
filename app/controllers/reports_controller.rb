@@ -59,7 +59,8 @@ class ReportsController < ApplicationController
     if params[:is_advanced_search].present?
       @data = @data.advance_search(call_log_report_params)
     end
-    @users = current_user.manageables.where(id: @data.map(&:user_id))
+    # Use pluck to avoid loading all records into memory
+    @users = current_user.manageables.where(id: @data.distinct.pluck(:user_id))
     respond_to do |format|
       format.html
       format.csv do
