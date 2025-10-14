@@ -309,7 +309,7 @@ module Api
             brokers = JSON.parse(details)
           end
         else
-          brokers=@company.brokers.select("brokers.id, CONCAT(brokers.name, '--', brokers.firm_name) as text").as_json
+          brokers=@company.brokers.select("brokers.id, CONCAT(brokers.name, '--', brokers.firm_name, CASE WHEN brokers.cp_code IS NOT NULL AND brokers.cp_code != '' THEN CONCAT('--', brokers.cp_code) ELSE '' END) as text").as_json
         end
         render json: brokers, status: 200 and return
       end
