@@ -4,7 +4,7 @@ class ReportsController < ApplicationController
   before_action :set_start_end_date
   before_action :set_base_leads, except: [:sales_dashboard, :visits, :campaigns, :campaigns_report, :campaign_detail, :activity, :activity_details, :source_wise_visits, :trends, :site_visit_planned, :customized_status_dashboard, :scheduled_site_visits, :scheduled_site_visits_detail, :presale_visits, :gre_source_report]
   helper_method :ld_path, :bl_path, :dld_path, :ad_path, :comment_edit_text, :status_edit_html, :vd_path, :user_edit_html, :source_edit_html
-  helper_method :activity_search_params, :visit_params, :site_visit_tracker_params, :call_log_report_params, :status_dashboard_params, :user_call_reponse_search, :channel_partner_params, :campaigns_params
+  helper_method :activity_search_params, :visit_params, :site_visit_tracker_params, :call_log_report_params, :status_dashboard_params, :sales_dashboard_params, :user_call_reponse_search, :channel_partner_params, :campaigns_params
   PER_PAGE = 20
 
   def source
@@ -561,6 +561,10 @@ class ReportsController < ApplicationController
                             @start_date.beginning_of_day, 
                             @end_date.end_of_day)
 
+
+    base_scope = base_scope.where(status_id: params[:status_ids]) if params[:status_ids].present?
+    base_scope = base_scope.where(source_id: params[:source_ids]) if params[:source_ids].present?
+
     # Initialize counts with safe defaults
     @walkin_count = 0
     @cp_count = 0
@@ -713,6 +717,10 @@ class ReportsController < ApplicationController
 
   def status_dashboard_params
     params.permit(:is_advanced_search, :start_date, :end_date, :manager_id, :visited, :site_visit_from, :site_visit_upto, project_ids: [], lead_statuses: [], manager_ids: [])
+  end
+
+  def sales_dashboard_params
+    params.permit(:start_date, :end_date, :page, project_id: [], source_ids: [], status_ids: [])
   end
 
   def user_call_reponse_search
