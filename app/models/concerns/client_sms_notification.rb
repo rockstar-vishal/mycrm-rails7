@@ -4,7 +4,7 @@ module ClientSmsNotification
   included do
     before_validation :set_changes
     after_create :new_lead_generated_sms,  :new_lead_assigned, unless: Proc.new { |lead| lead.cannot_send_notification}
-    after_commit :missed_followup, :site_visit_done_sms, :ravima_site_visit_done_sms, :site_visit_schedule_sms, :on_lead_assign, on: [:create, :update], unless: Proc.new { |lead| lead.cannot_send_notification }
+    after_commit :missed_followup, :site_visit_done_sms, :ravima_site_visit_done_sms, :site_visit_schedule_sms, :on_lead_assign, :house_truebulk_sms, on: [:create, :update], unless: Proc.new { |lead| lead.cannot_send_notification }
 
     def call_log_exotel_sms_integration_enabled?
       self.call_logs.present? && self.call_logs.first.third_party_id == 1
@@ -66,6 +66,20 @@ module ClientSmsNotification
           user_id: self.user_id,
         )
         ss.save
+      end
+      if self.company.template_flag_name =="house"
+        if self.company.enable_status_wise_notification && self.company.notification_templates.find_by(notification_category: "lead create").present?
+          template = self.company.notification_templates.find_by(notification_category: "lead create")
+          ss = self.company.system_smses.new(
+            messageable_id: self.id,
+            messageable_type: "Lead",
+            mobile: self.mobile,
+            text: template.body,
+            template_id: template.template_id,
+            user_id: self.user_id
+          )
+          ss.save
+        end
       end
     end
 
@@ -189,6 +203,23 @@ module ClientSmsNotification
           template_id: message_attributes[:template_id]
         )
         ss.save
+      end
+    end
+
+    def house_truebulk_sms
+      if self.company.template_flag_name =="house"
+        if self.company.enable_status_wise_notification && self.company.notification_templates.find_by(notification_category: self.status.name).present?
+          template = self.company.notification_templates.find_by(notification_category: self.status.name)
+          ss = self.company.system_smses.new(
+            messageable_id: self.id,
+            messageable_type: "Lead",
+            mobile: self.mobile,
+            text: template.body,
+            template_id: template.template_id,
+            user_id: self.user_id
+          )
+          ss.save
+        end
       end
     end
 

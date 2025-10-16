@@ -5,7 +5,7 @@ class NotificationTemplate < ActiveRecord::Base
     message: "Title should be unique" }
   validates :body, presence: true
   before_save :save_fields
-  CATEGORY = ['lead create']
+  CATEGORY = ['lead create', 'Ringing', 'Not Connected', 'Visited', 'Site Visit Scheduled', 'Warm', 'Hot', 'Lost', 'Booked', 'Unqualified']
   def save_fields
     dynamic_vars = self.body.scan(/\{{.*?\}}/).map{|content| content.gsub(/{{|}}/,'')}
     self.fields = dynamic_vars
