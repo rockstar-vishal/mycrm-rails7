@@ -1,16 +1,6 @@
 require 'csv'
 namespace :one_timers do
-  task :seed_company => :environment do
-    c = Company.new(:name=>"Corelto", :description=>"Parent Company", :domain=>"corelto.co", :sms_mask=>"ENRCHR", :dead_status_id=>22, :expected_site_visit_id=>16, :booking_done_id=>13)
-    c.save!
-  end
-
-  task :seed_sysad => :environment do
-    c = Company.unscoped.find_by_domain "corelto.co"
-    u = c.users.build(:name=>"Corelto Admin", :mobile=>"9999999999", :email=>"admin@corelto.co", :role_id=>1, :city_id=>1, :state=>"MH", :country=>"IN", :password=>"password")
-    u.save!
-  end
-
+  
   task :reset_statuses => :environment do
     ::Status.destroy_all
     ActiveRecord::Base.connection.reset_pk_sequence!('statuses')
