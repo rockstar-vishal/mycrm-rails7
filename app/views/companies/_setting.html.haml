@@ -195,7 +195,7 @@
       .col-md-3
         = s.text_field :nine_nine_profile_id, hide_label: true, placeholder: 'Enter Nine Nine Profile Id'
       .col-md-3
-        = s.select :template_flag_name, options_for_select([['ravima','ravima'], ['panom', 'panom'], ['ceratec', 'ceratec'], ['amruttara', 'amruttara'], ['ashapura', 'ashapura'], ['house', 'house']], (@company.template_flag_name)),{ hide_label: 'true',include_blank: "Email Template Flag" }, {class: "form-control"}
+        = s.select :template_flag_name, options_for_select([['ravima','ravima'], ['panom', 'panom'], ['ceratec', 'ceratec'], ['amruttara', 'amruttara'], ['ashapura', 'ashapura'], ['house of chavan', 'house of chavan']], (@company.template_flag_name)),{ hide_label: 'true',include_blank: "Email Template Flag" }, {class: "form-control"}
       .col-md-3
         .form-group
           = s.select :chart_type, options_for_select([["Pie Chart","Pie Chart"], ["Bar Chart", "Bar Chart"]], @company.chart_type), {hide_label: 'true', include_blank: "Chart Type"},{class: 'form-control'}

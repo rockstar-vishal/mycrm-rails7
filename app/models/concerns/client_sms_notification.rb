@@ -67,20 +67,6 @@ module ClientSmsNotification
         )
         ss.save
       end
-      if self.company.template_flag_name =="house"
-        if self.company.enable_status_wise_notification && self.company.notification_templates.find_by(notification_category: "lead create").present?
-          template = self.company.notification_templates.find_by(notification_category: "lead create")
-          ss = self.company.system_smses.new(
-            messageable_id: self.id,
-            messageable_type: "Lead",
-            mobile: self.mobile,
-            text: template.body,
-            template_id: template.template_id,
-            user_id: self.user_id
-          )
-          ss.save
-        end
-      end
     end
 
     def ravima_site_visit_done_sms
@@ -207,20 +193,21 @@ module ClientSmsNotification
     end
 
     def house_truebulk_sms
-      if self.company.template_flag_name =="house"
-        if self.company.enable_status_wise_notification && self.company.notification_templates.find_by(notification_category: self.status.name).present?
-          template = self.company.notification_templates.find_by(notification_category: self.status.name)
-          ss = self.company.system_smses.new(
-            messageable_id: self.id,
-            messageable_type: "Lead",
-            mobile: self.mobile,
-            text: template.body,
-            template_id: template.template_id,
-            user_id: self.user_id
-          )
-          ss.save
-        end
-      end
+      return unless self.company.template_flag_name == "house of chavan"
+      return unless self.company.enable_status_wise_notification
+      notification_category = self.status&.name == "New" ? "lead create" : self.status&.name
+
+      template = self.company.notification_templates.find_by(notification_category: notification_category)
+      return unless template.present?
+
+      self.company.system_smses.create(
+        messageable_id: self.id,
+        messageable_type: "Lead",
+        mobile: self.mobile,
+        text: template.body,
+        template_id: template.template_id,
+        user_id: self.user_id
+      )
     end
 
     def set_changes

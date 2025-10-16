@@ -25,7 +25,7 @@ class SystemSms < ActiveRecord::Base
       Resque.enqueue(ProcessAmruttaraSms, self.id)
     elsif self.company.template_flag_name == "ashapura"
       Resque.enqueue(ProcessAshpuraSms, self.id)
-    elsif self.company.template_flag_name == "house"
+    elsif self.company.template_flag_name == "house of chavan"
       Resque.enqueue(ProcessHouseSms, self.id)
     else
       Resque.enqueue(ProcessSystemSms, self.id)
