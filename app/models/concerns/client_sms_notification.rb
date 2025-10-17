@@ -4,7 +4,7 @@ module ClientSmsNotification
   included do
     before_validation :set_changes
     after_create :new_lead_generated_sms,  :new_lead_assigned, unless: Proc.new { |lead| lead.cannot_send_notification}
-    after_commit :missed_followup, :site_visit_done_sms, :ravima_site_visit_done_sms, :site_visit_schedule_sms, :on_lead_assign, on: [:create, :update], unless: Proc.new { |lead| lead.cannot_send_notification }
+    after_commit :missed_followup, :site_visit_done_sms, :ravima_site_visit_done_sms, :site_visit_schedule_sms, :on_lead_assign, :house_truebulk_sms, on: [:create, :update], unless: Proc.new { |lead| lead.cannot_send_notification }
 
     def call_log_exotel_sms_integration_enabled?
       self.call_logs.present? && self.call_logs.first.third_party_id == 1
@@ -191,6 +191,28 @@ module ClientSmsNotification
         ss.save
       end
     end
+
+    def house_truebulk_sms
+      company = self.company
+      status_name = self.status&.name
+      return unless company.template_flag_name == "house of chavan" && company.enable_status_wise_notification
+
+      notification_category = (status_name == "New") ? "lead create" : status_name
+
+      template = company.notification_templates.find_by(notification_category: notification_category)
+
+      return unless template.present?
+
+      company.system_smses.create(
+        messageable_id: self.id,
+        messageable_type: "Lead",
+        mobile: self.mobile,
+        text: template.body,
+        template_id: template.template_id,
+        user_id: self.user_id
+      )
+    end
+
 
     def set_changes
       @changes = self.changes
