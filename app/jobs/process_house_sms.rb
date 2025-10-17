@@ -14,9 +14,8 @@ class ProcessHouseSms
       @process_house_sms_logger.info("processing sms - #{id} - 1")
       mobile= sms.mobile
       message = CGI.escape(sms.text).gsub('+', '%20').gsub('.', '%2E').gsub('-', '%2D')
-      url = URI.parse("http://truebulksms.biz/api.php?username=saideep&password=273493&sender=SDCONS&sendto=91#{mobile}&message=#{message}&PEID=#{sms.sender_id}&templateid=#{sms.template_id}")
+      url = URI.parse("http://truebulksms.biz/api.php?username=saideep&password=273493&sender=SDCONS&sendto=91#{mobile}&message=#{message}&PEID=1701175748367269377&templateid=#{sms.template_id}")
       http_object = Net::HTTP.new(url.host, url.port)
-
       http_object.use_ssl = true if url.scheme == 'https'
 
       request = Net::HTTP::Post.new(url)
