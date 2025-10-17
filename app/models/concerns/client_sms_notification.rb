@@ -193,14 +193,17 @@ module ClientSmsNotification
     end
 
     def house_truebulk_sms
-      return unless self.company.template_flag_name == "house of chavan"
-      return unless self.company.enable_status_wise_notification
-      notification_category = self.status&.name == "New" ? "lead create" : self.status&.name
+      company = self.company
+      status_name = self.status&.name
+      return unless company.template_flag_name == "house of chavan" && company.enable_status_wise_notification
 
-      template = self.company.notification_templates.find_by(notification_category: notification_category)
+      notification_category = (status_name == "New") ? "lead create" : status_name
+
+      template = company.notification_templates.find_by(notification_category: notification_category)
+
       return unless template.present?
 
-      self.company.system_smses.create(
+      company.system_smses.create(
         messageable_id: self.id,
         messageable_type: "Lead",
         mobile: self.mobile,
@@ -209,6 +212,7 @@ module ClientSmsNotification
         user_id: self.user_id
       )
     end
+
 
     def set_changes
       @changes = self.changes
