@@ -1,4 +1,6 @@
 class ProcessGbkgroupQrGenerationTrigger
+  require 'rqrcode'
+  require 'chunky_png'
   @queue = :process_whatsapp
   @process_gbkgroup_whatsapp_logger = Logger.new('log/process_whatsapp.log')
 
@@ -13,19 +15,18 @@ class ProcessGbkgroupQrGenerationTrigger
       campaign_data = send(formatted_status, lead, broker)
       qr_file_path = nil
       if formatted_status == "send_site_visit_url"
-        qrcode = RQRCode::QRCode.new(lead.lead_no)
+        qrcode = RQRCode::QRCode.new(lead.lead_no.to_s, mode: :byte_8bit, level: :h)
 
         png = qrcode.as_png(
-          bit_depth: 1,
+          bit_depth: 8,
           border_modules: 4,
           color_mode: ChunkyPNG::COLOR_GRAYSCALE,
           color: "black",
-          file: nil,
           fill: "white",
-          module_px_size: 11,
+          module_px_size: 10,
           resize_exactly_to: false,
           resize_gte_to: false,
-          size: 300
+          size: 1500
         )
 
         folder_path = Rails.root.join("public")
@@ -36,6 +37,7 @@ class ProcessGbkgroupQrGenerationTrigger
         File.open(qr_file_path, "wb") { |file| file.write(png.to_s) } unless File.exist?(qr_file_path)
       end
       media_url = "https://#{lead.company.domain}/#{lead.lead_no}.png"
+      # media_url = "https://5b81e34c78d4.ngrok-free.app/#{lead.lead_no}.png"
       if formatted_status == "send_site_visit_url"
         request = {
           "apiKey": "#{lead.company.whatsapp_integration.integration_key}",
