@@ -412,7 +412,7 @@ class Lead < ActiveRecord::Base
   end
 
   def client_integration_enable?
-    self.company.setting.client_integration_enable
+    self.company.setting.client_integration_enable rescue false
   end
 
   def presale_user_site_visit_enabled?
