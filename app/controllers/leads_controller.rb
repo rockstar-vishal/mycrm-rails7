@@ -492,7 +492,6 @@ class LeadsController < ApplicationController
         @call_logs = @call_logs.advance_search(call_logs_search_params)
       end
     else
-      @call_logs = @call_logs.incoming
       @call_logs = @call_logs.advance_search(call_logs_search_params)
     end
 
