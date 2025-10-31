@@ -443,7 +443,8 @@ class CompaniesController < ApplicationController
           :only_10_digit_mobile_number_enabled,
           :enable_campaign_report,
           :cp_lead_qr_enable,
-          :client_visit_qr
+          :client_visit_qr,
+          :sv_form_rera_no_required
         ],
         magic_fields_attributes: [
           :id,
