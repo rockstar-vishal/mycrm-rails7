@@ -115,7 +115,8 @@ class Companies::Setting < ActiveRecord::Base
     :only_10_digit_mobile_number_enabled,
     :enable_campaign_report,
     :cp_lead_qr_enable,
-    :client_visit_qr
+    :client_visit_qr,
+    :sv_form_rera_no_required
   ]
 
   def default_fields_values
