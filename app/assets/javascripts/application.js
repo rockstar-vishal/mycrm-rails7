@@ -32,6 +32,14 @@
 //= require_tree .
 
 
+// Flash message dismiss handler
+$(document).on('click', '#flash .close', function(e) {
+  e.preventDefault();
+  $(this).closest('.alert').fadeOut(300, function() {
+    $(this).remove();
+  });
+});
+
 $(document).ready(function() {
   handleAdvanceSearch();
   handleSubscription();
@@ -583,5 +591,6 @@ $(document).on('shown.bs.modal', function() {
       });
     }
   });
+  
 });
 
