@@ -2592,3 +2592,26 @@ border-radius: 10px;
     height: 20px;
     line-height: 1;
 }
+[class*="col-md-"].required .form-group label::after,
+[class*="col-md-"][class*="required"] .form-group label::after {
+  content: " *";
+  color: #dc3545;
+  font-weight: bold;
+}
+
+#booking-done-fields .required .form-group label::after,
+#booking-loan-fields .required .form-group label::after,
+#dead-reason .required .form-group label::after,
+#token_status_fields .required .form-group label::after,
+#tentative-visit-planned.required .form-group label::after,
+#ncd_.required .form-group label::after {
+  content: " *";
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.form-group.required label::after {
+  content: " *";
+  color: #dc3545;
+  font-weight: bold;
+}

@@ -560,10 +560,14 @@ class ReportsController < ApplicationController
                        .where('leads_visits.date >= ? AND leads_visits.date <= ?', 
                             @start_date.beginning_of_day, 
                             @end_date.end_of_day)
+                       .distinct
 
+   booking_date_params = { 'booking_date_from' => params[:booking_date_from], 
+                           'booking_date_to' => params[:booking_date_to]}
 
     base_scope = base_scope.where(status_id: params[:status_ids]) if params[:status_ids].present?
     base_scope = base_scope.where(source_id: params[:source_ids]) if params[:source_ids].present?
+    base_scope = base_scope.advance_search(booking_date_params, current_user) if (params[:booking_date_from].present? || params[:booking_date_to].present?)
 
     # Initialize counts with safe defaults
     @walkin_count = 0
@@ -596,10 +600,10 @@ class ReportsController < ApplicationController
     end
 
     # Paginated results - base_scope already contains the right leads
-    @leads = base_scope.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id')
+    @leads = base_scope.select('leads.id, leads.name, leads.mobile, leads.email, leads.created_at, leads.status_id, leads.source_id, leads.project_id, leads.broker_id, leads.booking_date')
                        .includes(:project, :status, :source, :broker)
                        .paginate(page: params[:page], per_page: PER_PAGE)
-    
+
     @projects = @projects.select(:id, :name)
     # Optimized magic attributes - use pluck instead of map
     if @leads.any?
