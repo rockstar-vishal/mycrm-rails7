@@ -51,7 +51,7 @@
       .col-md-6#booking-done-fields.row{:style => ("display:none;" unless @lead.status_id == @company.booking_done_id)}
         .col-md-6.required
           .form-group
-            = f.text_field :booking_date, :value=>(Date.parse(@lead.booking_date.to_s) rescue nil), class: "form-control pull-right datetimepicker", placeholder: "Booking Date"
+            = f.text_field :booking_date, label: 'Booking Date', :value=>(Date.parse(@lead.booking_date.to_s) rescue nil), class: "form-control pull-right datetimepicker", placeholder: "Booking Date"
         .col-md-6.required
           = f.file_field :booking_form, label: 'Booking Form', class: "form-control"
     - if @company.setting.present? && @company.enable_booking_loan_fields
