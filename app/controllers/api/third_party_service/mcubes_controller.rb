@@ -93,7 +93,7 @@ class Api::ThirdPartyService::McubesController < PublicApiController
         direction: 'incoming',
         sid: params[:callid],
         start_time: (Time.zone.parse(params[:starttime]) rescue nil),
-        end_time: (Time.zone.parse(params[:endtime]) rescue nil)
+        end_time: (Time.zone.parse(params[:endtime]) rescue nil),
         to_number: customer_phone,
         from_number: @lead.mobile,
         status: params[:dialstatus],
