@@ -1,6 +1,6 @@
 class Api::ThirdPartyService::McubesController < PublicApiController
 
-  before_action :find_company, except: [:callback, :auto_dailer_hangup]
+  before_action :find_company, except: [:callback, :auto_dailer_hangup, :incoming_call_v2]
 
   def callback
     @call_log = Leads::CallLog.find_by(sid: mcube_params[:callid])
@@ -58,6 +58,52 @@ class Api::ThirdPartyService::McubesController < PublicApiController
       render :json=>{:status=>"Success"}, status: 200 and return
     else
       render json: {status: false, :message=>"Lead not created", :debug_message=>@lead.errors.full_messages.join(","), :data=>{}}, status: 422 and return
+    end
+  end
+
+  def incoming_call_v2
+    mcube_no = params[:clicktocalldid]
+    @company = (Company.joins(:mcube_groups).where("mcube_groups.number ILIKE ?", "%#{mcube_no&.last(10)}").where(mcube_groups: { is_active: true }).first ||
+  Company.joins(:mcube_groups).where(mcube_groups: { number: mcube_no, is_active: true }).first)
+    render json: {status: false, message: "Invalid"}, status: 404 and return if @company.blank?
+    
+    mcube_sid = @company.mcube_sids.where(number: mcube_no).last || @company.mcube_sids.where(number: mcube_no&.last(10)).last
+    project = mcube_sid&.project&.id
+    customer_phone = params[:callto]
+    emp_phone = params[:emp_phone]
+    @lead = @company.leads.active_for(@company).where("RIGHT(REPLACE(mobile,' ', ''), 10) LIKE ? AND project_id = ?", customer_phone.last(10), project).last
+    if mcube_sid.is_round_robin_enabled? && ::Leads::CallLog::MISSED_STATUS.include?(params[:dialstatus])
+      user_id = mcube_sid.find_round_robin_user
+    else
+      user_id = (@company.users.active.find_by(mobile: emp_phone) || @company.users.active.superadmins.first).id
+    end
+    unless @lead.present?
+      @lead = @company.leads.build(
+          :mobile=> customer_phone,
+          :source_id=> (mcube_sid.source_id || 2),
+          :enquiry_sub_source_id => mcube_sid.sub_source_id,
+          :status_id=>@company.new_status_id,
+          :user_id=>user_id,
+        )
+    end
+    @lead.project_id = project if project.present?
+    if @lead.save
+      call_logs = @lead.call_logs.build(
+        caller: 'Lead',
+        direction: 'incoming',
+        sid: params[:callid],
+        start_time: (Time.zone.parse(params[:starttime]) rescue nil),
+        end_time: (Time.zone.parse(params[:endtime]) rescue nil)
+        to_number: customer_phone,
+        from_number: @lead.mobile,
+        status: params[:dialstatus],
+        third_party_id: 'mcube',
+        phone_number_sid: mcube_no
+      )
+      call_logs.save
+      render :json=>{:status=>"Success"}, status: 200 and return
+    else
+      render json: {status: false, :message=>"Lead not saved", :debug_message=>@lead.errors.full_messages.join(",")}, status: 422 and return
     end
   end
 

@@ -282,6 +282,7 @@ Rails.application.routes.draw do
         collection do
           post :callback
           post :incoming_call
+          post :incoming_call_v2
           post :ctc_ic
           post :hangup
           post ':uuid/auto_dailer_hangup', to: "mcubes#auto_dailer_hangup"
