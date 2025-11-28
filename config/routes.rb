@@ -283,6 +283,7 @@ Rails.application.routes.draw do
           post :callback
           post :incoming_call
           post :incoming_call_v2
+          post ':companies_uuid/incoming_call_ai', to: 'mcubes#incoming_call_ai'
           post :ctc_ic
           post :hangup
           post ':uuid/auto_dailer_hangup', to: "mcubes#auto_dailer_hangup"
