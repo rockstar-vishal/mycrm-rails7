@@ -1,6 +1,6 @@
 class Api::ThirdPartyService::McubesController < PublicApiController
 
-  before_action :find_company, except: [:callback, :auto_dailer_hangup, :incoming_call_v2]
+  before_action :find_company, except: [:callback, :auto_dailer_hangup, :incoming_call_v2, :incoming_call_ai]
 
   def callback
     @call_log = Leads::CallLog.find_by(sid: mcube_params[:callid])
@@ -20,6 +20,17 @@ class Api::ThirdPartyService::McubesController < PublicApiController
     else
       render :json=>{:status=>"Call log not found"}, status: 404
     end
+  end
+
+  def incoming_call_ai
+    @company = Company.find_by_uuid(params[:companies_uuid])
+    render json: {message: 'Invalid UUID'}, status: 400 and return if @company.blank?
+
+    File.open(Rails.root.join('log', 'mcube_ai_params.log'), 'a') do |file|
+      file.puts(params.to_json)
+    end
+    
+    render json: { message: "Success" }, status: 200
   end
 
   def ctc_ic
@@ -265,5 +276,4 @@ class Api::ThirdPartyService::McubesController < PublicApiController
       :source
     )
   end
-
 end
