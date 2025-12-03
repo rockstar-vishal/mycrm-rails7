@@ -117,9 +117,9 @@ Rails.application.configure do
   # Configure SMTP settings
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    :user_name => "AKIARRQ5JN5T54YDEF53",
-    :password => "BLAemLncb7tr7WqJppih3+mKyILQe8EFipjierUHmVSa",
-    :domain => "corelto.co",
+    :user_name => "",
+    :password => "",
+    :domain => "",
     :address => "email-smtp.ap-south-1.amazonaws.com",
     :port => 25,
     :authentication => :plain,

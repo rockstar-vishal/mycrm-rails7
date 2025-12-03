@@ -111,7 +111,7 @@ module ClientSmsNotification
           messageable_id: self.user.id,
           messageable_type: "User",
           mobile: self.user.mobile,
-          text: "Dear user, you have received a lead on the Corelto panel for Mehta Group. Kindly login to the panel and give a call within 5 mins.",
+          text: "Dear user, you have received a lead on the CRM panel for Mehta Group. Kindly login to the panel and give a call within 5 mins.",
           user_id: (Lead.current_user.id rescue nil),
           template_id: '1707171197361122248'
         )
@@ -176,7 +176,7 @@ module ClientSmsNotification
       message_attributes = if self.company.pg_sms_api_enabled
                               {template_id: "1707169277452886715", text: "Dear#{self.user&.name}, A new lead has been assigned to you today at #{self.updated_at.strftime('%I:%M %p')} Client Name -#{self.name} Divine Realtors"}
       elsif self.company.template_flag_name =="amruttara"
-        {template_id: "1707171197361122248", text: "Dear user, you have received a lead on the Corelto panel for Mehta Group. Kindly login to the panel and give a call within 5 mins."}
+        {template_id: "1707171197361122248", text: "Dear user, you have received a lead on the CRM Panel for Mehta Group. Kindly login to the panel and give a call within 5 mins."}
       end
 
       if message_attributes.present? && message_attributes[:template_id].present? && message_attributes[:text].present? && @changes.present? && self.previous_changes.present? && self.previous_changes.include?(:user_id)
