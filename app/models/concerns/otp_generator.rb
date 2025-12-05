@@ -12,7 +12,7 @@ module OtpGenerator
         otp.send_sms_alert
         return true, otp
       else
-        otp = self.otps.for_phones.build(validatable_data: data[:validatable_data], event_type: data[:event_type])
+        otp = self.otps.for_phones.build(validatable_data: data[:validatable_data], event_type: data[:event_type], resource_id: data[:resource_id], resource_type: data[:resource_type])
         if otp.save
           return true, otp
         else
