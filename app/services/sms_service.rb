@@ -118,7 +118,6 @@ class SmsService
     end
 
     def prepare_variables(other_data, mobile_number, otp_code, otp_resource)
-      debugger
       variables = other_data.map do |key, value|
         if value == 'mobile'
           [key, mobile_number]
