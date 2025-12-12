@@ -27,6 +27,11 @@ module LeadNotifications
     end
 
     def send_whatsapp_on_create
+      # Agami Realty DoubleTick integration - check by company UUID
+      if self.company.uuid == 'df33c145-78db-4ddd-be80-04c000c7d5be'
+        Resque.enqueue(::ProcessAgamiDoubletickWhatsappTrigger, self.id, 'on_create')
+      end
+      
       if self.company.whatsapp_integration&.active
         if self.company.whatsapp_integration.user_name == "golden abode"
           body_values = {
@@ -75,6 +80,15 @@ module LeadNotifications
     end
 
     def send_whatsapp_notification_to_client
+      # Agami Realty DoubleTick integration - check by company UUID
+      if self.company.uuid == 'df33c145-78db-4ddd-be80-04c000c7d5be' && self.previous_changes.present? && self.previous_changes["status_id"].present?
+        # Check if the new status maps to a DoubleTick template
+        status_name = self.status&.name
+        if status_name.present? && ProcessAgamiDoubletickWhatsappTrigger::STATUS_TEMPLATE_MAPPING.key?(status_name)
+          Resque.enqueue(::ProcessAgamiDoubletickWhatsappTrigger, self.id)
+        end
+      end
+      
       if self.company.whatsapp_integration&.active && self.company.whatsapp_integration.integration_key.present?
         if self.company.whatsapp_integration.user_name == "panom" && self.previous_changes.present? && self.previous_changes["status_id"].present? && [12,49,50,54,87,310,405,406,407].include?(self.status_id)
           Resque.enqueue(::ProcessPanomWhatsappTrigger, self.id)
