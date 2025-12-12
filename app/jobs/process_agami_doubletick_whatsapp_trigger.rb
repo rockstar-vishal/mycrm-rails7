@@ -51,7 +51,10 @@ class ProcessAgamiDoubletickWhatsappTrigger
       )
 
       if success
-        @process_agami_doubletick_logger.info("Successfully sent DoubleTick WhatsApp template '#{template_name}' for Lead ID: #{id}")
+        message_id = response.is_a?(Hash) ? response[:message_id] : nil
+        log_message = "Successfully sent DoubleTick WhatsApp template '#{template_name}' for Lead ID: #{id}"
+        log_message += " - Message ID: #{message_id}" if message_id.present?
+        @process_agami_doubletick_logger.info(log_message)
       else
         @process_agami_doubletick_logger.error("Failed to send DoubleTick WhatsApp template for Lead ID: #{id} - Error: #{response}")
       end
