@@ -28,7 +28,8 @@ class DoubletickNotificationService
                 language: "en",
                 templateName: template_name
               },
-              to: phone_number
+              to: phone_number,
+              from: "+918050771555"
             }
           ]
         }.to_json

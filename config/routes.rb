@@ -289,6 +289,11 @@ Rails.application.routes.draw do
           post ':uuid/auto_dailer_hangup', to: "mcubes#auto_dailer_hangup"
         end
       end
+      resources :double_tick, only: [] do
+        collection do
+          post :log_messages
+        end
+      end
       resources :caller_desk, only: [] do
         collection do
           get :hangup
