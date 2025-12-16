@@ -21,15 +21,24 @@ class DoubletickNotificationService
         url = URI.parse("https://public.doubletick.io/whatsapp/message/template")
         
         # DoubleTick API payload format - matches curl request structure
+        # Include template placeholders: customer name and project name
         payload = {
           messages: [
             {
               content: {
                 language: "en",
+                templateData: {
+                  body: {
+                    placeholders: [
+                      lead.name || "",
+                      lead.project&.name || ""
+                    ]
+                  }
+                },
                 templateName: template_name
               },
-              to: phone_number,
-              from: "+918050771555"
+              from: "+918050771555",
+              to: phone_number
             }
           ]
         }.to_json
