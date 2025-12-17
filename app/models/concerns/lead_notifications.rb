@@ -28,9 +28,9 @@ module LeadNotifications
 
     def send_whatsapp_on_create
       # Agami Realty DoubleTick integration - check by company UUID
-      if self.company.uuid == 'df33c145-78db-4ddd-be80-04c000c7d5be'
-        Resque.enqueue(::ProcessAgamiDoubletickWhatsappTrigger, self.id, 'on_create')
-      end
+      # if self.company.uuid == 'df33c145-78db-4ddd-be80-04c000c7d5be'
+      #   Resque.enqueue(::ProcessAgamiDoubletickWhatsappTrigger, self.id, 'on_create')
+      # end
       
       if self.company.whatsapp_integration&.active
         if self.company.whatsapp_integration.user_name == "golden abode"
