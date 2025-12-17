@@ -11,7 +11,7 @@ class ProcessAgamiDoubletickWhatsappTrigger
     'Attempted to Contact' => 'attemptedtocontact_v2',
     'Following' => 'following_up',
     'Site Visit Scheduled' => 'site_visit_scheduled',
-    'Site Vist Done' => 'site_visit_completed',  # Note: Status name as provided by client
+    'Site Visit Done' => 'site_visit_completed',  # Note: Status name as provided by client
     'Site Visit Followup' => 'site_visit_followup',
     'Hot' => 'hot_lead',
     'Booked' => 'booked',
@@ -76,7 +76,7 @@ class ProcessAgamiDoubletickWhatsappTrigger
     end
 
     # Otherwise, map current status to template
-    status_name = lead.status&.name
+    status_name = lead.status&.name.to_s.strip
     return nil unless status_name.present?
 
     STATUS_TEMPLATE_MAPPING[status_name]
