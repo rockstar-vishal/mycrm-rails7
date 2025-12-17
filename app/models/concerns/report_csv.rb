@@ -292,9 +292,11 @@ module ReportCsv
       end
 
       def project_report_to_csv(options={}, user)
-        data = all.group("project_id, status_id").select("COUNT(*), project_id, status_id, json_agg(leads.id) as lead_ids")
-        uniq_projects = all.map{|k| k[:project_id]}.uniq
-        uniq_statuses = all.map{|k| k[:status_id]}.uniq
+        # Use the filtered relation (all refers to the relation this method is called on)
+        filtered_leads = all
+        data = filtered_leads.group("project_id, status_id").select("COUNT(*), project_id, status_id, json_agg(leads.id) as lead_ids")
+        uniq_projects = filtered_leads.distinct.pluck(:project_id).compact
+        uniq_statuses = filtered_leads.distinct.pluck(:status_id).compact
         projects = user.company.projects.where(:id=>uniq_projects)
         statuses = user.company.statuses.where(:id=>uniq_statuses)
         @data = data.as_json(except: [:id])
