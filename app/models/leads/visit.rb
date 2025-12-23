@@ -3,9 +3,47 @@ class Leads::Visit < ActiveRecord::Base
   belongs_to :lead
   belongs_to :user, optional: true
   belongs_to :source, optional: true
-  has_many :visits_projects, class_name: 'Leads::VisitsProject'
+  has_many :visits_projects, class_name: 'Leads::VisitsProject', dependent: :destroy
   has_many :projects, class_name: '::Project', through: :visits_projects
   validates :date, presence: true
+
+  # Store project_ids temporarily for processing after save
+  attr_accessor :project_ids_pending
+
+  def project_ids=(ids)
+    return if ids.blank?
+    # Filter out empty strings and convert to integers
+    valid_ids = ids.reject(&:blank?).map(&:to_i).uniq
+    Rails.logger.info "Visit#project_ids= called with #{ids.inspect}, filtered to #{valid_ids.inspect}"
+
+    if persisted?
+      # If visit is already saved, update associations directly
+      update_project_associations(valid_ids)
+    else
+      # If visit is new, store for later processing
+      self.project_ids_pending = valid_ids
+    end
+  end
+
+  after_save :process_pending_project_ids
+
+  private
+
+  def update_project_associations(project_ids)
+    self.visits_projects.where.not(project_id: project_ids).destroy_all
+    existing_project_ids = self.visits_projects.pluck(:project_id)
+    (project_ids - existing_project_ids).each do |project_id|
+      self.visits_projects.create!(project_id: project_id)
+    end
+  end
+
+  def process_pending_project_ids
+    if project_ids_pending.present?
+      Rails.logger.info "Processing pending project_ids: #{project_ids_pending.inspect}"
+      update_project_associations(project_ids_pending)
+      self.project_ids_pending = nil
+    end
+  end
   enum status_id:{
     "Hot": 1,
     "Warm": 2,
