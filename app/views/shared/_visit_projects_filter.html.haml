@@ -1,0 +1,5 @@
+.row
+  .col-md-12
+    .form-group
+      %label Select Visit Projects
+      = select_tag :visit_project_ids, options_from_collection_for_select(current_user.company.projects.sorted, :id, :name, params[:visit_project_ids]),multiple: true, prompt: "Select Visit Project", class: "tomselect-checkbox"

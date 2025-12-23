@@ -680,7 +680,7 @@ class ReportsController < ApplicationController
   end
 
   def visit_params
-    params.permit(:is_advanced_search, :start_date, :end_date, :selected, :customer_type, :visit_counts, :visit_counts_num, :manager_id, :project_ids=>[], :source_ids=>[], :presale_user_id=>[], :manager_ids=>[])
+    params.permit(:is_advanced_search, :start_date, :end_date, :selected, :customer_type, :visit_counts, :visit_counts_num, :manager_id, :project_ids=>[], :visit_project_ids=>[], :source_ids=>[], :presale_user_id=>[], :manager_ids=>[])
   end
 
   def site_visit_tracker_params

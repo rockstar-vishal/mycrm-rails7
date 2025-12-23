@@ -8,6 +8,11 @@ module SqlShared
     
     relation = Lead.joins(:visits)
 
+    # Join visits_projects if filtering by visit projects
+    if search_params["visit_project_ids"].present?
+      relation = relation.joins(visits: :visits_projects)
+    end
+
     # Conditionally apply the user or source join
     if is_source_wise
       relation = relation.joins(:source)
@@ -55,6 +60,10 @@ module SqlShared
     
     if search_params["project_ids"].present?
       relation = relation.where(project_id: search_params["project_ids"])
+    end
+
+    if search_params["visit_project_ids"].present?
+      relation = relation.where(leads_visits_projects: { project_id: search_params["visit_project_ids"] })
     end
     
     if search_params["source_ids"].present?

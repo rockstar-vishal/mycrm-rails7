@@ -39,6 +39,9 @@
                         %h5.mt-0 Search By Project Details
                       .col-md-6
                         = render partial: 'shared/projects_filter'
+                      - if current_user.company.is_sv_project_enabled
+                        .col-md-6
+                          = render partial: 'shared/visit_projects_filter'
                       - if current_user.check_source_presence
                         .col-md-6
                           = render partial: 'shared/sources_filter'
