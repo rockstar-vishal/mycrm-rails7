@@ -27,6 +27,12 @@ class Leads::Visit < ActiveRecord::Base
 
   after_save :process_pending_project_ids
 
+  def file_url
+    if self.site_visit_form.present?
+      self.site_visit_form.url
+    end
+  end
+
   private
 
   def update_project_associations(project_ids)
@@ -86,12 +92,6 @@ class Leads::Visit < ActiveRecord::Base
           end
         end
       end
-    end
-  end
-
-  def file_url
-    if self.site_visit_form.present?
-      self.site_visit_form.url
     end
   end
 
