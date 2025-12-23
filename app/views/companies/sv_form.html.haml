@@ -141,6 +141,12 @@
               <option value="otp">OTP</option>
             </select>
           `;
+        } else if (index === 3) {
+          inputField = `
+            <select name="values[]" id="input-value-${index}" class="">
+              <option value="project_name">Project</option>
+            </select>
+          `;
         } else {
           inputField = `<input type="text" name="values[]" id="input-value-${index}" />`;
         }

@@ -9,10 +9,11 @@ module OtpGenerator
     def generate_sms_otp(data)
       if self.otps.for_phones.send("#{data[:event_type]}").unused.gen_in_last_20_minutes.where(validatable_data: data[:validatable_data]).present?
         otp = self.otps.for_phones.unused.gen_in_last_20_minutes.last
+        otp.update(resource_id: data[:resource_id], resource_type: data[:resource_type]) if data[:resource_id].present?
         otp.send_sms_alert
         return true, otp
       else
-        otp = self.otps.for_phones.build(validatable_data: data[:validatable_data], event_type: data[:event_type])
+        otp = self.otps.for_phones.build(validatable_data: data[:validatable_data], event_type: data[:event_type], resource_id: data[:resource_id], resource_type: data[:resource_type])
         if otp.save
           return true, otp
         else

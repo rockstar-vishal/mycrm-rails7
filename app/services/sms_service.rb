@@ -9,7 +9,7 @@ class SmsService
       begin
         sv=otp.company.sv_form
         url = sv.otp_url
-        variables = prepare_variables(sv.other_data, otp.validatable_data, otp.code)
+        variables = prepare_variables(sv.other_data, otp.validatable_data, otp.code, otp.resource)
         rendered_template = render_template(url, variables)
         if sv.request_method=="post"
           if rendered_template.include?("headers")
@@ -117,12 +117,14 @@ class SmsService
       end
     end
 
-    def prepare_variables(other_data, mobile_number, otp_code)
+    def prepare_variables(other_data, mobile_number, otp_code, otp_resource)
       variables = other_data.map do |key, value|
         if value == 'mobile'
           [key, mobile_number]
         elsif value == 'otp'
           [key, otp_code]
+        elsif value == "project_name"
+          [key, (otp_resource.name rescue "")]
         else
           [key, value]
         end

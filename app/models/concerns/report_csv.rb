@@ -292,29 +292,42 @@ module ReportCsv
       end
 
       def project_report_to_csv(options={}, user)
-        data = all.group("project_id, status_id").select("COUNT(*), project_id, status_id, json_agg(leads.id) as lead_ids")
-        uniq_projects = all.map{|k| k[:project_id]}.uniq
-        uniq_statuses = all.map{|k| k[:status_id]}.uniq
+        # Use the filtered relation (all refers to the relation this method is called on)
+        # Match the exact logic from the controller's projects method
+        filtered_leads = all
+        data = filtered_leads.group("project_id, status_id").select("COUNT(*), project_id, status_id, json_agg(id) as lead_ids")
+        
+        # Match controller logic: extract unique values from the relation (same as @leads.map in controller)
+        # Note: This loads leads into memory but matches the controller behavior exactly
+        uniq_projects = filtered_leads.map{|k| k[:project_id]}.uniq.compact
+        uniq_statuses = filtered_leads.map{|k| k[:status_id]}.uniq.compact
+        
         projects = user.company.projects.where(:id=>uniq_projects)
         statuses = user.company.statuses.where(:id=>uniq_statuses)
         @data = data.as_json(except: [:id])
+        
         CSV.generate do |csv|
           exportable_fields = ['Project', 'Total']
           statuses.each do |status|
             exportable_fields << status.name
           end
           csv << exportable_fields
+          
           projects.each do |project|
             this_project_data = @data.select{|k| k["project_id"] == project.id}
+            # Match view logic: only include projects that have data (if this_project_data.present?)
             if this_project_data.present?
-              project_total = (this_project_data.map{|k| k["lead_ids"].count}.sum rescue nil)
+              # Match view logic: sum of lead_ids.count for each project (line 79 in view)
+              project_total = (this_project_data.map{|k| k["lead_ids"].count}.sum rescue 0)
               this_exportable_fields = [project.name, project_total]
+              
               statuses.each do |status|
                 this_status_data = this_project_data.detect{|k| k["status_id"] == status.id}
-                this_exportable_fields << (this_status_data["lead_ids"].count rescue nil)
+                # Match view logic: count of lead_ids for each status (line 90 in view)
+                this_exportable_fields << (this_status_data["lead_ids"].count rescue 0)
               end
+              csv << this_exportable_fields
             end
-            csv << this_exportable_fields
           end
         end
       end

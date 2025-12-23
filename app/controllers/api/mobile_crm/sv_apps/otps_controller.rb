@@ -18,7 +18,7 @@ module Api
             mobile_num= otp_params[:mobile]
           end
           is_otp_generated, otp = @company.generate_sms_otp(
-              {validatable_data: mobile_num, event_type: 'sv_visit'}
+              {validatable_data: mobile_num, event_type: 'sv_visit', resource_type: "Project", resource_id: (params[:params][:project_id][:id] rescue nil)}
             )
           if is_otp_generated
             render json: {success: true, message: 'otp created'}, status: 201
